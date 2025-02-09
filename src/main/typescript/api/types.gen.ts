@@ -8,9 +8,20 @@ export type TimedEvent = {
     end?: Date;
 };
 
+export type DayEvent = {
+    name: string;
+    description: string;
+    image: string;
+    day: Date;
+};
+
 export type GetTimedEventResponse = (TimedEvent);
 
 export type GetTimedEventError = unknown;
+
+export type GetDayEventResponse = (DayEvent);
+
+export type GetDayEventError = unknown;
 
 export type $OpenApiTs = {
     '/timed-event': {
@@ -20,6 +31,16 @@ export type $OpenApiTs = {
                  * OK
                  */
                 '200': TimedEvent;
+            };
+        };
+    };
+    '/day-event': {
+        get: {
+            res: {
+                /**
+                 * OK
+                 */
+                '200': DayEvent;
             };
         };
     };
