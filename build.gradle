@@ -2,6 +2,7 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.4.2'
 	id 'io.spring.dependency-management' version '1.1.7'
+	id 'com.github.node-gradle.node' version '7.1.0'
 }
 
 group = 'de.dreja'
@@ -22,8 +23,89 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+	// Open API
+	// https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-starter-webmvc-ui
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.4'
+}
+
+node {
+	version = '20.18.0'
+	npmInstallCommand = 'install'
+	distBaseUrl = 'https://nodejs.org/dist'
+	download = true
+}
+
+tasks.register('cleanJavascript', Copy) {
+	group = 'build'
+	from layout.buildDirectory.dir('typescript/compiled')
+	include '**/*.js'
+	exclude '**/*.test.js'
+	into layout.buildDirectory.dir('resources/main/static/js')
+	filter {
+		String line -> line.startsWith('export {};') ? null : line
+	}
+	filter {
+		String line -> line.startsWith('import') ? null : line
+	}
+	filter {
+		String line -> line.startsWith('export var') ? line.replaceFirst('export var', 'var') : line
+	}
+	filter {
+		String line -> line.startsWith('export const') ? line.replaceFirst('export const', 'const') : line
+	}
+	filter {
+		String line -> line.startsWith('export function') ? line.replaceFirst('export function', 'function') : line
+	}
+	filter {
+		String line -> line.startsWith('export interface') ? line.replaceFirst('export interface', 'interface') : line
+	}
+	filter {
+		String line -> line.startsWith('export class') ? line.replaceFirst('export class', 'class') : line
+	}
+}
+
+tasks.register('compileTypescript', NpxTask) {
+	group = 'build'
+	dependsOn tasks.named('npmInstall')
+	command = 'tsc'
+	inputs.files(project.fileTree('src/main/typescript').filter {
+		File f -> f.name.endsWith('.ts')
+	})
+	outputs.dir(layout.buildDirectory.dir('typescript/compiled'))
+	finalizedBy(tasks.named('cleanJavascript'))
+}
+
+tasks.register('testTypescript', NpxTask) {
+	group = 'verification'
+	dependsOn tasks.named('npmInstall')
+	command = 'jest'
+	inputs.files(project.fileTree('src/main/typescript').filter {
+		File f -> f.name.endsWith('.ts')
+	})
+	outputs.dir(layout.buildDirectory.dir('test-results/typescript'))
+}
+
+
+tasks.named('compileJava') {
+	dependsOn(tasks.named('compileTypescript'), tasks.named('cleanJavascript'))
+}
+tasks.named('processResources') {
+	dependsOn(tasks.named('compileTypescript'), tasks.named('cleanJavascript'))
+}
+tasks.named('test') {
+	dependsOn(tasks.named('testTypescript'))
+}
+
+javadoc {
+	options.encoding = 'UTF-8'
 }
 
 tasks.named('test') {
 	useJUnitPlatform()
 }
+
+tasks.named('bootJar') {
+	archiveFileName = 'intro-generator.jar'
+}
+

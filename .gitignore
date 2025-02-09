@@ -35,3 +35,12 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### Local Run ###
+**/application.properties
+
+### NodeJS ###
+node_modules
+package-lock.json
+openapi-ts-error*.log
+/src/main/typescript/api/index.ts
