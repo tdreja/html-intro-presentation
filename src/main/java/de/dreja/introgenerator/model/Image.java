@@ -2,9 +2,14 @@ package de.dreja.introgenerator.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.annotation.Nonnull;
-import org.springframework.util.MimeType;
 
 public record Image(@Nonnull
+                    @JsonProperty(required = true)
+                    Base64Id id,
+                    @Nonnull
+                    @JsonProperty(required = true)
+                    Base64Id version,
+                    @Nonnull
                     @JsonProperty(required = true)
                     String title,
                     @Nonnull
@@ -12,11 +17,12 @@ public record Image(@Nonnull
                     byte[] content,
                     @Nonnull
                     @JsonProperty(required = true)
-                    String mimeType) {
+                    String mimeType) implements Entity {
 
-    public Image(@Nonnull String title,
+    public Image(@Nonnull Base64Id id,
+                 @Nonnull String title,
                  @Nonnull byte[] content,
-                 @Nonnull MimeType mimeType) {
-        this(title, content, mimeType.toString());
+                 @Nonnull String mimeType) {
+        this(id, Base64Id.ONE, title, content, mimeType);
     }
 }
