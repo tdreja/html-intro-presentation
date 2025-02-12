@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Website</title>
+    <!--<link rel="stylesheet" href="./style.css">-->
+    <!--<link rel="icon" href="./favicon.ico" type="image/x-icon">-->
+</head>
+<body>
+<main>
+    <form action="presentation/create-new" method="post">
+        <input type="datetime-local" name="startTime" id="startTime"/>
+        <label for="startTime">Start Time</label>
+        <input type="range" name="countdownDuration" id="countdownDuration" min="1" max="60"/>
+        <label for="countdownDuration">Countdown Duration</label>
+        <input type="text" name="title" id="title"/>
+        <label for="title">Title</label>
+        <input type="text" name="subTitle" id="subTitle"/>
+        <label for="subTitle">SubTitle</label>
+        <input type="submit"/>
+    </form>
+</main>
+</body>
+</html>
