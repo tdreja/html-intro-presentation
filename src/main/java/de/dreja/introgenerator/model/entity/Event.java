@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import de.dreja.introgenerator.model.form.EventForm;
 import de.dreja.introgenerator.model.json.Base64Deserializer;
 import de.dreja.introgenerator.model.json.Base64Serializer;
 import jakarta.annotation.Nonnull;
@@ -35,20 +36,21 @@ public record Event(@JsonProperty(required = true)
                     @JsonProperty
                     Image image) implements Entity {
 
-    public Event(int id) {
-        this(id, 1, LocalDateTime.now(), "", null, null);
+    public Event(int id, @Nonnull EventForm eventForm) {
+        this(id, 1, eventForm.getStartTime(), eventForm.getTitle(), eventForm.getSubTitle(), null);
     }
 
     @Nonnull
-    public Event withUpdatedData(@Nonnull LocalDateTime startTime,
-                                 @Nonnull String title,
-                                 @Nullable String subTitle) {
-        if (this.startTime.equals(startTime)
-                && this.title.equals(title)
-                && Objects.equals(this.subTitle, subTitle)) {
+    public Event withUpdatedData(@Nonnull EventForm eventForm) {
+        final LocalDateTime newStartTime = eventForm.getStartTime();
+        final String newTitle = eventForm.getTitle();
+        final String newSubTitle = eventForm.getSubTitle();
+        if(newStartTime.equals(startTime)
+                && newTitle.equals(title)
+                && Objects.equals(newSubTitle, subTitle)) {
             return this;
         }
-        return new Event(id, version+1, startTime, title, subTitle, image);
+        return new Event(id, version+1, newStartTime, newTitle, newSubTitle, image);
     }
 
     @Nonnull

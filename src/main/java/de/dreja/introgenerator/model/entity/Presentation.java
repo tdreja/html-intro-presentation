@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import de.dreja.introgenerator.model.form.PresentationForm;
 import de.dreja.introgenerator.model.json.Base64Deserializer;
 import de.dreja.introgenerator.model.json.Base64Serializer;
 import jakarta.annotation.Nonnull;
@@ -14,6 +15,9 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
 
+/**
+ * Internal data model of the presentation
+ */
 public record Presentation(@JsonProperty(required = true)
                            @JsonSerialize(using = Base64Serializer.class)
                            @JsonDeserialize(using = Base64Deserializer.class)
@@ -40,26 +44,27 @@ public record Presentation(@JsonProperty(required = true)
                            @JsonIgnore
                            NavigableMap<Integer, Event> events) implements Entity {
 
-    private static final Duration INTIAL_DURATION = Duration.ofMinutes(15);
 
-
-    public Presentation(int id) {
+    public Presentation(int id, @Nonnull PresentationForm form) {
         this(id, 1,
-                LocalDateTime.now(), INTIAL_DURATION, "", null, Collections.emptyNavigableMap());
+                form.getCountdownEnd(), form.getCountdownRuntime(), form.getTitle(), form.getSubTitle(),
+                Collections.emptyNavigableMap());
     }
 
     @Nonnull
-    public Presentation withUpdatedData(@Nonnull LocalDateTime countdownEnd,
-                                        @Nonnull Duration countdownRuntime,
-                                        @Nonnull String title,
-                                        @Nullable String subTitle) {
-        if (this.countdownEnd.equals(countdownEnd)
-                && this.countdownRuntime.equals(countdownRuntime)
-                && this.title.equals(title)
-                && Objects.equals(this.subTitle, subTitle)) {
+    public Presentation withUpdatedData(@Nonnull PresentationForm form) {
+        final String newTitle = form.getTitle();
+        final String newSubTitle = form.getSubTitle();
+        final LocalDateTime newCountdownEnd = form.getCountdownEnd();
+        final Duration newCountdownRuntime = form.getCountdownRuntime();
+        if (newTitle.equals(title)
+                && Objects.equals(newSubTitle, subTitle)
+                && newCountdownEnd.equals(countdownEnd)
+                && newCountdownRuntime.equals(countdownRuntime)) {
             return this;
         }
-        return new Presentation(id, version+1, countdownEnd, countdownRuntime, title, subTitle, events);
+        return new Presentation(id, version + 1,
+                newCountdownEnd, newCountdownRuntime, newTitle, newSubTitle, events);
     }
 
     @Nonnull
@@ -73,7 +78,7 @@ public record Presentation(@JsonProperty(required = true)
         }
         final TreeMap<Integer, Event> newMap = new TreeMap<>(events);
         newMap.put(event.id(), event);
-        return new Presentation(id, version+1, countdownEnd, countdownRuntime, title, subTitle,
+        return new Presentation(id, version + 1, countdownEnd, countdownRuntime, title, subTitle,
                 Collections.unmodifiableNavigableMap(newMap));
     }
 
