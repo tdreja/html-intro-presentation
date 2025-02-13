@@ -16,8 +16,8 @@ public record PresentationForm(@Nullable String title,
                                @Nullable String subTitle,
                                @Nullable String countdownEndDate,
                                @Nullable String countdownEndTime,
-                               @Nullable String countdownRuntime,
-                               @Nullable String countdownRuntimeUnit) {
+                               @Nullable String countdownRuntimeMinutes,
+                               @Nullable String countdownRuntimeSeconds) {
 
     @Nonnull
     public String getTitle() {
@@ -39,19 +39,14 @@ public record PresentationForm(@Nullable String title,
 
     @Nonnull
     public Duration getCountdownRuntime() {
-        long runtime;
-        try {
-            runtime = countdownRuntime == null ? 15 : Long.parseLong(countdownRuntime);
-        } catch (NumberFormatException ex) {
-            runtime = 15;
+        long minutes = 0;
+        if(countdownRuntimeMinutes != null && !countdownRuntimeMinutes.isBlank()) {
+            minutes = Long.parseLong(countdownRuntimeMinutes);
         }
-        if(countdownRuntimeUnit == null) {
-            return Duration.ofMinutes(runtime);
+        long seconds = 0;
+        if(countdownRuntimeSeconds != null && !countdownRuntimeSeconds.isBlank()) {
+            seconds = Long.parseLong(countdownRuntimeSeconds);
         }
-        final ChronoUnit chronoUnit = Stream.of(ChronoUnit.values())
-                .filter(unit -> unit.name().equalsIgnoreCase(countdownRuntimeUnit))
-                .findFirst()
-                .orElse(ChronoUnit.MINUTES);
-        return Duration.of(runtime, chronoUnit);
+        return Duration.ofMinutes(minutes).plusSeconds(seconds);
     }
 }

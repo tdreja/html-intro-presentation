@@ -45,7 +45,7 @@ public final class LocalDateTimeParser {
 
         @Nonnull
         TEMPORAL parse(@Nullable String input) {
-            if (input == null) {
+            if (input == null || input.isBlank()) {
                 return fallback();
             }
             return formats.stream()

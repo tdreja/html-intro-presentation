@@ -1,6 +1,7 @@
 package de.dreja.introgenerator.interfaces;
 
-import de.dreja.introgenerator.model.form.CreatePresentation;
+import de.dreja.introgenerator.model.entity.Presentation;
+import de.dreja.introgenerator.model.form.PresentationForm;
 import de.dreja.introgenerator.service.EntityCache;
 import jakarta.annotation.Nonnull;
 import org.slf4j.Logger;
@@ -34,8 +35,10 @@ public class HttpEditor {
     }
 
     @PostMapping("/presentation/create-new")
-    public ResponseEntity<String> createPresentation(@ModelAttribute @Nonnull CreatePresentation create) {
-        LOG.info("Create {}", create);
+    public ResponseEntity<String> createPresentation(@ModelAttribute @Nonnull PresentationForm presentationForm) {
+        LOG.info("Create {}", presentationForm);
+        final Presentation presentation = entityCache.newPresentation(presentationForm);
+        LOG.info("Presentation created {}", presentation);
         return ResponseEntity.ok("Create");
     }
 
