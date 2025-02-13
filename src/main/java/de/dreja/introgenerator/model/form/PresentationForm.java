@@ -23,7 +23,7 @@ public record PresentationForm(@Nullable String title,
     public static PresentationForm emptyForm() {
         final LocalDate now = LocalDate.now();
         return new PresentationForm(null, null,
-                now.format(DateTimeFormatter.ISO_DATE), null, "15", null);
+                now.format(DateTimeFormatter.ISO_DATE), null, "15", "0");
     }
 
     @Nonnull

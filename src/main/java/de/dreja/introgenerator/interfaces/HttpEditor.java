@@ -4,6 +4,7 @@ import de.dreja.introgenerator.model.entity.Presentation;
 import de.dreja.introgenerator.model.form.PresentationForm;
 import de.dreja.introgenerator.service.EntityCache;
 import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +39,7 @@ public class HttpEditor {
     @GetMapping({"/", "/presentation"})
     public ModelAndView getStartPage(Map<String, Object> model) {
         model.put("presentation", PresentationForm.emptyForm());
+        model.put("presentationUrl", "/presentation/0");
         addBootstrap(model);
         return new ModelAndView("index", model);
     }
@@ -49,18 +51,26 @@ public class HttpEditor {
                 .map(Presentation::toForm)
                 .orElseGet(PresentationForm::emptyForm);
         model.put("presentation", form);
+        model.put("presentationUrl", "/presentation/" + presentationId);
         addBootstrap(model);
         return new ModelAndView("index", model);
     }
 
-    @PostMapping("/presentation/create-new")
-    public ResponseEntity<Boolean> createPresentation(@ModelAttribute @Nonnull PresentationForm presentationForm) {
-        LOG.info("Create {}", presentationForm);
-        final Presentation presentation = entityCache.newPresentation(presentationForm);
-        LOG.info("Presentation created {}", presentation);
-        return seePresentation(presentation.id(), true);
+    @PostMapping("presentation/{presentationId}")
+    public ResponseEntity<Void> createPresentation(@PathVariable(value = "presentationId", required = false)
+                                                   @Nullable
+                                                   Integer presentationId,
+                                                   @ModelAttribute
+                                                   @Nonnull
+                                                   PresentationForm presentationForm) {
+        if (presentationId == null || presentationId == 0) {
+            LOG.info("Create {}", presentationForm);
+            return seePresentation(entityCache.newPresentation(presentationForm).id());
+        } else {
+            LOG.info("Update {}: {}", presentationId, presentationForm);
+            return seePresentation(entityCache.update(presentationId, presentationForm).id());
+        }
     }
-
 
     private void addBootstrap(@Nonnull Map<String, Object> model) {
         try {
@@ -71,10 +81,10 @@ public class HttpEditor {
     }
 
     @Nonnull
-    private <V> ResponseEntity<V> seePresentation(int presentationId, @Nonnull V body) {
+    private ResponseEntity<Void> seePresentation(int presentationId) {
         return ResponseEntity.status(HttpStatus.SEE_OTHER)
-                .header("Location", "/presentation/"+presentationId)
-                .body(body);
+                .header("Location", "/presentation/" + presentationId)
+                .build();
     }
 
 }

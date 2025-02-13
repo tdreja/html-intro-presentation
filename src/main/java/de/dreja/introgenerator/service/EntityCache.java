@@ -16,8 +16,6 @@ import java.util.function.UnaryOperator;
 @Service
 public class EntityCache {
 
-    private static final Duration INITIAL_DURATION = Duration.ofMinutes(15);
-
     private int lastId;
     private final Map<Integer, VersionHistory<Presentation>> presentations;
     private final Map<Integer, VersionHistory<Event>> events;
@@ -96,6 +94,9 @@ public class EntityCache {
                                            @Nonnull Map<Integer, VersionHistory<E>> allEntities) {
         synchronized (this) {
             lastId++;
+            if(lastId < 0) {
+                lastId = 1;
+            }
             final E entity = constructor.apply(lastId);
             allEntities.put(entity.id(), new VersionHistory<>(entity));
             return entity;
