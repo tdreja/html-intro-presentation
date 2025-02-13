@@ -12,7 +12,10 @@ import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 /**
@@ -65,6 +68,19 @@ public record Presentation(@JsonProperty(required = true)
         }
         return new Presentation(id, version + 1,
                 newCountdownEnd, newCountdownRuntime, newTitle, newSubTitle, events);
+    }
+
+    @Nonnull
+    public PresentationForm toForm() {
+        final LocalDate date = countdownEnd.toLocalDate();
+        final LocalTime time = countdownEnd.toLocalTime();
+        final long runtimeMinutes = countdownRuntime.toMinutes();
+        final long runtimeSeconds = countdownRuntime.minusMinutes(runtimeMinutes).toSeconds();
+        return new PresentationForm(title, subTitle,
+                date.format(DateTimeFormatter.ISO_DATE),
+                time.format(DateTimeFormatter.ISO_TIME),
+                String.valueOf(runtimeMinutes),
+                String.valueOf(runtimeSeconds));
     }
 
     @Nonnull

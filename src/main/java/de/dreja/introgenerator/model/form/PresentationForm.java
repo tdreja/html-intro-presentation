@@ -8,8 +8,6 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
-import java.util.stream.Stream;
 
 /**
  * User-Input received from the HTML Form
@@ -49,11 +47,11 @@ public record PresentationForm(@Nullable String title,
     @Nonnull
     public Duration getCountdownRuntime() {
         long minutes = 0;
-        if(countdownRuntimeMinutes != null && !countdownRuntimeMinutes.isBlank()) {
+        if (countdownRuntimeMinutes != null && !countdownRuntimeMinutes.isBlank()) {
             minutes = Long.parseLong(countdownRuntimeMinutes);
         }
         long seconds = 0;
-        if(countdownRuntimeSeconds != null && !countdownRuntimeSeconds.isBlank()) {
+        if (countdownRuntimeSeconds != null && !countdownRuntimeSeconds.isBlank()) {
             seconds = Long.parseLong(countdownRuntimeSeconds);
         }
         return Duration.ofMinutes(minutes).plusSeconds(seconds);

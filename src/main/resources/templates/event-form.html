@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<!--suppress HtmlFormInputWithoutLabel -->
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Website</title>
+    <link th:if="${bootstrapCss == null}" rel="stylesheet" href="../static/bootstrap.css">
+    <style th:utext="${bootstrapCss}"></style>
+    <!--<link rel="stylesheet" href="./style.css">-->
+    <!--<link rel="icon" href="./favicon.ico" type="image/x-icon">-->
+</head>
+<body>
+
+<div th:fragment="event-form (event,url)">
+    <form action="event/update" method="post" th:action="${url}">
+        <div class="mb-3">
+            <label class="form-label" for="title">Title</label>
+            <input class="form-control" type="text" name="title" id="title" th:value="${event.title}"/>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label" for="subTitle">SubTitle</label>
+            <input class="form-control" type="text" name="subTitle" id="subTitle" th:value="${event.subTitle}"/>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label" for="startDate">Start Date</label>
+            <input class="form-control" type="date" name="startDate" id="startDate" th:value="${event.startDate}"/>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label" for="startTime">Start Time</label>
+            <input class="form-control" type="time" name="startTime" id="startTime" th:value="${event.startTime}"/>
+        </div>
+
+        <input type="submit"/>
+    </form>
+</div>
+</body>
+</html>

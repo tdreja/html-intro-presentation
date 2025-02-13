@@ -9,10 +9,7 @@ import jakarta.annotation.Nonnull;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Random;
+import java.util.*;
 import java.util.function.IntFunction;
 import java.util.function.UnaryOperator;
 
@@ -34,6 +31,14 @@ public class EntityCache {
     @Nonnull
     public Presentation newPresentation(final @Nonnull PresentationForm presentationForm) {
         return createNew(id -> new Presentation(id, presentationForm), this.presentations);
+    }
+
+    @Nonnull
+    public Optional<Presentation> findPresentation(final int id) {
+        synchronized (this) {
+            return Optional.ofNullable(this.presentations.get(id))
+                    .map(VersionHistory::current);
+        }
     }
 
     @Nonnull
