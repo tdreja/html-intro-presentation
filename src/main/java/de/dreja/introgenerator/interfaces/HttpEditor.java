@@ -30,7 +30,7 @@ public class HttpEditor {
 
     @GetMapping({"/", "/presentation"})
     public ModelAndView getStartPage(Map<String, Object> model) {
-        model.put("now", "Hello!");
+        model.put("presentation", PresentationForm.emptyForm());
         return new ModelAndView("index", model);
     }
 

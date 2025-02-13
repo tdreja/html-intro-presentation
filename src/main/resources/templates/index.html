@@ -11,39 +11,7 @@
 </head>
 <body>
 <main>
-    <form action="presentation/create-new" method="post">
-        <div class="mb-3">
-            <label class="form-label" for="title">Title</label>
-            <input class="form-control" type="text" name="title" id="title"/>
-        </div>
-
-        <div class="mb-3">
-            <label class="form-label" for="subTitle">SubTitle</label>
-            <input class="form-control" type="text" name="subTitle" id="subTitle"/>
-        </div>
-
-        <div class="mb-3">
-            <label class="form-label" for="countdownEndDate">Start Date</label>
-            <input class="form-control" type="date" name="countdownEndDate" id="countdownEndDate"/>
-        </div>
-
-        <div class="mb-3">
-            <label class="form-label" for="countdownEndTime">Start Time</label>
-            <input class="form-control" type="time" name="countdownEndTime" id="countdownEndTime"/>
-        </div>
-
-        <div class="mb-3">
-            <label class="form-label" for="countdownRuntimeMinutes">Countdown Duration</label>
-            <div class="input-group">
-                <input class="form-control" type="number" name="countdownRuntimeMinutes" id="countdownRuntimeMinutes" min="1" max="60"/>
-                <span class="input-group-text" id="minutes">Minutes</span>
-                <input class="form-control" type="number" name="countdownRuntimeSeconds" id="countdownRuntimeSeconds" min="1" max="60"/>
-                <label class="input-group-text" id="seconds" for="countdownRuntimeSeconds">Seconds</label>
-            </div>
-        </div>
-
-        <input type="submit"/>
-    </form>
+    <div th:replace="~{presentation-form::presentation-form (presentation=${presentation},url=${'presentation/create-new'})}"></div>
 </main>
 </body>
 </html>

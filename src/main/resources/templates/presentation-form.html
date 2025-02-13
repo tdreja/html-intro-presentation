@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<!--suppress HtmlFormInputWithoutLabel -->
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Website</title>
+    <link rel="stylesheet" href="bootstrap.css">
+    <!--<link rel="stylesheet" href="./style.css">-->
+    <!--<link rel="icon" href="./favicon.ico" type="image/x-icon">-->
+</head>
+<body>
+
+<div th:fragment="presentation-form (presentation,url)">
+    <form action="presentation/create-new" method="post" th:action="${url}">
+        <div class="mb-3">
+            <label class="form-label" for="title">Title</label>
+            <input class="form-control" type="text" name="title" id="title" th:value="${presentation.title}"/>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label" for="subTitle">SubTitle</label>
+            <input class="form-control" type="text" name="subTitle" id="subTitle" th:value="${presentation.subTitle}"/>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label" for="countdownEndDate">Start Date</label>
+            <input class="form-control" type="date" name="countdownEndDate" id="countdownEndDate" th:value="${presentation.countdownEndDate}"/>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label" for="countdownEndTime">Start Time</label>
+            <input class="form-control" type="time" name="countdownEndTime" id="countdownEndTime" th:value="${presentation.countdownEndTime}"/>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label" for="countdownRuntimeMinutes">Countdown Duration</label>
+            <div class="input-group">
+                <input class="form-control" type="number" name="countdownRuntimeMinutes" id="countdownRuntimeMinutes" min="1" max="60" th:value="${presentation.countdownRuntimeMinutes}"/>
+                <span class="input-group-text" id="minutes">Minutes</span>
+                <input class="form-control" type="number" name="countdownRuntimeSeconds" id="countdownRuntimeSeconds" min="1" max="60" th:value="${presentation.countdownRuntimeSeconds}"/>
+                <label class="input-group-text" id="seconds" for="countdownRuntimeSeconds">Seconds</label>
+            </div>
+        </div>
+        <input type="submit"/>
+    </form>
+</div>
+</body>
+</html>

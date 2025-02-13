@@ -5,7 +5,9 @@ import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.stream.Stream;
 
@@ -18,6 +20,13 @@ public record PresentationForm(@Nullable String title,
                                @Nullable String countdownEndTime,
                                @Nullable String countdownRuntimeMinutes,
                                @Nullable String countdownRuntimeSeconds) {
+
+    @Nonnull
+    public static PresentationForm emptyForm() {
+        final LocalDate now = LocalDate.now();
+        return new PresentationForm(null, null,
+                now.format(DateTimeFormatter.ISO_DATE), null, "15", null);
+    }
 
     @Nonnull
     public String getTitle() {
