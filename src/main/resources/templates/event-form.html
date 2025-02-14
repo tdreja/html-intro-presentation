@@ -14,6 +14,8 @@
 
 <div th:fragment="event-form (event,url)">
     <form action="event/update" method="post" th:action="${url}">
+        <input type="hidden" id="id" name="id" th:value="${event.id}">
+
         <div class="mb-3">
             <label class="form-label" for="title">Title</label>
             <input class="form-control" type="text" name="title" id="title" th:value="${event.title}"/>

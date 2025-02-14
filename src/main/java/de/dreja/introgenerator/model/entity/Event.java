@@ -9,6 +9,7 @@ import de.dreja.introgenerator.model.mapper.Base64Serializer;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public record Event(@JsonProperty(required = true)
@@ -28,5 +29,10 @@ public record Event(@JsonProperty(required = true)
                     @Nullable
                     @JsonProperty
                     Image image) implements Entity {
+
+    @Nonnull
+    public static Event newToday() {
+        return new Event(0, LocalDate.now().atStartOfDay(), "", null, null);
+    }
 
 }

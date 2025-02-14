@@ -6,6 +6,7 @@ import org.mapstruct.Named;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -39,12 +40,12 @@ public class IdService {
     }
 
     @Nonnull
-    public OptionalInt fromBase64(@Nullable String base64) {
+    public Optional<Integer> fromBase64(@Nullable String base64) {
         final int id = base64Deserializer.fromBase64(base64);
         if(id <= 0) {
-            return OptionalInt.empty();
+            return Optional.empty();
         }
-        return OptionalInt.of(id);
+        return Optional.of(id);
     }
 
     @Nonnull
