@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<!--suppress HtmlFormInputWithoutLabel -->
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Presentation</title>
+    <link th:if="${bootstrapCss == null}" rel="stylesheet" href="../static/bootstrap.css">
+    <style th:utext="${bootstrapCss}"></style>
+
+    <script type="text/javascript" th:if="${presentationJson != null}" th:utext="${presentationJson}"></script>
+    <script type="text/javascript" th:if="${mainJs != null}" th:utext="${mainJs}"></script>
+</head>
+<body>
+<main>
+
+</main>
+</body>
+</html>

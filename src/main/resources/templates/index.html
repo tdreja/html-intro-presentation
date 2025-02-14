@@ -10,6 +10,9 @@
 </head>
 <body>
 <main>
+    <a th:if="${presentation != null && presentation.id != null}" href="../final-presentation/" th:href="${'../final-presentation/'+presentation.id}">
+        Final Presentation
+    </a>
     <div th:replace="~{presentation-form::presentation-form (presentation=${presentation},url=${presentationUrl})}"></div>
 
     <div th:if="${events != null}">

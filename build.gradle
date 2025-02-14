@@ -43,7 +43,7 @@ node {
 
 tasks.register('cleanJavascript', Copy) {
 	group = 'build'
-	from layout.buildDirectory.dir('typescript/compiled')
+	from layout.buildDirectory.dir('typescript/compiled/src/main/typescript')
 	include '**/*.js'
 	exclude '**/*.test.js'
 	into layout.buildDirectory.dir('resources/main/static/js')

@@ -1,5 +1,7 @@
 package de.dreja.introgenerator.interfaces;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import de.dreja.introgenerator.model.entity.Event;
 import de.dreja.introgenerator.model.entity.Presentation;
 import de.dreja.introgenerator.model.form.EventForm;
@@ -9,6 +11,7 @@ import de.dreja.introgenerator.model.mapper.IdService;
 import de.dreja.introgenerator.model.mapper.PresentationMapper;
 import de.dreja.introgenerator.service.EntityCache;
 import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,24 +41,29 @@ public class HttpEditor {
     private final PresentationMapper presentationMapper;
     private final EventMapper eventMapper;
     private final IdService idService;
-    private final Resource bootStrapResource = new ClassPathResource("static/bootstrap.css");
+    private final ObjectMapper objectMapper;
+
+    private final Resource bootStrapCss = new ClassPathResource("static/bootstrap.css");
+    private final Resource mainJs = new ClassPathResource("static/js/main.js");
 
     @Autowired
     HttpEditor(EntityCache entityCache,
                PresentationMapper presentationMapper,
                EventMapper eventMapper,
-               IdService idService) {
+               IdService idService,
+               ObjectMapper objectMapper) {
         this.entityCache = entityCache;
         this.presentationMapper = presentationMapper;
         this.eventMapper = eventMapper;
         this.idService = idService;
+        this.objectMapper = objectMapper;
     }
 
     @GetMapping({"/"})
     public ModelAndView getStartPage(Map<String, Object> model) {
         model.put("presentation", presentationMapper.toForm(Presentation.newToday()));
         model.put("presentationUrl", "/presentation");
-        addBootstrap(model);
+        model.put("bootstrapCss", getResource(bootStrapCss));
         return new ModelAndView("index", model);
     }
 
@@ -64,16 +72,8 @@ public class HttpEditor {
                                         @Nonnull
                                         String presentationId,
                                         Map<String, Object> model) {
-        final var found = idService.fromBase64(presentationId)
-                .map(entityCache::getPresentation);
-        if (found.isEmpty()) {
-            throw HttpClientErrorException.create(HttpStatus.NOT_FOUND,
-                    "Presentation with ID %s not found!".formatted(presentationId),
-                    null, null, null);
-        }
-
         // Main Presentation form
-        final Presentation presentation = found.get();
+        final Presentation presentation = findPresentation(presentationId);
         model.put("presentation", presentationMapper.toForm(presentation));
         model.put("presentationUrl", "/presentation");
 
@@ -84,8 +84,7 @@ public class HttpEditor {
         model.put("events", events);
         model.put("eventsUrl", "/events-for/" + idService.toBase64(presentation.id()));
         model.put("emptyEvent", eventMapper.toForm(Event.newToday()));
-
-        addBootstrap(model);
+        model.put("bootstrapCss", getResource(bootStrapCss));
         return new ModelAndView("index", model);
     }
 
@@ -105,26 +104,20 @@ public class HttpEditor {
                                                     @ModelAttribute
                                                     @Nonnull
                                                     EventForm eventForm) {
-        final var foundPresentation = idService.fromBase64(presentationId)
-                .map(entityCache::getPresentation);
-        if(foundPresentation.isEmpty()) {
-            throw HttpClientErrorException.create(HttpStatus.NOT_FOUND,
-                    "Presentation with ID %s not found!".formatted(presentationId),
-                    null, null, null);
-        }
-        final Presentation presentation = foundPresentation.get();
+        final Presentation presentation = findPresentation(presentationId);
         final Event event = eventMapper.toEvent(eventForm);
         entityCache.storeEvent(event);
         entityCache.addToPresentation(presentation, event);
         return seePresentation(presentation.id());
     }
 
-    private void addBootstrap(@Nonnull Map<String, Object> model) {
-        try {
-            model.put("bootstrapCss", bootStrapResource.getContentAsString(StandardCharsets.UTF_8));
-        } catch (IOException e) {
-            model.put("bootstrapCss", "");
-        }
+    @Nonnull
+    private Presentation findPresentation(@Nullable String presentationId) throws HttpClientErrorException {
+        return idService.fromBase64(presentationId)
+                .map(entityCache::getPresentation)
+                .orElseThrow(() -> HttpClientErrorException.create(HttpStatus.NOT_FOUND,
+                        "Presentation with ID %s not found!".formatted(presentationId),
+                        null, null, null));
     }
 
     @Nonnull
@@ -132,6 +125,44 @@ public class HttpEditor {
         return ResponseEntity.status(HttpStatus.SEE_OTHER)
                 .header("Location", "/presentation/" + idService.toBase64(presentationId))
                 .build();
+    }
+
+    @Nonnull
+    private static String getResource(@Nonnull Resource resource) {
+        try {
+            return resource.getContentAsString(StandardCharsets.UTF_8);
+        } catch (IOException ex) {
+            LOG.atWarn().setCause(ex).log("Could not read resource '{}'", resource.getFilename());
+            return "";
+        }
+    }
+
+    @Nonnull
+    private String generateJson(Object object) {
+        try {
+            return objectMapper.writeValueAsString(object);
+        } catch (JsonProcessingException ex) {
+            LOG.atWarn().setCause(ex).log("Could not generate JSON from {}", object);
+            return "";
+        }
+    }
+
+    @GetMapping("/final-presentation/{presentationId}")
+    public ModelAndView getFinalPresentation(@PathVariable("presentationId")
+                                             @Nonnull
+                                             String presentationId,
+                                             Map<String, Object> model) {
+        final Presentation presentation = findPresentation(presentationId);
+        final String json = generateJson(presentation);
+
+        model.put("bootstrapCss", getResource(bootStrapCss));
+        model.put("mainJs", getResource(mainJs));
+        model.put("presentationJson",
+                """
+                const presentationJson = '%s';
+                const eventsJson = '%s';
+                """.formatted(json, "[]"));
+        return new ModelAndView("presentation", model);
     }
 
 }
