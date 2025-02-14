@@ -5,12 +5,13 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import de.dreja.introgenerator.model.json.Base64Deserializer;
-import de.dreja.introgenerator.model.json.Base64Serializer;
+import de.dreja.introgenerator.model.mapper.Base64Deserializer;
+import de.dreja.introgenerator.model.mapper.Base64Serializer;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
@@ -38,5 +39,10 @@ public record Presentation(@JsonProperty(required = true)
     @JsonProperty(value = "countdownInSeconds", required = true)
     long countdownInSeconds() {
         return countdownRuntime.toSeconds();
+    }
+
+    @Nonnull
+    public static Presentation newToday() {
+        return new Presentation(0, LocalDate.now().atStartOfDay(), Duration.ofMinutes(15), "", null);
     }
 }

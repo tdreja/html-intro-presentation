@@ -7,9 +7,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 import static de.dreja.introgenerator.model.form.FormUtils.trimOrEmpty;
 import static de.dreja.introgenerator.model.form.FormUtils.trimOrNull;
@@ -73,13 +70,6 @@ public record PresentationForm(@Nullable
         this.countdownEndTime = trimOrNull(countdownEndTime);
         this.countdownRuntimeMinutes = trimOrNull(countdownRuntimeMinutes);
         this.countdownRuntimeSeconds = trimOrNull(countdownRuntimeSeconds);
-    }
-
-    @Nonnull
-    public static PresentationForm emptyForm() {
-        final LocalDate now = LocalDate.now();
-        return new PresentationForm(null, null, null,
-                now.format(DateTimeFormatter.ISO_DATE), null, "15", null);
     }
 
     @Nonnull

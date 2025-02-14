@@ -1,4 +1,4 @@
-package de.dreja.introgenerator.model.json;
+package de.dreja.introgenerator.model.mapper;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;

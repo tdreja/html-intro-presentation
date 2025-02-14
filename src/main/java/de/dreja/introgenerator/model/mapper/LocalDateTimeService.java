@@ -1,4 +1,4 @@
-package de.dreja.introgenerator.model.json;
+package de.dreja.introgenerator.model.mapper;
 
 import de.dreja.introgenerator.model.form.HasTimeStamp;
 import jakarta.annotation.Nonnull;

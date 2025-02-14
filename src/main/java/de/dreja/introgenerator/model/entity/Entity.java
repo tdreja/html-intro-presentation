@@ -3,8 +3,8 @@ package de.dreja.introgenerator.model.entity;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import de.dreja.introgenerator.model.json.Base64Deserializer;
-import de.dreja.introgenerator.model.json.Base64Serializer;
+import de.dreja.introgenerator.model.mapper.Base64Deserializer;
+import de.dreja.introgenerator.model.mapper.Base64Serializer;
 
 public interface Entity {
 

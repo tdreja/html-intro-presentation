@@ -2,9 +2,6 @@ package de.dreja.introgenerator.model.mapper;
 
 import de.dreja.introgenerator.model.entity.Event;
 import de.dreja.introgenerator.model.form.EventForm;
-import de.dreja.introgenerator.model.json.Base64Deserializer;
-import de.dreja.introgenerator.model.json.Base64Serializer;
-import de.dreja.introgenerator.model.json.LocalDateTimeService;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -12,12 +9,12 @@ import org.mapstruct.MappingConstants;
 
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING,
         uses = {
-                Base64Deserializer.class, Base64Serializer.class, LocalDateTimeService.class
+            Base64Serializer.class, LocalDateTimeService.class, IdService.class,
         },
         injectionStrategy = InjectionStrategy.CONSTRUCTOR)
 public interface EventMapper {
 
-    @Mapping(target = "id", source = "id", qualifiedByName = "fromBase64")
+    @Mapping(target = "id", source = "id", qualifiedByName = "parseBase64OrCreateNew")
     @Mapping(target = "image", ignore = true)
     @Mapping(target = "startTime", source = ".", qualifiedByName = "parseTimeStamp")
     Event toEvent(EventForm form);
