@@ -1,6 +1,5 @@
 package de.dreja.introgenerator.interfaces;
 
-import de.dreja.introgenerator.model.entity.Presentation;
 import de.dreja.introgenerator.model.form.PresentationForm;
 import de.dreja.introgenerator.service.EntityCache;
 import jakarta.annotation.Nonnull;
@@ -47,10 +46,7 @@ public class HttpEditor {
     @GetMapping("/presentation/{presentationId}")
     public ModelAndView getPresentation(@PathVariable("presentationId") int presentationId,
                                         Map<String, Object> model) {
-        final PresentationForm form = entityCache.findPresentation(presentationId)
-                .map(Presentation::toForm)
-                .orElseGet(PresentationForm::emptyForm);
-        model.put("presentation", form);
+        model.put("presentation", PresentationForm.emptyForm());
         model.put("presentationUrl", "/presentation/" + presentationId);
         addBootstrap(model);
         return new ModelAndView("index", model);
@@ -63,13 +59,7 @@ public class HttpEditor {
                                                    @ModelAttribute
                                                    @Nonnull
                                                    PresentationForm presentationForm) {
-        if (presentationId == null || presentationId == 0) {
-            LOG.info("Create {}", presentationForm);
-            return seePresentation(entityCache.newPresentation(presentationForm).id());
-        } else {
-            LOG.info("Update {}: {}", presentationId, presentationForm);
-            return seePresentation(entityCache.update(presentationId, presentationForm).id());
-        }
+        return ResponseEntity.ok().build();
     }
 
     private void addBootstrap(@Nonnull Map<String, Object> model) {

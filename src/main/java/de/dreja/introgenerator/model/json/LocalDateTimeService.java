@@ -1,7 +1,10 @@
 package de.dreja.introgenerator.model.json;
 
+import de.dreja.introgenerator.model.form.HasTimeStamp;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
+import org.mapstruct.Named;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -11,28 +14,60 @@ import java.time.temporal.Temporal;
 import java.util.List;
 import java.util.Objects;
 
-public final class LocalDateTimeParser {
+@Service
+public class LocalDateTimeService {
 
-    private static final LocalDateParser DATE_PARSER = new LocalDateParser();
-    private static final LocalTimeParser TIME_PARSER = new LocalTimeParser();
+    private final LocalDateParser dateParser = new LocalDateParser();
+    private final LocalTimeParser timeParser = new LocalTimeParser();
 
-    private LocalDateTimeParser() {
+    private LocalDateTimeService() {
         // Ignore
     }
 
     @Nonnull
-    public static LocalDateTime parseDateTime(@Nullable String date, @Nullable String time) {
+    @Named("parseTimeStamp")
+    public LocalDateTime parseTimeStamp(@Nullable HasTimeStamp timeStamp) {
+        if (timeStamp == null) {
+            return LocalDate.now().atStartOfDay();
+        }
+        return parseDateTime(timeStamp.getDate(), timeStamp.getTime());
+    }
+
+    @Nonnull
+    @Named("parseDateTime")
+    public LocalDateTime parseDateTime(@Nullable String date, @Nullable String time) {
         return LocalDateTime.of(parseDate(date), parseTime(time));
     }
 
     @Nonnull
-    public static LocalDate parseDate(@Nullable String date) {
-        return DATE_PARSER.parse(date);
+    @Named("parseDate")
+    public LocalDate parseDate(@Nullable String date) {
+        return dateParser.parse(date);
     }
 
     @Nonnull
-    public static LocalTime parseTime(@Nullable String time) {
-        return TIME_PARSER.parse(time);
+    @Named("parseTime")
+    public LocalTime parseTime(@Nullable String time) {
+        return timeParser.parse(time);
+    }
+
+    @Nonnull
+    @Named("formatDate")
+    public String formatDate(@Nullable LocalDateTime dateTime) {
+        return dateTime == null ? "" : dateTime.format(DateTimeFormatter.ISO_LOCAL_DATE);
+    }
+
+    @Nullable
+    @Named("formatTime")
+    public String formatTime(@Nullable LocalDateTime dateTime) {
+        if(dateTime == null) {
+            return null;
+        }
+        // Skip 00:00!
+        if(dateTime.toLocalDate().atStartOfDay().isEqual(dateTime)) {
+            return null;
+        }
+        return dateTime.format(DateTimeFormatter.ISO_LOCAL_TIME);
     }
 
     protected static abstract class Parser<TEMPORAL extends Temporal> {

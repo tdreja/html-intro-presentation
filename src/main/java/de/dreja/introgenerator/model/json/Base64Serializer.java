@@ -4,6 +4,8 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+import org.mapstruct.Named;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -25,12 +27,18 @@ public class Base64Serializer extends StdSerializer<Integer> {
         if (value == null) {
             gen.writeNull();
         } else {
-            gen.writeString(toBase64(value));
+            gen.writeString(toBase64Internal(value));
         }
     }
 
+    @Nullable
+    @Named("toBase64")
+    public String toBase64(@Nullable Integer value) {
+        return (value == null || value == 0) ? null : toBase64Internal(value);
+    }
+
     @Nonnull
-    public String toBase64(int value) {
+    private String toBase64Internal(int value) {
         final ByteBuffer buffer = ByteBuffer.allocate(Integer.BYTES);
         buffer.putInt(value);
         return encoder.encodeToString(buffer.array());
