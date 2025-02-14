@@ -9,11 +9,12 @@
     <style th:utext="${bootstrapCss}"></style>
 
     <script type="text/javascript" th:if="${presentationJson != null}" th:utext="${presentationJson}"></script>
+    <script type="text/javascript" th:if="${timeJs != null}" th:utext="${timeJs}"></script>
     <script type="text/javascript" th:if="${mainJs != null}" th:utext="${mainJs}"></script>
 </head>
 <body>
 <main>
-
+    <p id="countdown">Countdown</p>
 </main>
 </body>
 </html>

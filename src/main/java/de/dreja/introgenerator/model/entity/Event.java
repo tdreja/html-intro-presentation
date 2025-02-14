@@ -1,6 +1,7 @@
 package de.dreja.introgenerator.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -11,6 +12,7 @@ import jakarta.annotation.Nullable;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public record Event(@JsonProperty(required = true)
                     @JsonSerialize(using = Base64Serializer.class)
@@ -18,7 +20,7 @@ public record Event(@JsonProperty(required = true)
                     @JsonFormat(shape = JsonFormat.Shape.STRING)
                     int id,
                     @Nonnull
-                    @JsonProperty(required = true)
+                    @JsonIgnore
                     LocalDateTime startTime,
                     @Nonnull
                     @JsonProperty(required = true)
@@ -33,6 +35,12 @@ public record Event(@JsonProperty(required = true)
     @Nonnull
     public static Event newToday() {
         return new Event(0, LocalDate.now().atStartOfDay(), "", null, null);
+    }
+
+    @Nonnull
+    @JsonProperty(value = "startTime", required = true)
+    String getStartTime() {
+        return startTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
     }
 
 }

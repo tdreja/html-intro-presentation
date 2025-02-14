@@ -49,6 +49,7 @@ public class HttpEditor {
 
     private final Resource bootStrapCss = new ClassPathResource("static/bootstrap.css");
     private final Resource mainJs = new ClassPathResource("static/js/main.js");
+    private final Resource timeJs = new ClassPathResource("static/js/time.js");
 
     @Autowired
     HttpEditor(EntityCache entityCache,
@@ -164,6 +165,7 @@ public class HttpEditor {
 
         model.put("bootstrapCss", getResource(bootStrapCss));
         model.put("mainJs", getResource(mainJs));
+        model.put("timeJs", getResource(timeJs));
         model.put("presentationJson",
                 """
                 const presentationJson = '%s';

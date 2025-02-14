@@ -2,7 +2,7 @@
 
 export type Presentation = {
     id: number;
-    countdownEnd: Date;
+    countdownEnd: string;
     title: string;
     subTitle?: string;
     countdownInSeconds: number;
@@ -10,7 +10,7 @@ export type Presentation = {
 
 export type Event = {
     id: number;
-    startTime: Date;
+    startTime: string;
     title: string;
     subTitle?: string;
     image?: Image;

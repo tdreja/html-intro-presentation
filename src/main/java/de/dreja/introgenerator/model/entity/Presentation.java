@@ -13,6 +13,7 @@ import jakarta.annotation.Nullable;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 /**
  * Internal data model of the presentation
@@ -23,7 +24,7 @@ public record Presentation(@JsonProperty(required = true)
                            @JsonFormat(shape = JsonFormat.Shape.STRING)
                            int id,
                            @Nonnull
-                           @JsonProperty(required = true)
+                           @JsonIgnore
                            LocalDateTime countdownEnd,
                            @Nonnull
                            @JsonIgnore
@@ -39,6 +40,12 @@ public record Presentation(@JsonProperty(required = true)
     @JsonProperty(value = "countdownInSeconds", required = true)
     long countdownInSeconds() {
         return countdownRuntime.toSeconds();
+    }
+
+    @Nonnull
+    @JsonProperty(value = "countdownEnd", required = true)
+    String getCountdownEnd() {
+        return countdownEnd.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
     }
 
     @Nonnull
