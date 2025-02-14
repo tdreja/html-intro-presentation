@@ -7,19 +7,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
-import java.util.OptionalInt;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 public class IdService {
 
-    private final Base64Deserializer base64Deserializer;
-    private final Base64Serializer base64Serializer;
+    private final Base64IdDeserializer base64Deserializer;
+    private final Base64IdSerializer base64Serializer;
     private final AtomicInteger nextId;
 
     @Autowired
-    IdService(Base64Deserializer base64Deserializer, Base64Serializer base64Serializer) {
+    IdService(Base64IdDeserializer base64Deserializer, Base64IdSerializer base64Serializer) {
         this.base64Deserializer = base64Deserializer;
         this.base64Serializer = base64Serializer;
         nextId = new AtomicInteger(new Random().nextInt(100_000));

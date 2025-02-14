@@ -14,12 +14,12 @@ import java.nio.ByteBuffer;
 import java.util.Base64;
 
 @Component
-public class Base64Deserializer extends StdDeserializer<Integer> {
+public class Base64IdDeserializer extends StdDeserializer<Integer> {
 
-    private static final Logger LOG = LoggerFactory.getLogger(Base64Deserializer.class);
+    private static final Logger LOG = LoggerFactory.getLogger(Base64IdDeserializer.class);
     private final Base64.Decoder decoder;
 
-    public Base64Deserializer() {
+    public Base64IdDeserializer() {
         super(Integer.class);
         decoder = Base64.getUrlDecoder();
     }

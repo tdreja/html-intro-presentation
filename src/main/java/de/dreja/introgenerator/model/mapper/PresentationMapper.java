@@ -9,7 +9,7 @@ import org.mapstruct.MappingConstants;
 
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING,
         uses = {
-                Base64Serializer.class, IdService.class,
+                Base64IdSerializer.class, IdService.class,
                 LocalDateTimeService.class, DurationService.class,
                 EventMapper.class
         },

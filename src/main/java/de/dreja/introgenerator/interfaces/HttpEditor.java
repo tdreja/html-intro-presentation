@@ -10,7 +10,9 @@ import de.dreja.introgenerator.model.form.PresentationForm;
 import de.dreja.introgenerator.model.mapper.EventMapper;
 import de.dreja.introgenerator.model.mapper.IdService;
 import de.dreja.introgenerator.model.mapper.PresentationMapper;
+import de.dreja.introgenerator.model.mapper.Base64IdSerializer;
 import de.dreja.introgenerator.service.EntityCache;
+import de.dreja.introgenerator.service.ResourceService;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import org.slf4j.Logger;
@@ -28,16 +30,28 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.servlet.ModelAndView;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
 @Controller
 public class HttpEditor {
 
-    private static final TypeReference<Presentation> PRESENTATION_REF = new TypeReference<>() {};
-    private static final TypeReference<List<Event>> EVENTS_REF = new TypeReference<>() {};
+    private static final TypeReference<Presentation> PRESENTATION_REF = new TypeReference<>() {
+    };
+    private static final TypeReference<List<Event>> EVENTS_REF = new TypeReference<>() {
+    };
+
+    private static final String INPUT_JSON =
+            """
+            const presentationJson = '%s';
+            const eventsJson = '%s';
+            """;
+    private static final String BACKGROUND_IMAGE =
+            """
+            body {
+                background-image: url("data:%s;base64,%s");
+            }
+            """;
 
     private static final Logger LOG = LoggerFactory.getLogger(HttpEditor.class);
 
@@ -46,8 +60,10 @@ public class HttpEditor {
     private final EventMapper eventMapper;
     private final IdService idService;
     private final ObjectMapper objectMapper;
+    private final ResourceService resourceService;
 
     private final Resource bootStrapCss = new ClassPathResource("static/bootstrap.css");
+    private final Resource background = new ClassPathResource("static/background.jpg");
     private final Resource mainJs = new ClassPathResource("static/js/main.js");
     private final Resource timeJs = new ClassPathResource("static/js/time.js");
 
@@ -56,19 +72,25 @@ public class HttpEditor {
                PresentationMapper presentationMapper,
                EventMapper eventMapper,
                IdService idService,
-               ObjectMapper objectMapper) {
+               ObjectMapper objectMapper,
+               Base64IdSerializer base64Serializer, ResourceService resourceService) {
         this.entityCache = entityCache;
         this.presentationMapper = presentationMapper;
         this.eventMapper = eventMapper;
         this.idService = idService;
         this.objectMapper = objectMapper;
+        this.resourceService = resourceService;
     }
 
     @GetMapping({"/"})
     public ModelAndView getStartPage(Map<String, Object> model) {
         model.put("presentation", presentationMapper.toForm(Presentation.newToday()));
         model.put("presentationUrl", "/presentation");
-        model.put("bootstrapCss", getResource(bootStrapCss));
+
+        model.put("bootstrapCss", resourceService.loadUtf8("bootstrapCss" ,bootStrapCss));
+        model.put("backgroundImage",
+                BACKGROUND_IMAGE.formatted("image/jpeg",
+                        resourceService.loadBase64("backgroundImage", background)));
         return new ModelAndView("index", model);
     }
 
@@ -89,7 +111,11 @@ public class HttpEditor {
         model.put("events", events);
         model.put("eventsUrl", "/events-for/" + idService.toBase64(presentation.id()));
         model.put("emptyEvent", eventMapper.toForm(Event.newToday()));
-        model.put("bootstrapCss", getResource(bootStrapCss));
+
+        model.put("bootstrapCss", resourceService.loadUtf8("bootstrapCss", bootStrapCss));
+        model.put("backgroundImage",
+                BACKGROUND_IMAGE.formatted("image/jpeg",
+                        resourceService.loadBase64("backgroundImage", background)));
         return new ModelAndView("index", model);
     }
 
@@ -133,16 +159,6 @@ public class HttpEditor {
     }
 
     @Nonnull
-    private static String getResource(@Nonnull Resource resource) {
-        try {
-            return resource.getContentAsString(StandardCharsets.UTF_8);
-        } catch (IOException ex) {
-            LOG.atWarn().setCause(ex).log("Could not read resource '{}'", resource.getFilename());
-            return "";
-        }
-    }
-
-    @Nonnull
     private <T> String generateJson(@Nonnull T object, @Nonnull TypeReference<T> typeReference) {
         try {
             return objectMapper.writerFor(typeReference).writeValueAsString(object);
@@ -162,15 +178,14 @@ public class HttpEditor {
 
         final List<Event> events = entityCache.getEventsOf(presentation).toList();
         final String eventsJson = generateJson(events, EVENTS_REF);
+        model.put("mainJs", resourceService.loadUtf8("mainJs", mainJs));
+        model.put("timeJs", resourceService.loadUtf8("timeJs", timeJs));
+        model.put("presentationJson", INPUT_JSON.formatted(presentationJson, eventsJson));
 
-        model.put("bootstrapCss", getResource(bootStrapCss));
-        model.put("mainJs", getResource(mainJs));
-        model.put("timeJs", getResource(timeJs));
-        model.put("presentationJson",
-                """
-                const presentationJson = '%s';
-                const eventsJson = '%s';
-                """.formatted(presentationJson, eventsJson));
+        model.put("bootstrapCss", resourceService.loadUtf8("bootstrapCss", bootStrapCss));
+        model.put("backgroundImage",
+                BACKGROUND_IMAGE.formatted("image/jpeg",
+                        resourceService.loadBase64("backgroundImage", background)));
         return new ModelAndView("presentation", model);
     }
 

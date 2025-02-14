@@ -5,8 +5,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import de.dreja.introgenerator.model.mapper.Base64Deserializer;
-import de.dreja.introgenerator.model.mapper.Base64Serializer;
+import de.dreja.introgenerator.model.mapper.Base64IdDeserializer;
+import de.dreja.introgenerator.model.mapper.Base64IdSerializer;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 
@@ -19,8 +19,8 @@ import java.time.format.DateTimeFormatter;
  * Internal data model of the presentation
  */
 public record Presentation(@JsonProperty(required = true)
-                           @JsonSerialize(using = Base64Serializer.class)
-                           @JsonDeserialize(using = Base64Deserializer.class)
+                           @JsonSerialize(using = Base64IdSerializer.class)
+                           @JsonDeserialize(using = Base64IdDeserializer.class)
                            @JsonFormat(shape = JsonFormat.Shape.STRING)
                            int id,
                            @Nonnull

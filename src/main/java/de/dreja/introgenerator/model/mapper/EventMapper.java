@@ -9,7 +9,7 @@ import org.mapstruct.MappingConstants;
 
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING,
         uses = {
-            Base64Serializer.class, LocalDateTimeService.class, IdService.class,
+            Base64IdSerializer.class, LocalDateTimeService.class, IdService.class,
         },
         injectionStrategy = InjectionStrategy.CONSTRUCTOR)
 public interface EventMapper {

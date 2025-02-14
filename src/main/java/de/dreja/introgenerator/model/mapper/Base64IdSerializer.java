@@ -13,11 +13,11 @@ import java.nio.ByteBuffer;
 import java.util.Base64;
 
 @Component
-public class Base64Serializer extends StdSerializer<Integer> {
+public class Base64IdSerializer extends StdSerializer<Integer> {
 
     private final Base64.Encoder encoder;
 
-    public Base64Serializer() {
+    public Base64IdSerializer() {
         super(Integer.class);
         encoder = Base64.getUrlEncoder().withoutPadding();
     }
