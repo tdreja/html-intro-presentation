@@ -1,6 +1,7 @@
 package de.dreja.introgenerator.interfaces;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.dreja.introgenerator.model.entity.Event;
 import de.dreja.introgenerator.model.entity.Presentation;
@@ -34,6 +35,9 @@ import java.util.Map;
 
 @Controller
 public class HttpEditor {
+
+    private static final TypeReference<Presentation> PRESENTATION_REF = new TypeReference<>() {};
+    private static final TypeReference<List<Event>> EVENTS_REF = new TypeReference<>() {};
 
     private static final Logger LOG = LoggerFactory.getLogger(HttpEditor.class);
 
@@ -138,9 +142,9 @@ public class HttpEditor {
     }
 
     @Nonnull
-    private String generateJson(Object object) {
+    private <T> String generateJson(@Nonnull T object, @Nonnull TypeReference<T> typeReference) {
         try {
-            return objectMapper.writeValueAsString(object);
+            return objectMapper.writerFor(typeReference).writeValueAsString(object);
         } catch (JsonProcessingException ex) {
             LOG.atWarn().setCause(ex).log("Could not generate JSON from {}", object);
             return "";
@@ -153,7 +157,10 @@ public class HttpEditor {
                                              String presentationId,
                                              Map<String, Object> model) {
         final Presentation presentation = findPresentation(presentationId);
-        final String json = generateJson(presentation);
+        final String presentationJson = generateJson(presentation, PRESENTATION_REF);
+
+        final List<Event> events = entityCache.getEventsOf(presentation).toList();
+        final String eventsJson = generateJson(events, EVENTS_REF);
 
         model.put("bootstrapCss", getResource(bootStrapCss));
         model.put("mainJs", getResource(mainJs));
@@ -161,7 +168,7 @@ public class HttpEditor {
                 """
                 const presentationJson = '%s';
                 const eventsJson = '%s';
-                """.formatted(json, "[]"));
+                """.formatted(presentationJson, eventsJson));
         return new ModelAndView("presentation", model);
     }
 
