@@ -1,0 +1,19 @@
+body {
+    background: url("../static/wood-full-hd.jpg");
+}
+
+main {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+section {
+    margin: auto;
+}
+
+.test-image {
+    background: url("../static/cycle.jpg");
+}
