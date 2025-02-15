@@ -10,10 +10,88 @@ main {
     justify-content: center;
 }
 
-section {
+/* region Variante 1 */
+.variante-1 {
+    --bs-border-radius: 1rem;
+
     margin: auto;
+    font-size: 1.6rem;
+
+    h5 {
+        font-size: 2.5rem;
+    }
+
+    h6 {
+        font-size: 1.8rem;
+    }
+
+    .card-body {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .qr-code {
+        max-height: 30vh;
+        max-width: 30vh;
+        align-self: center;
+    }
 }
 
-.test-image {
-    background: url("../static/cycle.jpg");
+.card.variante-1 {
+    max-width: 80vw;
+    max-height: 80vh;
+    box-shadow: 0 0.125rem 0.25rem rgba(255, 255, 255, 0.075);
+    overflow: hidden;
 }
+/* endregion Variante 1 */
+
+/* region Variante 2 */
+.variante-2 {
+    margin: auto;
+    font-size: 1.6rem;
+
+    h5 {
+        font-size: 2.5rem;
+    }
+
+    h6 {
+        font-size: 1.8rem;
+    }
+
+    .card-img-top {
+        overflow: hidden;
+        max-height: 50vh;
+    }
+}
+
+.card.variante-2 {
+    max-width: 90vw;
+}
+/* endregion Variante 2 */
+
+/* region Variante 3 */
+.variante-3 {
+    margin: auto;
+    font-size: 1.6rem;
+
+    h5 {
+        font-size: 2.5rem;
+    }
+
+    h6 {
+        font-size: 1.8rem;
+    }
+
+    .card-img-top {
+        overflow: hidden;
+        max-height: 50vh;
+    }
+}
+
+.card.variante-3 {
+    max-width: 90vw;
+    max-height: 90vh;
+    overflow: hidden;
+}
+/* endregion Variante 3 */
