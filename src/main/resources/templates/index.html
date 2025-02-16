@@ -6,7 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Website</title>
     <link th:if="${bootstrapCss == null}" rel="stylesheet" href="../static/bootstrap.css">
+    <link th:if="${appCss == null}" rel="stylesheet" href="../static/app.css">
+    <link th:if="${backgroundImage == null}" rel="stylesheet" href="../static/background.css">
     <style th:utext="${bootstrapCss}"></style>
+    <style th:utext="${appCss}"></style>
     <style th:utext="${backgroundImage}"></style>
 </head>
 <body>
