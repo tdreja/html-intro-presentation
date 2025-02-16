@@ -6,38 +6,69 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Website</title>
     <link th:if="${bootstrapCss == null}" rel="stylesheet" href="../static/bootstrap.css">
+    <link th:if="${appCss == null}" rel="stylesheet" href="../static/app.css">
+    <link th:if="${backgroundImage == null}" rel="stylesheet" href="../static/background.css">
     <style th:utext="${bootstrapCss}"></style>
-    <!--<link rel="stylesheet" href="./style.css">-->
-    <!--<link rel="icon" href="./favicon.ico" type="image/x-icon">-->
+    <style th:utext="${appCss}"></style>
+    <style th:utext="${backgroundImage}"></style>
 </head>
 <body>
 
-<div th:fragment="event-form (event,url)">
-    <form action="event/update" method="post" th:action="${url}">
-        <input type="hidden" id="id" name="id" th:value="${event.id}">
+<main>
+    <div class="card" th:fragment="event-form (event,url)">
+        <div class="row g-0">
+            <section class="col-md-3 preview rounded-start">
 
-        <div class="mb-3">
-            <label class="form-label" for="title">Title</label>
-            <input class="form-control" type="text" name="title" id="title" th:value="${event.title}"/>
+                <article class="card border-light-subtle text-bg-dark variante-1">
+                    <div class="row g-0">
+                        <div class="col-md-8">
+                            <img src="../static/cycle.jpg" class="img-fluid rounded-start" alt="...">
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card-body">
+                                <h5 class="card-title">Gottesdienst mit Mittagessen</h5>
+                                <h6 class="card-text">Sonntag, 23.02.2025 - 10:30 Uhr</h6>
+                                <p class="card-text">Unser monatlicher Gottesdienst mit Mittagessen.</p>
+                                <img class="qr-code" src="../static/frame.png" alt="QR">
+                            </div>
+                        </div>
+                    </div>
+                </article>
+
+            </section>
+            <section class="col-md-9">
+                <form action="event/update" method="post" th:action="${url}">
+                    <article class="card-body">
+                        <input type="hidden" id="id" name="id" th:value="${event.id}">
+
+                        <div class="mb-3">
+                            <label class="form-label" for="title">Title</label>
+                            <input class="form-control" type="text" name="title" id="title" th:value="${event.title}"/>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label" for="subTitle">SubTitle</label>
+                            <input class="form-control" type="text" name="subTitle" id="subTitle" th:value="${event.subTitle}"/>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label" for="startDate">Start Date</label>
+                            <div class="input-group">
+                                <span class="input-group-text" id="date">Date</span>
+                                <input class="form-control" type="date" name="startDate" id="startDate"
+                                       th:value="${event.startDate}"/>
+                                <label class="input-group-text" id="time" for="startTime">Time</label>
+                                <input class="form-control" type="time" name="startTime" id="startTime"
+                                       th:value="${event.startTime}"/>
+                            </div>
+                        </div>
+
+                        <input type="submit"/>
+                    </article>
+                </form>
+            </section>
         </div>
-
-        <div class="mb-3">
-            <label class="form-label" for="subTitle">SubTitle</label>
-            <input class="form-control" type="text" name="subTitle" id="subTitle" th:value="${event.subTitle}"/>
-        </div>
-
-        <div class="mb-3">
-            <label class="form-label" for="startDate">Start Date</label>
-            <input class="form-control" type="date" name="startDate" id="startDate" th:value="${event.startDate}"/>
-        </div>
-
-        <div class="mb-3">
-            <label class="form-label" for="startTime">Start Time</label>
-            <input class="form-control" type="time" name="startTime" id="startTime" th:value="${event.startTime}"/>
-        </div>
-
-        <input type="submit"/>
-    </form>
-</div>
+    </div>
+</main>
 </body>
 </html>

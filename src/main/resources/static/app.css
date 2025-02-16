@@ -5,3 +5,33 @@ main {
     align-items: center;
     justify-content: center;
 }
+
+.preview {
+    padding: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+
+    .variante-1 {
+        margin: auto;
+        max-width: 20vw;
+        max-height: 20vw;
+
+        .event-image {
+            overflow: hidden;
+        }
+
+        .card-body {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .qr-code {
+            max-height: 10vh;
+            max-width: 10vh;
+            align-self: center;
+        }
+    }
+}
