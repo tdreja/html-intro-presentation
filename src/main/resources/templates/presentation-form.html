@@ -16,73 +16,49 @@
 
 <main>
     <div class="card" th:fragment="presentation-form (presentation,url)">
-        <div class="row g-0">
-            <section class="col-md-4 preview rounded-start">
-                <h4 class="text-bg-dark">Preview</h4>
+        <form action="presentation/create-new" method="post" th:action="${url}">
+            <div class="card-body">
+                <input type="hidden" id="id" name="id" th:value="${presentation.id}">
 
-                <!-- replace card with preview -->
-                <div class="card mb-3" style="max-width: 540px;">
-                    <div class="row g-0">
-                        <div class="col-md-4">
-                            <img src="..." class="img-fluid rounded-start" alt="...">
-                        </div>
-                        <div class="col-md-8">
-                            <div class="card-body">
-                                <h5 class="card-title">Card title</h5>
-                                <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
-                                <p class="card-text"><small class="text-body-secondary">Last updated 3 mins ago</small></p>
-                            </div>
-                        </div>
+                <div class="mb-3">
+                    <label class="form-label" for="title">Title</label>
+                    <input class="form-control" type="text" name="title" id="title" th:value="${presentation.title}"/>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label" for="subTitle">SubTitle</label>
+                    <input class="form-control" type="text" name="subTitle" id="subTitle"
+                           th:value="${presentation.subTitle}"/>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label" for="countdownEndDate">Start Date</label>
+                    <div class="input-group">
+                        <span class="input-group-text" id="date">Date</span>
+                        <input class="form-control" type="date" name="countdownEndDate" id="countdownEndDate"
+                               th:value="${presentation.countdownEndDate}"/>
+                        <label class="input-group-text" id="time" for="countdownEndTime">Time</label>
+                        <input class="form-control" type="time" name="countdownEndTime" id="countdownEndTime"
+                               th:value="${presentation.countdownEndTime}"/>
                     </div>
                 </div>
 
-            </section>
-            <section class="col-md-8">
-                <form action="presentation/create-new" method="post" th:action="${url}">
-                    <div class="card-body">
-                        <input type="hidden" id="id" name="id" th:value="${presentation.id}">
-
-                        <div class="mb-3">
-                            <label class="form-label" for="title">Title</label>
-                            <input class="form-control" type="text" name="title" id="title" th:value="${presentation.title}"/>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label" for="subTitle">SubTitle</label>
-                            <input class="form-control" type="text" name="subTitle" id="subTitle"
-                                   th:value="${presentation.subTitle}"/>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label" for="countdownEndDate">Start Date</label>
-                            <div class="input-group">
-                                <span class="input-group-text" id="date">Date</span>
-                                <input class="form-control" type="date" name="countdownEndDate" id="countdownEndDate"
-                                       th:value="${presentation.countdownEndDate}"/>
-                                <label class="input-group-text" id="time" for="countdownEndTime">Time</label>
-                                <input class="form-control" type="time" name="countdownEndTime" id="countdownEndTime"
-                                       th:value="${presentation.countdownEndTime}"/>
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label" for="countdownRuntimeMinutes">Countdown Duration</label>
-                            <div class="input-group">
-                                <input class="form-control" type="number" name="countdownRuntimeMinutes"
-                                       id="countdownRuntimeMinutes"
-                                       min="0" max="60" th:value="${presentation.countdownRuntimeMinutes}"/>
-                                <span class="input-group-text" id="minutes">Minutes</span>
-                                <input class="form-control" type="number" name="countdownRuntimeSeconds"
-                                       id="countdownRuntimeSeconds"
-                                       min="0" max="60" th:value="${presentation.countdownRuntimeSeconds}"/>
-                                <label class="input-group-text" id="seconds" for="countdownRuntimeSeconds">Seconds</label>
-                            </div>
-                        </div>
-                        <input class="btn btn-primary" type="submit"/>
+                <div class="mb-3">
+                    <label class="form-label" for="countdownRuntimeMinutes">Countdown Duration</label>
+                    <div class="input-group">
+                        <input class="form-control" type="number" name="countdownRuntimeMinutes"
+                               id="countdownRuntimeMinutes"
+                               min="0" max="60" th:value="${presentation.countdownRuntimeMinutes}"/>
+                        <span class="input-group-text" id="minutes">Minutes</span>
+                        <input class="form-control" type="number" name="countdownRuntimeSeconds"
+                               id="countdownRuntimeSeconds"
+                               min="0" max="60" th:value="${presentation.countdownRuntimeSeconds}"/>
+                        <label class="input-group-text" id="seconds" for="countdownRuntimeSeconds">Seconds</label>
                     </div>
-                </form>
-            </section>
-        </div>
+                </div>
+                <input class="btn btn-primary" type="submit"/>
+            </div>
+        </form>
     </div>
 </main>
 

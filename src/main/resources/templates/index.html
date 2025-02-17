@@ -13,7 +13,7 @@
     <style th:utext="${backgroundImage}"></style>
 </head>
 <body>
-<main>
+<main style="display: flex; flex-direction: column">
     <a th:if="${presentation != null && presentation.id != null}" href="../final-presentation/" th:href="${'../final-presentation/'+presentation.id}">
         Final Presentation
     </a>

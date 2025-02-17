@@ -63,7 +63,8 @@ public class HttpEditor {
     private final ResourceService resourceService;
 
     private final Resource bootStrapCss = new ClassPathResource("static/bootstrap.css");
-    private final Resource background = new ClassPathResource("static/background.jpg");
+    private final Resource appCss = new ClassPathResource("static/app.css");
+    private final Resource background = new ClassPathResource("static/wood-full-hd.jpg");
     private final Resource mainJs = new ClassPathResource("static/js/main.js");
     private final Resource timeJs = new ClassPathResource("static/js/time.js");
 
@@ -88,6 +89,7 @@ public class HttpEditor {
         model.put("presentationUrl", "/presentation");
 
         model.put("bootstrapCss", resourceService.loadUtf8("bootstrapCss" ,bootStrapCss));
+        model.put("appCss", resourceService.loadUtf8("appCss", appCss));
         model.put("backgroundImage",
                 BACKGROUND_IMAGE.formatted("image/jpeg",
                         resourceService.loadBase64("backgroundImage", background)));
@@ -113,6 +115,7 @@ public class HttpEditor {
         model.put("emptyEvent", eventMapper.toForm(Event.newToday()));
 
         model.put("bootstrapCss", resourceService.loadUtf8("bootstrapCss", bootStrapCss));
+        model.put("appCss", resourceService.loadUtf8("appCss", appCss));
         model.put("backgroundImage",
                 BACKGROUND_IMAGE.formatted("image/jpeg",
                         resourceService.loadBase64("backgroundImage", background)));
@@ -183,6 +186,7 @@ public class HttpEditor {
         model.put("presentationJson", INPUT_JSON.formatted(presentationJson, eventsJson));
 
         model.put("bootstrapCss", resourceService.loadUtf8("bootstrapCss", bootStrapCss));
+        model.put("appCss", resourceService.loadUtf8("appCss", appCss));
         model.put("backgroundImage",
                 BACKGROUND_IMAGE.formatted("image/jpeg",
                         resourceService.loadBase64("backgroundImage", background)));

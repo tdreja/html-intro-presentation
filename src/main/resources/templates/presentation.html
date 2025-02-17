@@ -6,8 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Presentation</title>
     <link th:if="${bootstrapCss == null}" rel="stylesheet" href="../static/bootstrap.css">
-    <link th:if="${bootstrapCss == null}" rel="stylesheet" href="../static/temp.css">
+    <link th:if="${appCss == null}" rel="stylesheet" href="../static/app.css">
+    <link th:if="${backgroundImage == null}" rel="stylesheet" href="../static/background.css">
     <style th:utext="${bootstrapCss}"></style>
+    <style th:utext="${appCss}"></style>
+    <style th:utext="${backgroundImage}"></style>
 
     <script type="text/javascript" th:if="${presentationJson != null}" th:utext="${presentationJson}"></script>
     <script type="text/javascript" th:if="${timeJs != null}" th:utext="${timeJs}"></script>
@@ -17,16 +20,16 @@
 <main>
 
     <!-- Variante 1 -->
-    <section class="card border-light-subtle text-bg-dark variante-1">
+    <section class="card border-light-subtle text-bg-dark event-presentation" th:fragment="event-presentation (event)">
         <div class="row g-0">
             <div class="col-md-8">
                 <img src="../static/cycle.jpg" class="img-fluid rounded-start" alt="...">
             </div>
             <div class="col-md-4">
                 <div class="card-body">
-                    <h5 class="card-title">Gottesdienst mit Mittagessen</h5>
-                    <h6 class="card-text">Sonntag, 23.02.2025 - 10:30 Uhr</h6>
-                    <p class="card-text">Unser monatlicher Gottesdienst mit Mittagessen.</p>
+                    <h5 class="card-title" th:text="${event.title}">Gottesdienst mit Mittagessen</h5>
+                    <h6 class="card-text" th:text="${event.getStartTimeFormatted(#locale)}">Sonntag, 23.02.2025 - 10:30 Uhr</h6>
+                    <p class="card-text" th:text="${event.subTitle}">Unser monatlicher Gottesdienst mit Mittagessen.</p>
                     <img class="qr-code" src="../static/frame.png" alt="QR">
                 </div>
             </div>
