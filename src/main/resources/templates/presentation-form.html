@@ -1,6 +1,8 @@
 <!DOCTYPE html>
-<!--suppress HtmlFormInputWithoutLabel -->
 <html lang="de">
+<!-- /* @thymesVar id="bootstrapCss" type="java.lang.String" */ -->
+<!-- /* @thymesVar id="appCss" type="java.lang.String" */ -->
+<!-- /* @thymesVar id="backgroundImage" type="java.lang.String" */ -->
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,20 +17,22 @@
 <body>
 
 <main>
-    <div class="card" th:fragment="presentation-form (presentation,url)">
-        <form action="presentation/create-new" method="post" th:action="${url}">
+    <!-- /* @thymesVar id="presentationForm" type="de.dreja.introgenerator.model.form.PresentationForm" */ -->
+    <div class="card" th:fragment="presentation-form (presentationForm, presentationFormUrl)">
+        <!-- /* @thymesVar id="presentationFormUrl" type="java.lang.String" */ -->
+        <form action="presentation/create-new" method="post" th:action="${presentationFormUrl}">
             <div class="card-body">
-                <input type="hidden" id="id" name="id" th:value="${presentation.id}">
+                <input type="hidden" id="id" name="id" th:value="${presentationForm.id}">
 
                 <div class="mb-3">
                     <label class="form-label" for="title">Title</label>
-                    <input class="form-control" type="text" name="title" id="title" th:value="${presentation.title}"/>
+                    <input class="form-control" type="text" name="title" id="title" th:value="${presentationForm.title}"/>
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label" for="subTitle">SubTitle</label>
                     <input class="form-control" type="text" name="subTitle" id="subTitle"
-                           th:value="${presentation.subTitle}"/>
+                           th:value="${presentationForm.subTitle}"/>
                 </div>
 
                 <div class="mb-3">
@@ -36,10 +40,10 @@
                     <div class="input-group">
                         <span class="input-group-text" id="date">Date</span>
                         <input class="form-control" type="date" name="countdownEndDate" id="countdownEndDate"
-                               th:value="${presentation.countdownEndDate}"/>
+                               th:value="${presentationForm.countdownEndDate}"/>
                         <label class="input-group-text" id="time" for="countdownEndTime">Time</label>
                         <input class="form-control" type="time" name="countdownEndTime" id="countdownEndTime"
-                               th:value="${presentation.countdownEndTime}"/>
+                               th:value="${presentationForm.countdownEndTime}"/>
                     </div>
                 </div>
 
@@ -48,11 +52,11 @@
                     <div class="input-group">
                         <input class="form-control" type="number" name="countdownRuntimeMinutes"
                                id="countdownRuntimeMinutes"
-                               min="0" max="60" th:value="${presentation.countdownRuntimeMinutes}"/>
+                               min="0" max="60" th:value="${presentationForm.countdownRuntimeMinutes}"/>
                         <span class="input-group-text" id="minutes">Minutes</span>
                         <input class="form-control" type="number" name="countdownRuntimeSeconds"
                                id="countdownRuntimeSeconds"
-                               min="0" max="60" th:value="${presentation.countdownRuntimeSeconds}"/>
+                               min="0" max="60" th:value="${presentationForm.countdownRuntimeSeconds}"/>
                         <label class="input-group-text" id="seconds" for="countdownRuntimeSeconds">Seconds</label>
                     </div>
                 </div>

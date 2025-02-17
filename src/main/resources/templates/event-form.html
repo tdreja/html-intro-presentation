@@ -1,6 +1,8 @@
 <!DOCTYPE html>
-<!--suppress HtmlFormInputWithoutLabel -->
 <html lang="de">
+<!-- /* @thymesVar id="bootstrapCss" type="java.lang.String" */ -->
+<!-- /* @thymesVar id="appCss" type="java.lang.String" */ -->
+<!-- /* @thymesVar id="backgroundImage" type="java.lang.String" */ -->
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,12 +17,13 @@
 <body>
 
 <main>
-    <div class="card event-card" th:fragment="event-form (event,url)">
+    <!--/* @thymesVar id="eventForm" type="de.dreja.introgenerator.model.form.EventForm" */-->
+    <div class="card event-card" th:fragment="event-form (eventForm, eventFormUrl)">
         <div class="row g-0">
             <section class="col-md-4 preview rounded-start">
 
                 <h4 class="text-bg-dark">Preview</h4>
-                <article class="card border-light-subtle text-bg-dark variante-1" th:replace="~{presentation::event-presentation (event=${event})}">
+                <article class="card border-light-subtle text-bg-dark variante-1" th:replace="~{presentation::event-presentation (event=${eventForm})}">
                     <div class="row g-0">
                         <div class="col-md-8">
                             <img src="../static/cycle.jpg" class="img-fluid rounded-start" alt="...">
@@ -38,18 +41,19 @@
 
             </section>
             <section class="col-md-8">
-                <form action="event/update" method="post" th:action="${url}">
+                <!-- /* @thymesVar id="eventFormUrl" type="java.lang.String" */ -->
+                <form action="event/update" method="post" th:action="${eventFormUrl}">
                     <article class="card-body">
-                        <input type="hidden" id="id" name="id" th:value="${event.id}">
+                        <input type="hidden" id="id" name="id" th:value="${eventForm.id}">
 
                         <div class="mb-3">
                             <label class="form-label" for="title">Title</label>
-                            <input class="form-control" type="text" name="title" id="title" th:value="${event.title}"/>
+                            <input class="form-control" type="text" name="title" id="title" th:value="${eventForm.title}"/>
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label" for="subTitle">SubTitle</label>
-                            <input class="form-control" type="text" name="subTitle" id="subTitle" th:value="${event.subTitle}"/>
+                            <input class="form-control" type="text" name="subTitle" id="subTitle" th:value="${eventForm.subTitle}"/>
                         </div>
 
                         <div class="mb-3">
@@ -57,10 +61,10 @@
                             <div class="input-group">
                                 <span class="input-group-text" id="date">Date</span>
                                 <input class="form-control" type="date" name="startDate" id="startDate"
-                                       th:value="${event.startDate}"/>
+                                       th:value="${eventForm.startDate}"/>
                                 <label class="input-group-text" id="time" for="startTime">Time</label>
                                 <input class="form-control" type="time" name="startTime" id="startTime"
-                                       th:value="${event.startTime}"/>
+                                       th:value="${eventForm.startTime}"/>
                             </div>
                         </div>
 
