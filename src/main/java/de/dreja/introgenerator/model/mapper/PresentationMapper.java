@@ -1,7 +1,9 @@
 package de.dreja.introgenerator.model.mapper;
 
 import de.dreja.introgenerator.model.entity.Presentation;
+import de.dreja.introgenerator.model.form.EntityWithForm;
 import de.dreja.introgenerator.model.form.PresentationForm;
+import jakarta.annotation.Nonnull;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -28,4 +30,9 @@ public interface PresentationMapper {
     @Mapping(target = "countdownRuntimeMinutes", source = "countdownRuntime", qualifiedByName = "getMinutes")
     @Mapping(target = "countdownRuntimeSeconds", source = "countdownRuntime", qualifiedByName = "getSeconds")
     PresentationForm toForm(Presentation presentation);
+
+    @Nonnull
+    default EntityWithForm<Presentation, PresentationForm> toCombination(@Nonnull Presentation presentation) {
+        return new EntityWithForm<>(presentation, toForm(presentation));
+    }
 }

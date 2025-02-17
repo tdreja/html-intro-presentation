@@ -17,12 +17,12 @@
     <a th:if="${presentation != null && presentation.id != null}" href="../final-presentation/" th:href="${'../final-presentation/'+presentation.id}">
         Final Presentation
     </a>
-    <div th:replace="~{presentation-form::presentation-form (presentation=${presentation},url=${presentationUrl})}"></div>
+    <div th:replace="~{presentation-form::presentation-form (presentationForm=${presentation}, presentationFormUrl=${presentationUrl})}"></div>
 
     <div th:if="${events != null}">
-        <div th:if="${emptyEvent != null}" th:replace="~{event-form::event-form (event=${emptyEvent},url=${eventsUrl})}"></div>
+        <div th:if="${emptyEvent != null}" th:replace="~{event-form::event-form (eventForm=${emptyEvent.form()},eventEntity=${emptyEvent.entity()},eventFormUrl=${eventsUrl})}"></div>
         <div th:each="event : ${events}">
-            <div th:replace="~{event-form::event-form (event=${event},url=${eventsUrl})}"></div>
+            <div th:replace="~{event-form::event-form (eventForm=${event.form()}, eventEntity=${event.entity()}, eventFormUrl=${eventsUrl})}"></div>
         </div>
     </div>
 </main>

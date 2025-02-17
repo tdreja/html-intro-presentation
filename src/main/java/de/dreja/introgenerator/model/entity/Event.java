@@ -12,7 +12,10 @@ import jakarta.annotation.Nullable;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
+import java.util.Locale;
 
 public record Event(@JsonProperty(required = true)
                     @JsonSerialize(using = Base64IdSerializer.class)
@@ -43,4 +46,11 @@ public record Event(@JsonProperty(required = true)
         return startTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
     }
 
+    @Nonnull
+    @SuppressWarnings("unused")
+    public String getStartTimeFormatted(@Nullable Locale locale) {
+        return DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL, FormatStyle.MEDIUM)
+                .localizedBy(locale == null ? Locale.GERMAN : locale)
+                .format(startTime);
+    }
 }

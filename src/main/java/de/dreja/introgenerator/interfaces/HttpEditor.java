@@ -107,12 +107,12 @@ public class HttpEditor {
         model.put("presentationUrl", "/presentation");
 
         // Events for presentation form
-        final List<EventForm> events = entityCache.getEventsOf(presentation)
-                .map(eventMapper::toForm)
+        final var events = entityCache.getEventsOf(presentation)
+                .map(eventMapper::toCombination)
                 .toList();
         model.put("events", events);
         model.put("eventsUrl", "/events-for/" + idService.toBase64(presentation.id()));
-        model.put("emptyEvent", eventMapper.toForm(Event.newToday()));
+        model.put("emptyEvent", eventMapper.toCombination(Event.newToday()));
 
         model.put("bootstrapCss", resourceService.loadUtf8("bootstrapCss", bootStrapCss));
         model.put("appCss", resourceService.loadUtf8("appCss", appCss));

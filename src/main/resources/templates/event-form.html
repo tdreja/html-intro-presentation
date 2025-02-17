@@ -18,12 +18,12 @@
 
 <main>
     <!--/* @thymesVar id="eventForm" type="de.dreja.introgenerator.model.form.EventForm" */-->
-    <div class="card event-card" th:fragment="event-form (eventForm, eventFormUrl)">
+    <div class="card event-card" th:fragment="event-form (eventForm, eventEntity, eventFormUrl)">
         <div class="row g-0">
             <section class="col-md-4 preview rounded-start">
 
                 <h4 class="text-bg-dark">Preview</h4>
-                <article class="card border-light-subtle text-bg-dark variante-1" th:replace="~{presentation::event-presentation (event=${eventForm})}">
+                <article class="card border-light-subtle text-bg-dark variante-1" th:replace="~{presentation::event-presentation (event=${eventEntity})}">
                     <div class="row g-0">
                         <div class="col-md-8">
                             <img src="../static/cycle.jpg" class="img-fluid rounded-start" alt="...">
