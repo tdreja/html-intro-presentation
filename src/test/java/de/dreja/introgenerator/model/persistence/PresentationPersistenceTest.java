@@ -41,16 +41,16 @@ public class PresentationPersistenceTest {
         presentation.setTitle("Presentation Title");
         presentation.setDescription("Presentation Description");
         presentation.setCountdownRunTimeSeconds(10);
-        presentationRepository.save(presentation);
+        presentationRepository.saveAndFlush(presentation);
 
         final Event event = new Event();
         event.setStartTime(TARGET_TIME);
         event.setTitle("Event Title");
         event.setDescription("Event Description");
         event.setPresentation(presentation);
-        eventRepository.save(event);
+        eventRepository.saveAndFlush(event);
         presentation.getEvents().add(event);
-        presentationRepository.save(presentation);
+        presentationRepository.saveAndFlush(presentation);
 
         presentationId = presentation.getId();
         eventId = event.getId();

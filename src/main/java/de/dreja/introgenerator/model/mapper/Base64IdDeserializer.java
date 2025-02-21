@@ -42,8 +42,14 @@ public class Base64IdDeserializer extends StdDeserializer<Long> {
             return OptionalLong.empty();
         }
         try {
-            final ByteBuffer buffer = ByteBuffer.wrap(decoder.decode(base64));
-            return OptionalLong.of(buffer.getLong());
+            final byte[] raw = decoder.decode(base64);
+            final ByteBuffer buffer = ByteBuffer.wrap(raw);
+            if(raw.length == Integer.BYTES) {
+                return OptionalLong.of(buffer.getInt());
+            } else if(raw.length == Long.BYTES) {
+                return OptionalLong.of(buffer.getLong());
+            }
+            return OptionalLong.empty();
         } catch (RuntimeException ex) {
             LOG.atWarn().setCause(ex).log("Could not parse Base64 ID {}", base64);
             return OptionalLong.empty();

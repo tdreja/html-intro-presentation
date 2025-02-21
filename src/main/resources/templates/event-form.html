@@ -17,43 +17,28 @@
 <body>
 
 <main>
-    <!--/* @thymesVar id="eventForm" type="de.dreja.introgenerator.model.form.EventForm" */-->
-    <div class="card event-card" th:fragment="event-form (eventForm, eventEntity, eventFormUrl)">
+    <!--/* @thymesVar id="entity" type="de.dreja.introgenerator.model.persistence.Event" */-->
+    <!--/* @thymesVar id="form" type="de.dreja.introgenerator.model.form.EventForm" */-->
+    <!-- /* @thymesVar id="url" type="java.lang.String" */ -->
+    <div class="card event-card" th:fragment="event-form (entity, form, url)">
         <div class="row g-0">
             <section class="col-md-4 preview rounded-start">
-
                 <h4 class="text-bg-dark">Preview</h4>
-                <article class="card border-light-subtle text-bg-dark variante-1" th:replace="~{presentation::event-presentation (event=${eventEntity})}">
-                    <div class="row g-0">
-                        <div class="col-md-8">
-                            <img src="../static/cycle.jpg" class="img-fluid rounded-start" alt="...">
-                        </div>
-                        <div class="col-md-4">
-                            <div class="card-body">
-                                <h5 class="card-title">Gottesdienst mit Mittagessen</h5>
-                                <h6 class="card-text">Sonntag, 23.02.2025 - 10:30 Uhr</h6>
-                                <p class="card-text">Unser monatlicher Gottesdienst mit Mittagessen.</p>
-                                <img class="qr-code" src="../static/frame.png" alt="QR">
-                            </div>
-                        </div>
-                    </div>
-                </article>
 
             </section>
             <section class="col-md-8">
-                <!-- /* @thymesVar id="eventFormUrl" type="java.lang.String" */ -->
-                <form action="event/update" method="post" th:action="${eventFormUrl}">
+                <form action="event/update" method="post" th:action="${url}">
                     <article class="card-body">
-                        <input type="hidden" id="id" name="id" th:value="${eventForm.id}">
+                        <input type="hidden" id="id" name="id" th:value="${form.id}">
 
                         <div class="mb-3">
                             <label class="form-label" for="title">Title</label>
-                            <input class="form-control" type="text" name="title" id="title" th:value="${eventForm.title}"/>
+                            <input class="form-control" type="text" name="title" id="title" th:value="${form.title}"/>
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label" for="subTitle">SubTitle</label>
-                            <input class="form-control" type="text" name="subTitle" id="subTitle" th:value="${eventForm.subTitle}"/>
+                            <label class="form-label" for="description">Description</label>
+                            <input class="form-control" type="text" name="description" id="description" th:value="${form.description}"/>
                         </div>
 
                         <div class="mb-3">
@@ -61,10 +46,10 @@
                             <div class="input-group">
                                 <span class="input-group-text" id="date">Date</span>
                                 <input class="form-control" type="date" name="startDate" id="startDate"
-                                       th:value="${eventForm.startDate}"/>
+                                       th:value="${form.startDate}"/>
                                 <label class="input-group-text" id="time" for="startTime">Time</label>
                                 <input class="form-control" type="time" name="startTime" id="startTime"
-                                       th:value="${eventForm.startTime}"/>
+                                       th:value="${form.startTime}"/>
                             </div>
                         </div>
 

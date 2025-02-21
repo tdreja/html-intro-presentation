@@ -26,7 +26,6 @@ public interface PresentationMapper {
 
     @Mapping(target = "countdownEndTime", source = "countdownEndDateTime", qualifiedByName = "formToTime")
     @Mapping(target = "countdownRunTime", qualifiedByName = "formToDuration")
-    @Mapping(target = "countdownRunTimeSeconds", ignore = true)
     @Mapping(target = "events", ignore = true)
     void updatePersistence(@Nullable PresentationForm form, @Nullable @MappingTarget Presentation event);
 

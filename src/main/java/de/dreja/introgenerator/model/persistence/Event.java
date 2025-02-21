@@ -1,5 +1,6 @@
 package de.dreja.introgenerator.model.persistence;
 
+import de.dreja.introgenerator.service.persistence.LocalDateTimeConverter;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
@@ -16,6 +17,7 @@ public class Event {
     private long id;
 
     @Column(nullable = false, name = "start_time")
+    @Convert(converter = LocalDateTimeConverter.class)
     private LocalDateTime startTime;
 
     @Column(nullable = false)

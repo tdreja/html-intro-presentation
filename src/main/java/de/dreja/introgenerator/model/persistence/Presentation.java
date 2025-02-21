@@ -1,5 +1,7 @@
 package de.dreja.introgenerator.model.persistence;
 
+import de.dreja.introgenerator.service.persistence.DurationConverter;
+import de.dreja.introgenerator.service.persistence.LocalDateTimeConverter;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
@@ -19,9 +21,12 @@ public class Presentation {
     private long id;
 
     @Column(nullable = false, name = "countdown_end_time")
+    @Convert(converter = LocalDateTimeConverter.class)
+    @Nonnull
     private LocalDateTime countdownEndTime;
 
     @Column(nullable = false)
+    @Nonnull
     private String title;
 
     @Column
@@ -29,7 +34,9 @@ public class Presentation {
     private String description;
 
     @Column(nullable = false, name = "countdown_runtime_seconds")
-    private long countdownRunTimeSeconds;
+    @Convert(converter = DurationConverter.class)
+    @Nonnull
+    private Duration countdownRuntime;
 
     @OneToMany(targetEntity = Event.class, mappedBy = "presentation")
     private List<Event> events = new ArrayList<>();
@@ -65,21 +72,13 @@ public class Presentation {
         this.description = description;
     }
 
-    public long getCountdownRunTimeSeconds() {
-        return countdownRunTimeSeconds;
-    }
-
-    public void setCountdownRunTimeSeconds(long countdownRunTimeSeconds) {
-        this.countdownRunTimeSeconds = countdownRunTimeSeconds;
-    }
-
     @Nonnull
     public Duration getCountdownRunTime() {
-        return Duration.ofSeconds(countdownRunTimeSeconds);
+        return countdownRuntime;
     }
 
     public void setCountdownRunTime(@Nonnull Duration countdownRunTime) {
-        this.countdownRunTimeSeconds = countdownRunTime.getSeconds();
+        this.countdownRuntime = countdownRunTime;
     }
 
     @Nonnull
