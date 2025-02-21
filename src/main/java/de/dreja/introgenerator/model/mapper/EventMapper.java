@@ -1,33 +1,33 @@
 package de.dreja.introgenerator.model.mapper;
 
-import de.dreja.introgenerator.model.entity.Event;
-import de.dreja.introgenerator.model.form.EntityWithForm;
+import de.dreja.introgenerator.model.form.EventData;
 import de.dreja.introgenerator.model.form.EventForm;
+import de.dreja.introgenerator.model.persistence.Event;
 import jakarta.annotation.Nonnull;
-import org.mapstruct.InjectionStrategy;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.MappingConstants;
+import jakarta.annotation.Nullable;
+import org.mapstruct.*;
+
+import java.util.Objects;
 
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING,
         uses = {
-                Base64IdSerializer.class, LocalDateTimeService.class, IdService.class,
+                Base64IdSerializer.class, LocalDateTimeMapper.class,
         },
         injectionStrategy = InjectionStrategy.CONSTRUCTOR)
 public interface EventMapper {
 
-    @Mapping(target = "id", source = "id", qualifiedByName = "parseBase64OrCreateNew")
-    @Mapping(target = "image", ignore = true)
-    @Mapping(target = "startTime", source = ".", qualifiedByName = "parseTimeStamp")
-    Event toEvent(EventForm form);
-
     @Mapping(target = "id", source = "id", qualifiedByName = "toBase64")
-    @Mapping(target = "startDate", source = "startTime", qualifiedByName = "formatDate")
-    @Mapping(target = "startTime", source = "startTime", qualifiedByName = "formatTime")
-    EventForm toForm(Event event);
+    @Mapping(target = "startDateTime", source = "startTime", qualifiedByName = "timeToForm")
+    @Nullable
+    EventForm persistenceToForm(@Nullable Event event);
+
+    @Mapping(target = "startTime", source = "startDateTime", qualifiedByName = "formToTime")
+    @Mapping(target = "presentation", ignore = true)
+    @Mapping(target = "id", ignore = true)
+    void updatePersistence(@Nullable EventForm form, @Nullable @MappingTarget Event event);
 
     @Nonnull
-    default EntityWithForm<Event, EventForm> toCombination(@Nonnull Event event) {
-        return new EntityWithForm<>(event, toForm(event));
+    default EventData toData(@Nonnull Event event) {
+        return new EventData(event, Objects.requireNonNull(persistenceToForm(event)));
     }
 }

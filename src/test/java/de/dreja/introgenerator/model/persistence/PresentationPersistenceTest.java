@@ -9,6 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -36,7 +37,7 @@ public class PresentationPersistenceTest {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     void setupData() {
         final Presentation presentation = new Presentation();
-        presentation.setStartTime(TARGET_TIME);
+        presentation.setCountdownEndTime(TARGET_TIME);
         presentation.setTitle("Presentation Title");
         presentation.setDescription("Presentation Description");
         presentation.setCountdownRunTimeSeconds(10);
@@ -64,10 +65,11 @@ public class PresentationPersistenceTest {
         final Presentation presentation = presentationRepository.findById(presentationId).orElse(null);
         assertThat(presentation).isNotNull()
                 .hasNoNullFieldsOrProperties()
-                .hasFieldOrPropertyWithValue("startTime", TARGET_TIME)
+                .hasFieldOrPropertyWithValue("countdownEndTime", TARGET_TIME)
                 .hasFieldOrPropertyWithValue("title", "Presentation Title")
                 .hasFieldOrPropertyWithValue("description", "Presentation Description")
-                .hasFieldOrPropertyWithValue("countdownRunTimeSeconds", 10L);
+                .hasFieldOrPropertyWithValue("countdownRunTimeSeconds", 10L)
+                .hasFieldOrPropertyWithValue("countdownRunTime", Duration.ofSeconds(10));
         assertThat(presentation.getEvents()).isNotNull()
                 .isNotEmpty().hasSize(1);
         final Event event = presentation.getEvents().getFirst();

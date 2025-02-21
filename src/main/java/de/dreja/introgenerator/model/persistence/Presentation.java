@@ -4,6 +4,7 @@ import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,8 +18,8 @@ public class Presentation {
     @Column(nullable = false)
     private long id;
 
-    @Column(nullable = false, name = "start_time")
-    private LocalDateTime startTime;
+    @Column(nullable = false, name = "countdown_end_time")
+    private LocalDateTime countdownEndTime;
 
     @Column(nullable = false)
     private String title;
@@ -38,12 +39,12 @@ public class Presentation {
     }
 
     @Nonnull
-    public LocalDateTime getStartTime() {
-        return startTime;
+    public LocalDateTime getCountdownEndTime() {
+        return countdownEndTime;
     }
 
-    public void setStartTime(@Nonnull LocalDateTime startTime) {
-        this.startTime = startTime;
+    public void setCountdownEndTime(@Nonnull LocalDateTime countdownEndTime) {
+        this.countdownEndTime = countdownEndTime;
     }
 
     @Nonnull
@@ -70,6 +71,15 @@ public class Presentation {
 
     public void setCountdownRunTimeSeconds(long countdownRunTimeSeconds) {
         this.countdownRunTimeSeconds = countdownRunTimeSeconds;
+    }
+
+    @Nonnull
+    public Duration getCountdownRunTime() {
+        return Duration.ofSeconds(countdownRunTimeSeconds);
+    }
+
+    public void setCountdownRunTime(@Nonnull Duration countdownRunTime) {
+        this.countdownRunTimeSeconds = countdownRunTime.getSeconds();
     }
 
     @Nonnull

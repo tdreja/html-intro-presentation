@@ -1,6 +1,6 @@
 package de.dreja.introgenerator.model.mapper;
 
-import de.dreja.introgenerator.model.form.HasTimeStamp;
+import de.dreja.introgenerator.model.form.DateTimeForm;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import org.mapstruct.Named;
@@ -15,28 +15,39 @@ import java.util.List;
 import java.util.Objects;
 
 @Service
-public class LocalDateTimeService {
+public class LocalDateTimeMapper {
 
     private final LocalDateParser dateParser = new LocalDateParser();
     private final LocalTimeParser timeParser = new LocalTimeParser();
 
-    private LocalDateTimeService() {
+    private LocalDateTimeMapper() {
         // Ignore
     }
 
     @Nonnull
-    @Named("parseTimeStamp")
-    public LocalDateTime parseTimeStamp(@Nullable HasTimeStamp timeStamp) {
-        if (timeStamp == null) {
-            return LocalDate.now().atStartOfDay();
+    @Named("timeToForm")
+    public DateTimeForm timeToForm(@Nullable LocalDateTime localDateTime) {
+        if(localDateTime == null) {
+            return new DateTimeForm("", null);
         }
-        return parseDateTime(timeStamp.getDate(), timeStamp.getTime());
+        final String time;
+        if(localDateTime.toLocalTime().equals(LocalTime.MIDNIGHT)) {
+            time = null;
+        } else {
+            time = localDateTime.toLocalTime().format(DateTimeFormatter.ISO_LOCAL_TIME);
+        }
+        return new DateTimeForm(localDateTime.toLocalDate().format(DateTimeFormatter.ISO_LOCAL_DATE), time);
     }
 
     @Nonnull
-    @Named("parseDateTime")
-    public LocalDateTime parseDateTime(@Nullable String date, @Nullable String time) {
-        return LocalDateTime.of(parseDate(date), parseTime(time));
+    @Named("formToTime")
+    public LocalDateTime formToTime(@Nullable DateTimeForm dateTimeForm) {
+        if(dateTimeForm == null) {
+            return LocalDate.now().atStartOfDay();
+        }
+        final LocalDate date = parseDate(dateTimeForm.date());
+        final LocalTime time = parseTime(dateTimeForm.time());
+        return LocalDateTime.of(date, time);
     }
 
     @Nonnull
@@ -49,25 +60,6 @@ public class LocalDateTimeService {
     @Named("parseTime")
     public LocalTime parseTime(@Nullable String time) {
         return timeParser.parse(time);
-    }
-
-    @Nonnull
-    @Named("formatDate")
-    public String formatDate(@Nullable LocalDateTime dateTime) {
-        return dateTime == null ? "" : dateTime.format(DateTimeFormatter.ISO_LOCAL_DATE);
-    }
-
-    @Nullable
-    @Named("formatTime")
-    public String formatTime(@Nullable LocalDateTime dateTime) {
-        if(dateTime == null) {
-            return null;
-        }
-        // Skip 00:00!
-        if(dateTime.toLocalDate().atStartOfDay().isEqual(dateTime)) {
-            return null;
-        }
-        return dateTime.format(DateTimeFormatter.ISO_LOCAL_TIME);
     }
 
     protected static abstract class Parser<TEMPORAL extends Temporal> {

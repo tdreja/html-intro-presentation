@@ -1,38 +1,37 @@
 package de.dreja.introgenerator.model.mapper;
 
-import de.dreja.introgenerator.model.entity.Presentation;
-import de.dreja.introgenerator.model.form.EntityWithForm;
+import de.dreja.introgenerator.model.form.PresentationData;
 import de.dreja.introgenerator.model.form.PresentationForm;
+import de.dreja.introgenerator.model.persistence.Presentation;
 import jakarta.annotation.Nonnull;
-import org.mapstruct.InjectionStrategy;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.MappingConstants;
+import jakarta.annotation.Nullable;
+import org.mapstruct.*;
+
+import java.util.Objects;
 
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING,
         uses = {
-                Base64IdSerializer.class, IdService.class,
-                LocalDateTimeService.class, DurationService.class,
+                Base64IdSerializer.class,
+                LocalDateTimeMapper.class, DurationMapper.class,
                 EventMapper.class
         },
         injectionStrategy = InjectionStrategy.CONSTRUCTOR)
 public interface PresentationMapper {
 
-    @Mapping(target = "id", source = "id", qualifiedByName = "parseBase64OrCreateNew")
-    @Mapping(target = "countdownEnd", source = ".", qualifiedByName = "parseTimeStamp")
-    @Mapping(target = "countdownRuntime", source = ".", qualifiedByName = "getDuration")
-    Presentation toPresentation(PresentationForm form);
-
-
     @Mapping(target = "id", source = "id", qualifiedByName = "toBase64")
-    @Mapping(target = "countdownEndDate", source = "countdownEnd", qualifiedByName = "formatDate")
-    @Mapping(target = "countdownEndTime", source = "countdownEnd", qualifiedByName = "formatTime")
-    @Mapping(target = "countdownRuntimeMinutes", source = "countdownRuntime", qualifiedByName = "getMinutes")
-    @Mapping(target = "countdownRuntimeSeconds", source = "countdownRuntime", qualifiedByName = "getSeconds")
-    PresentationForm toForm(Presentation presentation);
+    @Mapping(target = "countdownEndDateTime", source = "countdownEndTime", qualifiedByName = "timeToForm")
+    @Mapping(target = "countdownRunTime", qualifiedByName = "durationToForm")
+    @Nullable
+    PresentationForm persistenceToForm(@Nullable Presentation event);
+
+    @Mapping(target = "countdownEndTime", source = "countdownEndDateTime", qualifiedByName = "formToTime")
+    @Mapping(target = "countdownRunTime", qualifiedByName = "formToDuration")
+    @Mapping(target = "countdownRunTimeSeconds", ignore = true)
+    @Mapping(target = "events", ignore = true)
+    void updatePersistence(@Nullable PresentationForm form, @Nullable @MappingTarget Presentation event);
 
     @Nonnull
-    default EntityWithForm<Presentation, PresentationForm> toCombination(@Nonnull Presentation presentation) {
-        return new EntityWithForm<>(presentation, toForm(presentation));
+    default PresentationData toData(@Nonnull Presentation presentation) {
+        return new PresentationData(presentation, Objects.requireNonNull(persistenceToForm(presentation)));
     }
 }

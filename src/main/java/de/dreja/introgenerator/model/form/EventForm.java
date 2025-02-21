@@ -16,19 +16,15 @@ public record EventForm(@Nullable
                         @JsonInclude(NON_NULL)
                         String id,
                         @Nonnull
-                        @JsonProperty(value = "startDate", required = true)
-                        String startDate,
-                        @Nullable
-                        @JsonProperty("startTime")
-                        @JsonInclude(NON_NULL)
-                        String startTime,
+                        @JsonIgnore
+                        DateTimeForm startDateTime,
                         @Nonnull
                         @JsonProperty(value = "title", required = true)
                         String title,
                         @Nullable
-                        @JsonProperty("subTitle")
+                        @JsonProperty("description")
                         @JsonInclude(NON_NULL)
-                        String subTitle) implements HasTimeStamp {
+                        String description) {
 
     @JsonCreator
     public EventForm(@Nullable
@@ -45,25 +41,22 @@ public record EventForm(@Nullable
                      String title,
                      @Nullable
                      @JsonProperty("subTitle")
-                     String subTitle) {
-        this.id = trimOrNull(id);
-        this.startDate = trimOrEmpty(startDate);
-        this.startTime = trimOrNull(startTime);
-        this.title = trimOrEmpty(title);
-        this.subTitle = trimOrNull(subTitle);
+                     String description) {
+        this(trimOrNull(id),
+                new DateTimeForm(trimOrEmpty(startDate), trimOrNull(startTime)),
+                trimOrEmpty(title),
+                trimOrNull(description));
     }
 
+    @JsonProperty(value = "startDate", required = true)
     @Nonnull
-    @Override
-    @JsonIgnore
-    public String getDate() {
-        return startDate;
+    public String getStartDate() {
+        return startDateTime.date();
     }
 
     @Nullable
-    @Override
-    @JsonIgnore
-    public String getTime() {
-        return startTime;
+    @JsonProperty("startTime")
+    public String getStartTime() {
+        return startDateTime.time();
     }
 }

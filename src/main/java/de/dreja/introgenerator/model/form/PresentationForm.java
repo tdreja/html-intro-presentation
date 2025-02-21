@@ -22,24 +22,15 @@ public record PresentationForm(@Nullable
                                @JsonProperty(value = "title", required = true)
                                String title,
                                @Nullable
-                               @JsonProperty("subTitle")
+                               @JsonProperty("description")
                                @JsonInclude(NON_NULL)
-                               String subTitle,
+                               String description,
                                @Nonnull
-                               @JsonProperty(value = "countdownEndDate", required = true)
-                               String countdownEndDate,
-                               @Nullable
-                               @JsonProperty("countdownEndTime")
-                               @JsonInclude(NON_NULL)
-                               String countdownEndTime,
-                               @Nullable
-                               @JsonProperty("countdownRuntimeMinutes")
-                               @JsonInclude(NON_NULL)
-                               String countdownRuntimeMinutes,
-                               @Nullable
-                               @JsonProperty("countdownRuntimeSeconds")
-                               @JsonInclude(NON_NULL)
-                               String countdownRuntimeSeconds) implements HasTimeStamp, HasDuration {
+                               @JsonIgnore
+                               DateTimeForm countdownEndDateTime,
+                               @Nonnull
+                               @JsonIgnore
+                               DurationForm countdownRunTime) {
 
     @JsonCreator
     public PresentationForm(@Nullable
@@ -49,8 +40,8 @@ public record PresentationForm(@Nullable
                             @JsonProperty("title")
                             String title,
                             @Nullable
-                            @JsonProperty("subTitle")
-                            String subTitle,
+                            @JsonProperty("description")
+                            String description,
                             @Nullable
                             @JsonProperty("countdownEndDate")
                             String countdownEndDate,
@@ -63,40 +54,34 @@ public record PresentationForm(@Nullable
                             @Nullable
                             @JsonProperty("countdownRuntimeSeconds")
                             String countdownRuntimeSeconds) {
-        this.id = trimOrNull(id);
-        this.title = trimOrEmpty(title);
-        this.subTitle = trimOrNull(subTitle);
-        this.countdownEndDate = trimOrEmpty(countdownEndDate);
-        this.countdownEndTime = trimOrNull(countdownEndTime);
-        this.countdownRuntimeMinutes = trimOrNull(countdownRuntimeMinutes);
-        this.countdownRuntimeSeconds = trimOrNull(countdownRuntimeSeconds);
+        this(trimOrNull(id),
+                trimOrEmpty(title),
+                trimOrNull(description),
+                new DateTimeForm(trimOrEmpty(countdownEndDate), trimOrNull(countdownEndTime)),
+                new DurationForm(trimOrEmpty(countdownRuntimeMinutes), trimOrNull(countdownRuntimeSeconds)));
     }
 
     @Nonnull
-    @Override
-    @JsonIgnore
-    public String getDate() {
-        return countdownEndDate;
+    @JsonProperty(value = "countdownEndDate", required = true)
+    public String getCountdownEndDate() {
+        return countdownEndDateTime.date();
     }
 
     @Nullable
-    @Override
-    @JsonIgnore
-    public String getTime() {
-        return countdownEndTime;
+    @JsonProperty("countdownEndTime")
+    public String getCountdownEndTime() {
+        return countdownEndDateTime.time();
+    }
+
+    @Nonnull
+    @JsonProperty(value = "countdownRuntimeMinutes", required = true)
+    public String getCountdownRuntimeMinutes() {
+        return countdownRunTime.minutes();
     }
 
     @Nullable
-    @Override
-    @JsonIgnore
-    public String getMinutes() {
-        return countdownRuntimeMinutes;
-    }
-
-    @Nullable
-    @Override
-    @JsonIgnore
-    public String getSeconds() {
-        return countdownRuntimeSeconds;
+    @JsonProperty("countdownRuntimeSeconds")
+    public String getCountdownRuntimeSeconds() {
+        return countdownRunTime.seconds();
     }
 }

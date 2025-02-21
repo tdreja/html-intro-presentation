@@ -13,17 +13,17 @@ import java.nio.ByteBuffer;
 import java.util.Base64;
 
 @Component
-public class Base64IdSerializer extends StdSerializer<Integer> {
+public class Base64IdSerializer extends StdSerializer<Long> {
 
     private final Base64.Encoder encoder;
 
     public Base64IdSerializer() {
-        super(Integer.class);
+        super(Long.class);
         encoder = Base64.getUrlEncoder().withoutPadding();
     }
 
     @Override
-    public void serialize(Integer value, JsonGenerator gen, SerializerProvider provider) throws IOException {
+    public void serialize(Long value, JsonGenerator gen, SerializerProvider provider) throws IOException {
         if (value == null) {
             gen.writeNull();
         } else {
@@ -33,14 +33,20 @@ public class Base64IdSerializer extends StdSerializer<Integer> {
 
     @Nullable
     @Named("toBase64")
-    public String toBase64(@Nullable Integer value) {
+    public String toBase64(@Nullable Long value) {
         return (value == null || value == 0) ? null : toBase64Internal(value);
     }
 
     @Nonnull
-    private String toBase64Internal(int value) {
-        final ByteBuffer buffer = ByteBuffer.allocate(Integer.BYTES);
-        buffer.putInt(value);
+    private String toBase64Internal(long value) {
+        final ByteBuffer buffer;
+        if(Math.abs(value) > Integer.MAX_VALUE) {
+            buffer = ByteBuffer.allocate(Long.BYTES);
+            buffer.putLong(value);
+        } else {
+            buffer = ByteBuffer.allocate(Integer.BYTES);
+            buffer.putInt((int) value);
+        }
         return encoder.encodeToString(buffer.array());
     }
 }
