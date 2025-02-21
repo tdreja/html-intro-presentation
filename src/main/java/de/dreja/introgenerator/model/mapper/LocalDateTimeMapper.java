@@ -40,6 +40,18 @@ public class LocalDateTimeMapper {
     }
 
     @Nonnull
+    @Named("timeToDateForm")
+    public String timeToDateForm(@Nullable LocalDateTime localDateTime) {
+        return timeToForm(localDateTime).date();
+    }
+
+    @Nullable
+    @Named("timeToTimeForm")
+    public String timeToTimeForm(@Nullable LocalDateTime localDateTime) {
+        return timeToForm(localDateTime).time();
+    }
+
+    @Nonnull
     @Named("formToTime")
     public LocalDateTime formToTime(@Nullable DateTimeForm dateTimeForm) {
         if(dateTimeForm == null) {

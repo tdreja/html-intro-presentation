@@ -17,7 +17,8 @@ import java.util.Objects;
 public interface EventMapper {
 
     @Mapping(target = "id", source = "id", qualifiedByName = "toBase64")
-    @Mapping(target = "startDateTime", source = "startTime", qualifiedByName = "timeToForm")
+    @Mapping(target = "startDate", source = "startTime", qualifiedByName = "timeToDateForm")
+    @Mapping(target = "startTime", source = "startTime", qualifiedByName = "timeToTimeForm")
     @Nullable
     EventForm persistenceToForm(@Nullable Event event);
 

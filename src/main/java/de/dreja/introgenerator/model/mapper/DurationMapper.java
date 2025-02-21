@@ -26,6 +26,18 @@ public class DurationMapper {
     }
 
     @Nonnull
+    @Named("durationToMinuteForm")
+    public String durationToMinuteForm(@Nullable Duration duration) {
+        return durationToForm(duration).minutes();
+    }
+
+    @Nullable
+    @Named("durationToSecondsForm")
+    public String durationToSecondsForm(@Nullable Duration duration) {
+        return durationToForm(duration).seconds();
+    }
+
+    @Nonnull
     @Named("formToDuration")
     public Duration formToDuration(@Nullable DurationForm durationForm) {
         if (durationForm == null) {

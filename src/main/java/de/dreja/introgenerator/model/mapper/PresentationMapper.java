@@ -19,13 +19,15 @@ import java.util.Objects;
 public interface PresentationMapper {
 
     @Mapping(target = "id", source = "id", qualifiedByName = "toBase64")
-    @Mapping(target = "countdownEndDateTime", source = "countdownEndTime", qualifiedByName = "timeToForm")
-    @Mapping(target = "countdownRunTime", qualifiedByName = "durationToForm")
+    @Mapping(target = "countdownEndDate", source = "countdownEndTime", qualifiedByName = "timeToDateForm")
+    @Mapping(target = "countdownEndTime", source = "countdownEndTime", qualifiedByName = "timeToTimeForm")
+    @Mapping(target = "countdownRuntimeMinutes", source = "countdownRunTime", qualifiedByName = "durationToMinuteForm")
+    @Mapping(target = "countdownRuntimeSeconds", source = "countdownRunTime", qualifiedByName = "durationToSecondsForm")
     @Nullable
     PresentationForm persistenceToForm(@Nullable Presentation event);
 
-    @Mapping(target = "countdownEndTime", source = "countdownEndDateTime", qualifiedByName = "formToTime")
-    @Mapping(target = "countdownRunTime", qualifiedByName = "formToDuration")
+    @Mapping(target = "countdownEndTime", source = "countdownEnd", qualifiedByName = "formToTime")
+    @Mapping(target = "countdownRunTime", source = "countdownRuntime", qualifiedByName = "formToDuration")
     @Mapping(target = "events", ignore = true)
     void updatePersistence(@Nullable PresentationForm form, @Nullable @MappingTarget Presentation event);
 
