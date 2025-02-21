@@ -19,10 +19,20 @@ repositories {
 }
 
 dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+	// Persistence
+	implementation 'org.liquibase:liquibase-core'
+	// https://mvnrepository.com/artifact/org.xerial/sqlite-jdbc
+	implementation 'org.xerial:sqlite-jdbc:3.49.1.0'
+	// https://mvnrepository.com/artifact/org.hibernate.orm/hibernate-community-dialects
+	implementation 'org.hibernate.orm:hibernate-community-dialects:6.6.8.Final'
+	// https://mvnrepository.com/artifact/org.hibernate.orm/hibernate-core
+	implementation 'org.hibernate.orm:hibernate-core:6.6.8.Final'
 
 	// Open API
 	// https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-starter-webmvc-ui
@@ -35,7 +45,7 @@ dependencies {
 }
 
 node {
-	version = '20.18.0'
+	version = '22.14.0'
 	npmInstallCommand = 'install'
 	distBaseUrl = 'https://nodejs.org/dist'
 	download = true

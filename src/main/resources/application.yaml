@@ -1,0 +1,21 @@
+spring:
+  profiles:
+    active: dev
+  application:
+    jpa:
+      properties:
+        hibernate:
+          dialect: org.hibernate.community.dialect.SQLiteDialect
+  jpa:
+    database-platform: org.hibernate.community.dialect.SQLiteDialect
+  datasource:
+    hikari:
+      maximum-pool-size: 1
+    driverClassName: org.sqlite.JDBC
+    password: sa
+    username: sa
+    url: jdbc:sqlite:./build/dev-db.db
+
+springdoc:
+  api-docs:
+    enabled: true

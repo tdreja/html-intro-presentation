@@ -1,0 +1,5 @@
+spring:
+  datasource:
+    driverClassName: org.sqlite.JDBC
+    password: "sa"
+    url: jdbc:sqlite:./build/dev-db.db
