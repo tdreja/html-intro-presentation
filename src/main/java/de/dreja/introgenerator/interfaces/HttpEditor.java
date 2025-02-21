@@ -29,26 +29,23 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.ModelAndView;
 
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Optional;
-import java.util.stream.Stream;
+import java.time.LocalDateTime;
+import java.util.*;
 
 @Controller
 public class HttpEditor {
 
     private static final String INPUT_JSON =
             """
-                const presentationJson = '%s';
-                const eventsJson = '%s';
-            """;
+                        const presentationJson = '%s';
+                        const eventsJson = '%s';
+                    """;
     private static final String BACKGROUND_IMAGE =
             """
-                body {
-                    background-image: url("data:%s;base64,%s");
-                }
-            """;
+                        body {
+                            background-image: url("data:%s;base64,%s");
+                        }
+                    """;
 
     private static final Logger LOG = LoggerFactory.getLogger(HttpEditor.class);
 
@@ -83,9 +80,15 @@ public class HttpEditor {
     }
 
     @GetMapping({"/"})
+    @Transactional(readOnly = true)
     public ModelAndView getStartPage(Map<String, Object> model) {
         model.put("presentation", presentationMapper.toData(new Presentation()));
         model.put("presentationUrl", "/presentation");
+
+        final var activePresentations = presentationRepository.findAllByCountdownEndTimeAfter(LocalDateTime.now()).stream()
+                .map(presentation -> presentationMapper.toDisplay(presentation, Locale.GERMAN))
+                .toList();
+        model.put("activePresentations", activePresentations);
 
         model.put("bootstrapCss", resourceService.loadUtf8("bootstrapCss", bootStrapCss));
         model.put("appCss", resourceService.loadUtf8("appCss", appCss));
@@ -128,7 +131,7 @@ public class HttpEditor {
                                                            @Nonnull
                                                            PresentationForm presentationForm) {
         final Optional<Presentation> result = findPresentation(presentationForm.id());
-        if(result.isPresent()) {
+        if (result.isPresent()) {
             final Presentation presentation = result.get();
             presentationMapper.updatePersistence(presentationForm, presentation);
             presentationRepository.saveAndFlush(presentation);

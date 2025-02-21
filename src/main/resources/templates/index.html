@@ -16,12 +16,10 @@
 <main style="display: flex; flex-direction: column">
     <div th:replace="~{presentation-form::presentation-form (entity=${presentation.presentation()}, form=${presentation.presentationForm()}, url=${presentationUrl})}"></div>
 
-    <div th:if="${events != null}">
-        <div th:if="${emptyEvent != null}" th:replace="~{event-form::event-form (entity=${emptyEvent.event()}, form=${emptyEvent.eventForm()}, url=${eventsUrl})}"></div>
-        <div th:each="event : ${events}">
-            <div th:replace="~{event-form::event-form (entity=${event.event()}, form=${event.eventForm()}, url=${eventsUrl})}"></div>
-        </div>
-    </div>
+    <!-- /* @thymesVar id="pres" type="de.dreja.introgenerator.model.http.DisplayPresentation" */ -->
+    <ul th:each="pres : ${activePresentations}">
+        <li><a href="/presentation/" th:href="'/presentation/' + ${pres.id}" th:text="${pres.title} + ' ' + ${pres.countdownEndDate} + ' ' + ${pres.countdownEndTime}">Title</a></li>
+    </ul>
 </main>
 </body>
 </html>
