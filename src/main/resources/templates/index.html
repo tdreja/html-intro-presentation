@@ -13,13 +13,45 @@
     <style th:utext="${backgroundImage}"></style>
 </head>
 <body>
-<main style="display: flex; flex-direction: column">
-    <div th:replace="~{presentation-form::presentation-form (entity=${presentation.presentation()}, form=${presentation.presentationForm()}, url=${presentationUrl})}"></div>
-
-    <!-- /* @thymesVar id="pres" type="de.dreja.introgenerator.model.http.DisplayPresentation" */ -->
-    <ul th:each="pres : ${activePresentations}">
-        <li><a href="/presentation/" th:href="'/presentation/' + ${pres.id}" th:text="${pres.title} + ' ' + ${pres.countdownEndDate} + ' ' + ${pres.countdownEndTime}">Title</a></li>
-    </ul>
+<main class="container">
+    <div class="row main-content gy-4">
+        <div class="col-5">
+            <div class="card">
+                <div class="card-header">
+                    Existing presentations
+                </div>
+                <!-- /* @thymesVar id="pres" type="de.dreja.introgenerator.model.http.DisplayPresentation" */ -->
+                <ul class="list-group list-group-flush" th:each="pres : ${activePresentations}">
+                    <li class="list-group-item d-flex gap-1 align-items-baseline">
+                        <a
+                                class="btn btn-primary"
+                                href="/presentation/"
+                                th:href="'/presentation/' + ${pres.id}"
+                                th:text="${pres.title}">
+                            Service
+                        </a>
+                        <span class="badge text-bg-secondary rounded-pill" th:text="${pres.countdownEndDate}">
+                            Sunday, 23.02.2025
+                        </span>
+                        <span class="badge text-bg-secondary rounded-pill" th:text="${pres.countdownEndTime}">
+                            10:30
+                        </span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="col-7">
+            <div class="card" th:replace="~{presentation-form::presentation-form (entity=${presentation.presentation()}, form=${presentation.presentationForm()}, url=${presentationUrl})}">
+                <div class="card-header">
+                    New Presentation
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">Placeholder</h5>
+                    <p class="card-text">Form for new presentation</p>
+                </div>
+            </div>
+        </div>
+    </div>
 </main>
 </body>
 </html>

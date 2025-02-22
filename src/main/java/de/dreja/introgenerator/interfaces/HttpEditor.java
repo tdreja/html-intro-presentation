@@ -29,7 +29,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.time.DayOfWeek;
+import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.TemporalAdjuster;
+import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 
 @Controller
@@ -82,7 +87,11 @@ public class HttpEditor {
     @GetMapping({"/"})
     @Transactional(readOnly = true)
     public ModelAndView getStartPage(Map<String, Object> model) {
-        model.put("presentation", presentationMapper.toData(new Presentation()));
+        final Presentation nextSunday = new Presentation();
+        nextSunday.setCountdownEndTime(
+                LocalDate.now().with(TemporalAdjusters.next(DayOfWeek.SUNDAY)).atTime(10, 30));
+        nextSunday.setCountdownRunTime(Duration.ofMinutes(15));
+        model.put("presentation", presentationMapper.toData(nextSunday));
         model.put("presentationUrl", "/presentation");
 
         final var activePresentations = presentationRepository.findAllByCountdownEndTimeAfter(LocalDateTime.now()).stream()
@@ -122,7 +131,7 @@ public class HttpEditor {
         model.put("backgroundImage",
                 BACKGROUND_IMAGE.formatted("image/jpeg",
                         resourceService.loadBase64("backgroundImage", background)));
-        return new ModelAndView("index", model);
+        return new ModelAndView("presentation", model);
     }
 
     @PostMapping("/presentation")

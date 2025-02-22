@@ -21,6 +21,12 @@
     <!--/* @thymesVar id="form" type="de.dreja.introgenerator.model.form.EventForm" */-->
     <!-- /* @thymesVar id="url" type="java.lang.String" */ -->
     <div class="card event-card" th:fragment="event-form (entity, form, url)">
+        <div class="card-header" th:if="${form.id == null}" th:text="${'New Event'}">
+            New Presentation
+        </div>
+        <div class="card-header" th:unless="${form.id == null}" th:text="${entity.title}">
+            Entity title
+        </div>
         <div class="row g-0">
             <section class="col-md-4 preview rounded-start">
                 <h4 class="text-bg-dark">Preview</h4>

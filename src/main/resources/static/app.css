@@ -6,6 +6,10 @@ main {
     justify-content: center;
 }
 
+.main-content {
+    width: 100%;
+}
+
 .event-card {
     width: 80%;
 }

@@ -21,6 +21,12 @@
     <!-- /* @thymesVar id="form" type="de.dreja.introgenerator.model.form.PresentationForm" */ -->
     <!-- /* @thymesVar id="url" type="java.lang.String" */ -->
     <div class="card" th:fragment="presentation-form (entity, form, url)">
+        <div class="card-header" th:if="${form.id == null}" th:text="${'New Presentation'}">
+            New Presentation
+        </div>
+        <div class="card-header" th:unless="${form.id == null}" th:text="${entity.title}">
+            Entity title
+        </div>
         <form action="presentation/create-new" method="post" th:action="${url}">
             <div class="card-body">
                 <input type="hidden" id="id" name="id" th:value="${form.id}">
