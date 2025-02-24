@@ -27,7 +27,7 @@
         <!--/*/ <th:block th:each="event : ${events}"> /*/-->
         <!-- /* @thymesVar id="event" type="de.dreja.introgenerator.model.form.EventData" */ -->
             <div class="col">
-                <div th:replace="~{event-form::event-form (entity=${event.event()}, form=${event.eventForm()}, image=${null}, eventUrl=${eventsUrl}, imageUrl='/images-for')}">
+                <div th:replace="~{event-form::event-form (entity=${event.event()}, form=${event.eventForm()}, image=${event.image()}, eventUrl=${eventsUrl}, imageUrl='/images-for')}">
                     Existing event form
                 </div>
             </div>

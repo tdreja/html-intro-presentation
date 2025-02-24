@@ -57,9 +57,10 @@
                 <input type="submit"/>
             </form>
         </section>
+        <!--/* @thymesVar id="image" type="de.dreja.introgenerator.model.http.DisplayImage" */-->
         <section class="rounded-bottom row" th:unless="${form.id == null}">
-            <div class="col-4 d-flex justify-content-center rounded-bottom" style="overflow: hidden">
-                <img src="../static/cycle.jpg" alt="..." class="w-100 h-100">
+            <div th:if="${image != null}" class="col-4 d-flex justify-content-center rounded-bottom" style="overflow: hidden">
+                <img  src="../static/cycle.jpg" alt="..." class="w-100 h-100" th:src="${'data:' + image.mimeType() + ';base64,' + image.base64()}" th:alt="${image.fileName()}">
             </div>
             <div class="col-8">
                 <div class="pe-3">
