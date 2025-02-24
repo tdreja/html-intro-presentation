@@ -1,6 +1,7 @@
 package de.dreja.introgenerator.model.persistence;
 
 import de.dreja.introgenerator.service.persistence.EventRepository;
+import de.dreja.introgenerator.service.persistence.ImageRepository;
 import de.dreja.introgenerator.service.persistence.PresentationRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -8,7 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.MimeTypeUtils;
 
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.LocalDateTime;
 
@@ -22,15 +25,18 @@ public class PresentationPersistenceTest {
 
     private final PresentationRepository presentationRepository;
     private final EventRepository eventRepository;
+    private final ImageRepository imageRepository;
 
     private Long presentationId;
     private Long eventId;
+    private Long imageId;
 
     @Autowired
     PresentationPersistenceTest(PresentationRepository presentationRepository,
-                                EventRepository eventRepository) {
+                                EventRepository eventRepository, ImageRepository imageRepository) {
         this.presentationRepository = presentationRepository;
         this.eventRepository = eventRepository;
+        this.imageRepository = imageRepository;
     }
 
     @BeforeEach
@@ -40,7 +46,7 @@ public class PresentationPersistenceTest {
         presentation.setCountdownEndTime(TARGET_TIME);
         presentation.setTitle("Presentation Title");
         presentation.setDescription("Presentation Description");
-        presentation.setCountdownRunTimeSeconds(10);
+        presentation.setCountdownRunTime(Duration.ofSeconds(10));
         presentationRepository.saveAndFlush(presentation);
 
         final Event event = new Event();
@@ -52,8 +58,18 @@ public class PresentationPersistenceTest {
         presentation.getEvents().add(event);
         presentationRepository.saveAndFlush(presentation);
 
+        final Image image = new Image();
+        image.setFileName("image");
+        image.setMimeType(MimeTypeUtils.IMAGE_JPEG);
+        image.setContent("test".getBytes(StandardCharsets.UTF_8));
+        image.setEvent(event);
+        imageRepository.saveAndFlush(image);
+        event.setImage(image);
+        eventRepository.saveAndFlush(event);
+
         presentationId = presentation.getId();
         eventId = event.getId();
+        imageId = image.getId();
     }
 
     @Test
@@ -61,6 +77,7 @@ public class PresentationPersistenceTest {
     void testPersistence() {
         assertThat(presentationId).isNotNull();
         assertThat(eventId).isNotNull();
+        assertThat(imageId).isNotNull();
 
         final Presentation presentation = presentationRepository.findById(presentationId).orElse(null);
         assertThat(presentation).isNotNull()
@@ -68,7 +85,6 @@ public class PresentationPersistenceTest {
                 .hasFieldOrPropertyWithValue("countdownEndTime", TARGET_TIME)
                 .hasFieldOrPropertyWithValue("title", "Presentation Title")
                 .hasFieldOrPropertyWithValue("description", "Presentation Description")
-                .hasFieldOrPropertyWithValue("countdownRunTimeSeconds", 10L)
                 .hasFieldOrPropertyWithValue("countdownRunTime", Duration.ofSeconds(10));
         assertThat(presentation.getEvents()).isNotNull()
                 .isNotEmpty().hasSize(1);
@@ -79,5 +95,13 @@ public class PresentationPersistenceTest {
                 .hasFieldOrPropertyWithValue("startTime", TARGET_TIME)
                 .hasFieldOrPropertyWithValue("title", "Event Title")
                 .hasFieldOrPropertyWithValue("description", "Event Description");
+
+        final Image image = event.getImage();
+        assertThat(image).isNotNull()
+                .hasNoNullFieldsOrProperties()
+                .hasFieldOrPropertyWithValue("id", imageId)
+                .hasFieldOrPropertyWithValue("fileName", "image")
+                .hasFieldOrPropertyWithValue("mimeType", MimeTypeUtils.IMAGE_JPEG)
+                .hasFieldOrPropertyWithValue("content", "test".getBytes(StandardCharsets.UTF_8));
     }
 }

@@ -18,9 +18,10 @@
 
 <main>
     <!--/* @thymesVar id="entity" type="de.dreja.introgenerator.model.persistence.Event" */-->
+    <!-- /* @thymesVar id="eventUrl" type="java.lang.String" */ -->
     <!--/* @thymesVar id="form" type="de.dreja.introgenerator.model.form.EventForm" */-->
-    <!-- /* @thymesVar id="url" type="java.lang.String" */ -->
-    <div class="card" th:fragment="event-form (entity, form, image, url)">
+    <!-- /* @thymesVar id="imageUrl" type="java.lang.String" */ -->
+    <div class="card" th:fragment="event-form (entity, form, image, eventUrl, imageUrl)">
         <div class="card-header" th:if="${form.id == null}" th:text="${'New Event'}">
             New Presentation
         </div>
@@ -28,7 +29,7 @@
             Entity title
         </div>
         <section class="card-body">
-            <form action="event/update" method="post" th:action="${url}">
+            <form action="event/update" method="post" th:action="${eventUrl}">
                 <input type="hidden" id="id" name="id" th:value="${form.id}">
 
                 <div class="mb-3">
@@ -56,12 +57,20 @@
                 <input type="submit"/>
             </form>
         </section>
-        <section class="rounded-bottom row" th:if="${image != null}">
+        <section class="rounded-bottom row" th:unless="${form.id == null}">
             <div class="col-4 d-flex justify-content-center rounded-bottom" style="overflow: hidden">
                 <img src="../static/cycle.jpg" alt="..." class="w-100 h-100">
             </div>
             <div class="col-8">
-                Form
+                <div class="pe-3">
+                    <form action="image/update" method="post" enctype="multipart/form-data" th:action="${imageUrl + '/' + form.id}">
+                        <div class="input-group mb-3">
+                            <input type="file" class="form-control" name="imageFile" id="imageFile">
+                            <label class="input-group-text" for="imageFile">Upload</label>
+                        </div>
+                        <input type="submit"/>
+                    </form>
+                </div>
             </div>
         </section>
     </div>

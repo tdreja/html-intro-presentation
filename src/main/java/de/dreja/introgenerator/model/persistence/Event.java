@@ -31,6 +31,9 @@ public class Event {
     @JoinColumn(name = "presentation_id")
     private Presentation presentation;
 
+    @OneToOne(targetEntity = Image.class, fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "event")
+    private Image image;
+
     public long getId() {
         return id;
     }
@@ -69,5 +72,14 @@ public class Event {
 
     public void setPresentation(@Nonnull Presentation presentation) {
         this.presentation = presentation;
+    }
+
+    @Nullable
+    public Image getImage() {
+        return image;
+    }
+
+    public void setImage(@Nullable Image image) {
+        this.image = image;
     }
 }

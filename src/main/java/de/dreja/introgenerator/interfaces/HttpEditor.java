@@ -8,9 +8,11 @@ import de.dreja.introgenerator.model.mapper.Base64IdSerializer;
 import de.dreja.introgenerator.model.mapper.EventMapper;
 import de.dreja.introgenerator.model.mapper.PresentationMapper;
 import de.dreja.introgenerator.model.persistence.Event;
+import de.dreja.introgenerator.model.persistence.Image;
 import de.dreja.introgenerator.model.persistence.Presentation;
 import de.dreja.introgenerator.service.ResourceService;
 import de.dreja.introgenerator.service.persistence.EventRepository;
+import de.dreja.introgenerator.service.persistence.ImageRepository;
 import de.dreja.introgenerator.service.persistence.PresentationRepository;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
@@ -23,17 +25,18 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.util.MimeType;
+import org.springframework.util.MimeTypeUtils;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.time.DayOfWeek;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.temporal.TemporalAdjuster;
 import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 
@@ -66,6 +69,7 @@ public class HttpEditor {
     private final Resource bootStrapCss = new ClassPathResource("static/bootstrap.css");
     private final Resource appCss = new ClassPathResource("static/app.css");
     private final Resource background = new ClassPathResource("static/wood-full-hd.jpg");
+    private final ImageRepository imageRepository;
 
     @Autowired
     HttpEditor(PresentationRepository presentationRepository,
@@ -74,7 +78,7 @@ public class HttpEditor {
                Base64IdSerializer idSerializer,
                PresentationMapper presentationMapper,
                EventMapper eventMapper,
-               ResourceService resourceService) {
+               ResourceService resourceService, ImageRepository imageRepository) {
         this.presentationRepository = presentationRepository;
         this.eventRepository = eventRepository;
         this.idDeserializer = idDeserializer;
@@ -82,6 +86,7 @@ public class HttpEditor {
         this.presentationMapper = presentationMapper;
         this.eventMapper = eventMapper;
         this.resourceService = resourceService;
+        this.imageRepository = imageRepository;
     }
 
     @GetMapping({"/"})
@@ -180,6 +185,37 @@ public class HttpEditor {
         presentationRepository.saveAndFlush(presentation);
         eventRepository.saveAndFlush(newEvent);
         return seePresentation(presentation.getId());
+    }
+
+    @PostMapping("/images-for/{eventId}")
+    @Transactional
+    public ResponseEntity<Void> createOrUpdateImage(@PathVariable("eventId")
+                                                    @Nonnull
+                                                    String eventId,
+                                                    @RequestParam("imageFile") MultipartFile file) {
+        final Event event = idDeserializer.fromBase64(eventId).stream().boxed()
+                .flatMap(id -> eventRepository.findById(id).stream())
+                .findAny()
+                .orElseThrow(NoSuchElementException::new);
+        Image image = event.getImage();
+        if (image == null) {
+            image = new Image();
+        }
+        try {
+            image.setEvent(event);
+            image.setMimeType(file.getContentType() == null
+                    ? MimeTypeUtils.APPLICATION_OCTET_STREAM
+                    : MimeType.valueOf(file.getContentType()));
+            image.setContent(file.getBytes());
+            image.setFileName(file.getOriginalFilename() == null
+                    ? "file"
+                    : file.getOriginalFilename());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        eventRepository.saveAndFlush(event);
+        imageRepository.saveAndFlush(image);
+        return seePresentation(event.getPresentation().getId());
     }
 
     @Nonnull

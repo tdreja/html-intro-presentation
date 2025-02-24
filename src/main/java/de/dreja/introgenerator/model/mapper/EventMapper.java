@@ -25,6 +25,7 @@ public interface EventMapper {
     @Mapping(target = "startTime", source = "startDateTime", qualifiedByName = "formToTime")
     @Mapping(target = "presentation", ignore = true)
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "image", ignore = true)
     void updatePersistence(@Nullable EventForm form, @Nullable @MappingTarget Event event);
 
     @Nonnull
