@@ -1,35 +1,47 @@
-import React, { useContext, useState } from 'react';
+import React, { useCallback, useContext, useState } from 'react';
 import ReactQuill from 'react-quill-new';
 import 'react-quill-new/dist/quill.snow.css';
 import { PresentationContext, PresentationEditorContext } from '../model/PresentationContext.ts';
 import './presentation.css';
 
+function toDateTimeLocal(date: Date): string {
+    const pad = (n: number) => String(n).padStart(2, '0');
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+}
+
 export function Editor() {
     const presentation = useContext(PresentationContext);
     const setPresentation = useContext(PresentationEditorContext);
-    const { slides } = presentation;
+    const { slides, target } = presentation;
 
     const [selectedIndex, setSelectedIndex] = useState(0);
     const currentSlide = slides[selectedIndex] ?? null;
 
-    function addSlide() {
+    const updateTarget = useCallback((value: string) => {
+        const parsed = new Date(value);
+        if (!isNaN(parsed.getTime())) {
+            setPresentation({ ...presentation, target: parsed });
+        }
+    }, [presentation, setPresentation]);
+
+    const addSlide = useCallback(() => {
         const newSlides = [...slides, { content: '<h1>Neue Folie</h1><p>Inhalt hier...</p>' }];
         setPresentation({ ...presentation, slides: newSlides });
         setSelectedIndex(newSlides.length - 1);
-    }
+    }, [presentation, slides, setPresentation]);
 
-    function removeSlide(index: number) {
+    const removeSlide = useCallback((index: number) => {
         if (slides.length <= 1) return;
         const newSlides = slides.filter((_, i) => i !== index);
         setPresentation({ ...presentation, slides: newSlides });
         setSelectedIndex(Math.min(selectedIndex, newSlides.length - 1));
-    }
+    }, [presentation, slides, selectedIndex, setPresentation]);
 
-    function updateCurrentSlide(content: string) {
+    const updateCurrentSlide = useCallback((content: string) => {
         const newSlides = slides.map((slide, i) =>
             i === selectedIndex ? { ...slide, content } : slide);
         setPresentation({ ...presentation, slides: newSlides });
-    }
+    }, [presentation, slides, selectedIndex, setPresentation]);
 
     return (
         <div className="editor-layout d-flex flex-column vw-100 vh-100 overflow-hidden">
@@ -63,6 +75,21 @@ export function Editor() {
                     : (
                         <div className="editor-preview-empty text-center">Keine Folie ausgewählt</div>
                     )}
+            </div>
+
+            {/* Target Date & Time */}
+            <div className="editor-target-bar flex-shrink-0 border-top d-flex align-items-center gap-3 px-4 py-2">
+                <label htmlFor="target-datetime" className="form-label mb-0 fw-semibold text-nowrap">
+                    <span className="material-symbols-outlined align-middle me-1" style={{ fontSize: '1.1rem' }}>event</span>
+                    Präsentation endet am
+                </label>
+                <input
+                    id="target-datetime"
+                    type="datetime-local"
+                    className="form-control form-control-sm w-auto"
+                    value={toDateTimeLocal(target)}
+                    onChange={(e) => updateTarget(e.target.value)}
+                />
             </div>
 
             {/* Carousel */}
