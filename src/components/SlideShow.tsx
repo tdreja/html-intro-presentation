@@ -56,8 +56,8 @@ export function SlideShow() {
 
     if (expired) {
         return (
-            <div className="slide-container slide-container--expired">
-                <a href="#editor" className="editor-button editor-button--center">
+            <div className="slide-container d-flex flex-column align-items-center justify-content-center position-relative overflow-hidden gap-4">
+                <a href="#editor" className="editor-button--center">
                     Zum Editor
                 </a>
             </div>
@@ -66,8 +66,8 @@ export function SlideShow() {
 
     if (!slides.length) {
         return (
-            <div className="slide-container">
-                <div className="slide-content slide-empty">
+            <div className="slide-container d-flex align-items-center justify-content-center position-relative overflow-hidden">
+                <div className="slide-content text-center slide-empty">
                     Keine Slides geladen.
                 </div>
             </div>
@@ -77,7 +77,7 @@ export function SlideShow() {
     const slide = slides[currentIndex];
 
     return (
-        <div className="slide-container">
+        <div className="slide-container d-flex align-items-center justify-content-center position-relative overflow-hidden">
             {transitioning && prevIndex !== null && (
                 <div className="slide-content slide-content--exit"
                      dangerouslySetInnerHTML={{ __html: slides[prevIndex].content }}
@@ -87,12 +87,12 @@ export function SlideShow() {
                 className={`slide-content${transitioning ? ' slide-content--enter' : ''}`}
                 dangerouslySetInnerHTML={{ __html: slide.content }}
             />
-            <div className="slide-counter">
+            <div className="slide-counter font-monospace small user-select-none pe-none">
                 {currentIndex + 1}
                 {' / '}
                 {slides.length}
             </div>
-            <a href="#editor" className="editor-button editor-button--ghost" title="Zum Editor">
+            <a href="#editor" className="editor-button--ghost" title="Zum Editor">
                 <span className="material-symbols-outlined">edit</span>
             </a>
         </div>

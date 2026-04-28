@@ -33,6 +33,11 @@ export function Countdown() {
 
     const className = [
         'countdown',
+        'position-fixed',
+        'font-monospace',
+        'fw-bold',
+        'user-select-none',
+        'pe-none',
         lastMinute ? 'countdown--last-minute' : '',
         expired ? 'countdown--expired' : '',
     ].filter(Boolean).join(' ');

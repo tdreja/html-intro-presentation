@@ -32,15 +32,15 @@ export function Editor() {
     }
 
     return (
-        <div className="editor-layout">
+        <div className="editor-layout d-flex flex-column vw-100 vh-100 overflow-hidden">
             {/* Header */}
-            <div className="editor-header">
-                <a href="#" className="editor-nav-link">
+            <div className="editor-header d-flex align-items-center justify-content-between flex-shrink-0 border-bottom gap-3">
+                <a href="#" className="editor-nav-link d-flex align-items-center gap-1 text-decoration-none">
                     <span className="material-symbols-outlined">arrow_back</span>
                     Zurück zur Präsentation
                 </a>
-                <span className="editor-title">Editor</span>
-                <span className="editor-slide-info">
+                <span className="editor-title font-monospace fw-bold">Editor</span>
+                <span className="editor-slide-info font-monospace small">
                     {'Folie '}
                     {selectedIndex + 1}
                     {' / '}
@@ -49,10 +49,10 @@ export function Editor() {
             </div>
 
             {/* Quill Editor */}
-            <div className="editor-preview-area">
+            <div className="editor-preview-area flex-grow-1 d-flex align-items-stretch justify-content-center p-3 overflow-hidden">
                 {currentSlide
                     ? (
-                        <div className="editor-quill-wrapper">
+                        <div className="editor-quill-wrapper d-flex flex-column w-100 h-100">
                             <ReactQuill
                                 theme="snow"
                                 value={currentSlide.content}
@@ -61,29 +61,29 @@ export function Editor() {
                         </div>
                     )
                     : (
-                        <div className="editor-preview-empty">Keine Folie ausgewählt</div>
+                        <div className="editor-preview-empty text-center">Keine Folie ausgewählt</div>
                     )}
             </div>
 
             {/* Carousel */}
-            <div className="editor-carousel-bar">
-                <div className="editor-carousel">
+            <div className="editor-carousel-bar flex-shrink-0 border-top overflow-x-auto">
+                <div className="editor-carousel d-flex gap-2 h-100 align-items-center">
                     {slides.map((slide, index) => (
                         <div
                             key={index}
-                            className={`editor-thumb${index === selectedIndex ? ' editor-thumb--active' : ''}`}
+                            className={`editor-thumb position-relative d-flex align-items-center justify-content-center overflow-hidden rounded-2${index === selectedIndex ? ' editor-thumb--active' : ''}`}
                             onClick={() => setSelectedIndex(index)}
                             title={`Folie ${index + 1}`}
                         >
-                            <div className="editor-thumb-number">{index + 1}</div>
-                            <div className="editor-thumb-preview">
+                            <div className="editor-thumb-number position-absolute font-monospace user-select-none pe-none">{index + 1}</div>
+                            <div className="editor-thumb-preview w-100 h-100 overflow-hidden d-flex align-items-start">
                                 <div
                                     className="editor-thumb-inner"
                                     dangerouslySetInnerHTML={{ __html: slide.content }}
                                 />
                             </div>
                             <button
-                                className="editor-thumb-remove"
+                                className="editor-thumb-remove position-absolute border-0 d-flex align-items-center justify-content-center p-0"
                                 onClick={(e) => {
                                     e.stopPropagation();
                                     removeSlide(index);
@@ -95,7 +95,7 @@ export function Editor() {
                             </button>
                         </div>
                     ))}
-                    <div className="editor-thumb editor-thumb--add" onClick={addSlide} title="Folie hinzufügen">
+                    <div className="editor-thumb editor-thumb--add position-relative d-flex flex-column align-items-center justify-content-center overflow-hidden rounded-2" onClick={addSlide} title="Folie hinzufügen">
                         <span className="material-symbols-outlined">add</span>
                     </div>
                 </div>

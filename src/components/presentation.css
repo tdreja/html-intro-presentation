@@ -14,7 +14,7 @@ html, body, #root {
     overflow: hidden;
 }
 
-/* SlideShow */
+/* ── SlideShow ──────────────────────────────────────────── */
 
 @keyframes slideIn {
     from { opacity: 0.4; transform: translateX(150%); }
@@ -22,18 +22,13 @@ html, body, #root {
 }
 
 @keyframes slideOut {
-    from { opacity: 1;    transform: translateX(0); }
-    to   { opacity: 1;    transform: translateX(-150%); }
+    from { opacity: 1;   transform: translateX(0); }
+    to   { opacity: 1;   transform: translateX(-150%); }
 }
 
 .slide-container {
-    position: relative;
-    overflow: hidden;
     width: 100vw;
     height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     background-color: #1a1a2e;
     color: #e0e0e0;
     padding: 4rem 6rem;
@@ -79,33 +74,17 @@ html, body, #root {
 .slide-empty {
     color: #888;
     font-size: 1.2rem;
-    text-align: center;
 }
 
 .slide-counter {
     position: fixed;
     bottom: 1rem;
     left: 1.5rem;
-    font-size: 0.85rem;
     color: #666;
-    font-family: monospace;
-    user-select: none;
-    pointer-events: none;
 }
 
-/* Editor Button */
+/* ── Editor Button ──────────────────────────────────────── */
 
-.editor-button {
-    display: inline-block;
-    text-decoration: none;
-    border-radius: 8px;
-    font-family: monospace;
-    font-weight: 700;
-    cursor: pointer;
-    transition: opacity 0.3s ease, background-color 0.3s ease;
-}
-
-/* Läuft: fast unsichtbar, hover sichtbarer */
 .editor-button--ghost {
     position: fixed;
     top: 1rem;
@@ -117,6 +96,9 @@ html, body, #root {
     border: none;
     opacity: 0.2;
     line-height: 0;
+    text-decoration: none;
+    display: inline-block;
+    transition: opacity 0.3s ease;
 }
 
 .editor-button--ghost .material-symbols-outlined {
@@ -129,40 +111,36 @@ html, body, #root {
     color: #90caf9;
 }
 
-/* Abgeschlossen: zentraler Button */
-.slide-container--expired {
-    flex-direction: column;
-    gap: 2rem;
-}
-
 .editor-button--center {
     padding: 1rem 2.5rem;
     font-size: 1.4rem;
     background-color: #90caf9;
     color: #1a1a2e;
     border: none;
-    opacity: 1;
+    border-radius: 8px;
+    font-family: monospace;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+    display: inline-block;
+    transition: background-color 0.3s ease;
 }
 
 .editor-button--center:hover {
     background-color: #bbdefb;
+    color: #1a1a2e;
 }
 
-/* Countdown */
+/* ── Countdown ──────────────────────────────────────────── */
 
 .countdown {
-    position: fixed;
     bottom: 1rem;
     right: 1.5rem;
-    font-family: monospace;
-    font-weight: 700;
     font-size: 1.4rem;
     color: #ffffff;
     text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
     transition: font-size 0.3s ease, color 0.3s ease;
     z-index: 100;
-    pointer-events: none;
-    user-select: none;
 }
 
 .countdown--last-minute {
@@ -177,49 +155,28 @@ html, body, #root {
 /* ── Editor ─────────────────────────────────────────────── */
 
 .editor-layout {
-    display: flex;
-    flex-direction: column;
-    width: 100vw;
-    height: 100vh;
     background-color: #12122a;
     color: #e0e0e0;
-    overflow: hidden;
 }
 
-/* Header */
-
 .editor-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0.6rem 1.5rem;
     background-color: #1a1a3e;
-    border-bottom: 1px solid #2e2e5e;
-    flex-shrink: 0;
-    gap: 1rem;
+    border-bottom-color: #2e2e5e !important;
+    padding: 0.6rem 1.5rem;
 }
 
 .editor-title {
-    font-family: monospace;
     font-size: 1.1rem;
-    font-weight: 700;
     color: #90caf9;
     letter-spacing: 0.05em;
 }
 
 .editor-slide-info {
-    font-family: monospace;
-    font-size: 0.85rem;
     color: #888;
 }
 
 .editor-nav-link {
-    display: flex;
-    align-items: center;
-    gap: 0.3rem;
-    text-decoration: none;
     color: #90caf9;
-    font-family: monospace;
     font-size: 0.9rem;
     transition: color 0.2s;
 }
@@ -232,23 +189,14 @@ html, body, #root {
     font-size: 1.1rem;
 }
 
-/* Large preview / editor area */
-
-.editor-preview-area {
-    flex: 1 1 0;
-    display: flex;
-    align-items: stretch;
-    justify-content: center;
-    padding: 1rem 3rem;
-    overflow: hidden;
+.editor-preview-empty {
+    color: #888;
 }
 
+/* Quill wrapper */
+
 .editor-quill-wrapper {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
     max-width: 900px;
-    height: 100%;
 }
 
 .editor-quill-wrapper .quill {
@@ -268,23 +216,14 @@ html, body, #root {
     flex-shrink: 0;
 }
 
-.editor-quill-wrapper .ql-toolbar .ql-stroke {
-    stroke: #90caf9;
-}
-
-.editor-quill-wrapper .ql-toolbar .ql-fill {
-    fill: #90caf9;
-}
+.editor-quill-wrapper .ql-toolbar .ql-stroke { stroke: #90caf9; }
+.editor-quill-wrapper .ql-toolbar .ql-fill   { fill:   #90caf9; }
 
 .editor-quill-wrapper .ql-toolbar button:hover .ql-stroke,
-.editor-quill-wrapper .ql-toolbar button.ql-active .ql-stroke {
-    stroke: #bbdefb;
-}
+.editor-quill-wrapper .ql-toolbar button.ql-active .ql-stroke { stroke: #bbdefb; }
 
 .editor-quill-wrapper .ql-toolbar button:hover .ql-fill,
-.editor-quill-wrapper .ql-toolbar button.ql-active .ql-fill {
-    fill: #bbdefb;
-}
+.editor-quill-wrapper .ql-toolbar button.ql-active .ql-fill   { fill:   #bbdefb; }
 
 .editor-quill-wrapper .ql-container {
     flex: 1 1 0;
@@ -311,44 +250,31 @@ html, body, #root {
     font-style: italic;
 }
 
-
-/* Carousel */
+/* ── Carousel ──────────────────────────────────────────── */
 
 .editor-carousel-bar {
-    flex-shrink: 0;
     height: 160px;
     background-color: #16162e;
-    border-top: 1px solid #2e2e5e;
-    overflow-x: auto;
-    overflow-y: hidden;
+    border-top-color: #2e2e5e !important;
     padding: 0.75rem 1rem;
     scrollbar-width: thin;
     scrollbar-color: #2e2e5e #16162e;
 }
 
 .editor-carousel {
-    display: flex;
-    gap: 0.75rem;
-    height: 100%;
-    align-items: center;
+    flex-wrap: nowrap;
 }
 
-/* Thumbnail */
+/* ── Thumbnail ─────────────────────────────────────────── */
 
 .editor-thumb {
-    position: relative;
     flex-shrink: 0;
     width: 160px;
     height: 110px;
     background-color: #1a1a2e;
     border: 2px solid #2e2e5e;
-    border-radius: 6px;
     cursor: pointer;
-    overflow: hidden;
     transition: border-color 0.2s, box-shadow 0.2s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
 }
 
 .editor-thumb:hover {
@@ -361,25 +287,10 @@ html, body, #root {
 }
 
 .editor-thumb-number {
-    position: absolute;
     bottom: 3px;
     left: 6px;
-    font-family: monospace;
     font-size: 0.65rem;
     color: #555;
-    pointer-events: none;
-    user-select: none;
-}
-
-/* Scale slide content down for thumbnail */
-
-.editor-thumb-preview {
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    display: flex;
-    align-items: flex-start;
-    justify-content: flex-start;
 }
 
 .editor-thumb-inner {
@@ -402,23 +313,17 @@ html, body, #root {
     margin-top: 0.5em;
 }
 
-/* Remove button on thumbnail */
+/* Remove button */
 
 .editor-thumb-remove {
-    position: absolute;
     top: 3px;
     right: 3px;
     background: rgba(26, 26, 46, 0.8);
-    border: none;
-    border-radius: 4px;
     color: #888;
     cursor: pointer;
-    padding: 0;
     line-height: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     opacity: 0;
+    border-radius: 4px;
     transition: opacity 0.2s, color 0.2s;
 }
 
@@ -441,11 +346,9 @@ html, body, #root {
 /* Add-slide button */
 
 .editor-thumb--add {
-    border-style: dashed;
+    border-style: dashed !important;
     color: #555;
     font-size: 0;
-    flex-direction: column;
-    gap: 0.3rem;
     transition: border-color 0.2s, color 0.2s;
 }
 
@@ -454,7 +357,6 @@ html, body, #root {
 }
 
 .editor-thumb--add:hover {
-    border-color: #90caf9;
+    border-color: #90caf9 !important;
     color: #90caf9;
 }
-
