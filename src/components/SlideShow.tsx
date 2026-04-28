@@ -23,20 +23,36 @@ export function SlideShow() {
     }, [target]);
 
     const [currentIndex, setCurrentIndex] = useState(0);
+    const [prevIndex, setPrevIndex] = useState<number | null>(null);
+    const [transitioning, setTransitioning] = useState(false);
     const indexRef = useRef(currentIndex);
     indexRef.current = currentIndex;
+    const transitionTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     // Reset to first slide when presentation changes
     useEffect(() => {
         setCurrentIndex(0);
+        setPrevIndex(null);
+        setTransitioning(false);
     }, [slides]);
 
     useEffect(() => {
         if (!slides.length) return;
         const id = setInterval(() => {
-            setCurrentIndex((prev) => (prev + 1) % slides.length);
+            const next = (indexRef.current + 1) % slides.length;
+            setPrevIndex(indexRef.current);
+            setCurrentIndex(next);
+            setTransitioning(true);
+            if (transitionTimerRef.current) clearTimeout(transitionTimerRef.current);
+            transitionTimerRef.current = setTimeout(() => {
+                setTransitioning(false);
+                setPrevIndex(null);
+            }, 600);
         }, SECONDS_PER_SLIDE * 1000);
-        return () => clearInterval(id);
+        return () => {
+            clearInterval(id);
+            if (transitionTimerRef.current) clearTimeout(transitionTimerRef.current);
+        };
     }, [slides]);
 
     if (expired) {
@@ -63,7 +79,12 @@ export function SlideShow() {
 
     return (
         <div className="slide-container">
-            <div key={currentIndex} className="slide-content">
+            {transitioning && prevIndex !== null && (
+                <div className="slide-content slide-content--exit">
+                    <Markdown>{slides[prevIndex].content}</Markdown>
+                </div>
+            )}
+            <div className={`slide-content${transitioning ? ' slide-content--enter' : ''}`}>
                 <Markdown>{slide.content}</Markdown>
             </div>
             <div className="slide-counter">

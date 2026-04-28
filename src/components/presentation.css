@@ -16,12 +16,19 @@ html, body, #root {
 
 /* SlideShow */
 
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(12px); }
-    to   { opacity: 1; transform: translateY(0); }
+@keyframes slideIn {
+    from { opacity: 0.4; transform: translateX(150%); }
+    to   { opacity: 1;   transform: translateX(0); }
+}
+
+@keyframes slideOut {
+    from { opacity: 1;    transform: translateX(0); }
+    to   { opacity: 1;    transform: translateX(-150%); }
 }
 
 .slide-container {
+    position: relative;
+    overflow: hidden;
     width: 100vw;
     height: 100vh;
     display: flex;
@@ -33,11 +40,19 @@ html, body, #root {
 }
 
 .slide-content {
+    position: absolute;
     max-width: 900px;
-    width: 100%;
+    width: calc(100% - 12rem);
     font-size: 1.5rem;
     line-height: 1.7;
-    animation: fadeIn 0.5s ease;
+}
+
+.slide-content--enter {
+    animation: slideIn 0.55s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.slide-content--exit {
+    animation: slideOut 0.55s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
 .slide-content h1,
