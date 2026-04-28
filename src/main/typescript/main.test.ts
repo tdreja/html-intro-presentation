@@ -1,3 +1,0 @@
-test('tempTest', () => {
-    expect(2 + 2).toBe(4);
-});
