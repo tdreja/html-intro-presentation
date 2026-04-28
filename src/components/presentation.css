@@ -1,3 +1,5 @@
+@import 'material-symbols/outlined.css';
+
 /* Reset */
 
 *, *::before, *::after {
@@ -74,6 +76,61 @@ html, body, #root {
     font-family: monospace;
     user-select: none;
     pointer-events: none;
+}
+
+/* Editor Button */
+
+.editor-button {
+    display: inline-block;
+    text-decoration: none;
+    border-radius: 8px;
+    font-family: monospace;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity 0.3s ease, background-color 0.3s ease;
+}
+
+/* Läuft: fast unsichtbar, hover sichtbarer */
+.editor-button--ghost {
+    position: fixed;
+    top: 1rem;
+    right: 1.5rem;
+    padding: 0.3rem;
+    font-size: 0;
+    background-color: transparent;
+    color: rgba(144, 202, 249, 0.2);
+    border: none;
+    opacity: 0.2;
+    line-height: 0;
+}
+
+.editor-button--ghost .material-symbols-outlined {
+    font-size: 1.8rem;
+    transition: color 0.3s ease;
+}
+
+.editor-button--ghost:hover {
+    opacity: 1;
+    color: #90caf9;
+}
+
+/* Abgeschlossen: zentraler Button */
+.slide-container--expired {
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.editor-button--center {
+    padding: 1rem 2.5rem;
+    font-size: 1.4rem;
+    background-color: #90caf9;
+    color: #1a1a2e;
+    border: none;
+    opacity: 1;
+}
+
+.editor-button--center:hover {
+    background-color: #bbdefb;
 }
 
 /* Countdown */

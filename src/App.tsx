@@ -3,6 +3,17 @@ import { type Presentation } from './model/Presentation.ts';
 import { PresentationContext, PresentationEditorContext } from './model/PresentationContext.ts';
 import { SlideShow } from './components/SlideShow.tsx';
 import { Countdown } from './components/Countdown.tsx';
+import { Editor } from './components/Editor.tsx';
+
+function useHash(): string {
+    const [hash, setHash] = useState(() => window.location.hash.replace('#', ''));
+    useEffect(() => {
+        const handler = () => setHash(window.location.hash.replace('#', ''));
+        window.addEventListener('hashchange', handler);
+        return () => window.removeEventListener('hashchange', handler);
+    }, []);
+    return hash;
+}
 
 function App() {
     const fakePresentation: Presentation = {
@@ -17,6 +28,18 @@ function App() {
     useEffect(() => {
         // setPresentation(loadPresentation());
     }, []);
+
+    const route = useHash();
+
+    if (route === 'editor') {
+        return (
+            <PresentationContext.Provider value={presentation}>
+                <PresentationEditorContext.Provider value={setPresentation}>
+                    <Editor />
+                </PresentationEditorContext.Provider>
+            </PresentationContext.Provider>
+        );
+    }
 
     return (
         <PresentationContext.Provider value={presentation}>

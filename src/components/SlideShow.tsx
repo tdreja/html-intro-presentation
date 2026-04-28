@@ -1,3 +1,5 @@
+// noinspection HtmlUnknownAnchorTarget
+
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import Markdown from 'react-markdown';
 import { PresentationContext } from '../model/PresentationContext.ts';
@@ -38,7 +40,13 @@ export function SlideShow() {
     }, [slides]);
 
     if (expired) {
-        return <div className="slide-container" />;
+        return (
+            <div className="slide-container slide-container--expired">
+                <a href="#editor" className="editor-button editor-button--center">
+                    Zum Editor
+                </a>
+            </div>
+        );
     }
 
     if (!slides.length) {
@@ -63,6 +71,9 @@ export function SlideShow() {
                 {' / '}
                 {slides.length}
             </div>
+            <a href="#editor" className="editor-button editor-button--ghost" title="Zum Editor">
+                <span className="material-symbols-outlined">edit</span>
+            </a>
         </div>
     );
 }
