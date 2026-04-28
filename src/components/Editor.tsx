@@ -13,6 +13,7 @@ export function Editor() {
     const presentation = useContext(PresentationContext);
     const setPresentation = useContext(PresentationEditorContext);
     const { slides, target } = presentation;
+    const isPast = target.getTime() <= Date.now();
 
     const [selectedIndex, setSelectedIndex] = useState(0);
     const currentSlide = slides[selectedIndex] ?? null;
@@ -47,7 +48,11 @@ export function Editor() {
         <div className="editor-layout d-flex flex-column vw-100 vh-100 overflow-hidden">
             {/* Header */}
             <div className="editor-header d-flex align-items-center justify-content-between flex-shrink-0 border-bottom gap-3">
-                <a href="#" className="editor-nav-link d-flex align-items-center gap-1 text-decoration-none">
+                <a
+                    href={isPast ? undefined : '#'}
+                    aria-disabled={isPast}
+                    className={`editor-nav-link d-flex align-items-center gap-1 text-decoration-none${isPast ? ' disabled text-muted pe-none' : ''}`}
+                >
                     <span className="material-symbols-outlined">arrow_back</span>
                     Zurück zur Präsentation
                 </a>

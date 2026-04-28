@@ -4,6 +4,7 @@ import { PresentationContext, PresentationEditorContext } from './model/Presenta
 import { SlideShow } from './components/SlideShow.tsx';
 import { Countdown } from './components/Countdown.tsx';
 import { Editor } from './components/Editor.tsx';
+import { EDITOR_REDIRECT_THRESHOLD_SECONDS } from './settings.ts';
 
 function useHash(): string {
     const [hash, setHash] = useState(() => window.location.hash.replace('#', ''));
@@ -30,6 +31,22 @@ function App() {
     }, []);
 
     const route = useHash();
+
+    // Auto-redirect to editor after threshold has passed since presentation ended
+    useEffect(() => {
+        if (route === 'editor') return;
+        const targetTime = presentation.target.getTime();
+        const redirectAt = targetTime + EDITOR_REDIRECT_THRESHOLD_SECONDS * 1000;
+        const delay = redirectAt - Date.now();
+        if (delay <= 0) {
+            window.location.hash = 'editor';
+            return;
+        }
+        const id = setTimeout(() => {
+            window.location.hash = 'editor';
+        }, delay);
+        return () => clearTimeout(id);
+    }, [presentation.target, route]);
 
     if (route === 'editor') {
         return (
