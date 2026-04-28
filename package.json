@@ -14,10 +14,10 @@
   "dependencies": {
     "bootstrap": "^5.3.8",
     "material-symbols": "^0.44.1",
+    "quill": "^2.0.2",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
-    "react-markdown": "^10.1.0",
-    "yaml": "^2.8.3"
+    "react-quill-new": "^3.7.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.22.0",

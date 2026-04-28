@@ -1,5 +1,6 @@
 import React, { useContext, useState } from 'react';
-import Markdown from 'react-markdown';
+import ReactQuill from 'react-quill-new';
+import 'react-quill-new/dist/quill.snow.css';
 import { PresentationContext, PresentationEditorContext } from '../model/PresentationContext.ts';
 import './presentation.css';
 
@@ -12,7 +13,7 @@ export function Editor() {
     const currentSlide = slides[selectedIndex] ?? null;
 
     function addSlide() {
-        const newSlides = [...slides, { content: '# Neue Folie\n\nInhalt hier...' }];
+        const newSlides = [...slides, { content: '<h1>Neue Folie</h1><p>Inhalt hier...</p>' }];
         setPresentation({ ...presentation, slides: newSlides });
         setSelectedIndex(newSlides.length - 1);
     }
@@ -22,6 +23,12 @@ export function Editor() {
         const newSlides = slides.filter((_, i) => i !== index);
         setPresentation({ ...presentation, slides: newSlides });
         setSelectedIndex(Math.min(selectedIndex, newSlides.length - 1));
+    }
+
+    function updateCurrentSlide(content: string) {
+        const newSlides = slides.map((slide, i) =>
+            i === selectedIndex ? { ...slide, content } : slide);
+        setPresentation({ ...presentation, slides: newSlides });
     }
 
     return (
@@ -41,15 +48,16 @@ export function Editor() {
                 </span>
             </div>
 
-            {/* Large preview – Platzhalter für echten Editor */}
+            {/* Quill Editor */}
             <div className="editor-preview-area">
                 {currentSlide
                     ? (
-                        <div className="editor-preview-slide">
-                            <div className="editor-preview-label">Vorschau (Platzhalter)</div>
-                            <div className="editor-preview-content slide-content">
-                                <Markdown>{currentSlide.content}</Markdown>
-                            </div>
+                        <div className="editor-quill-wrapper">
+                            <ReactQuill
+                                theme="snow"
+                                value={currentSlide.content}
+                                onChange={updateCurrentSlide}
+                            />
                         </div>
                     )
                     : (
@@ -69,9 +77,10 @@ export function Editor() {
                         >
                             <div className="editor-thumb-number">{index + 1}</div>
                             <div className="editor-thumb-preview">
-                                <div className="editor-thumb-inner">
-                                    <Markdown>{slide.content}</Markdown>
-                                </div>
+                                <div
+                                    className="editor-thumb-inner"
+                                    dangerouslySetInnerHTML={{ __html: slide.content }}
+                                />
                             </div>
                             <button
                                 className="editor-thumb-remove"

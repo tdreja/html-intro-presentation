@@ -1,7 +1,7 @@
-export type Markdown = string;
+export type Html = string;
 
 export interface Slide {
-    content: Markdown,
+    content: Html,
 }
 
 export interface Presentation {

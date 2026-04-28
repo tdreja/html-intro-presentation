@@ -1,7 +1,6 @@
 // noinspection HtmlUnknownAnchorTarget
 
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import Markdown from 'react-markdown';
 import { PresentationContext } from '../model/PresentationContext.ts';
 import { SECONDS_PER_SLIDE } from '../settings.ts';
 import './presentation.css';
@@ -80,13 +79,14 @@ export function SlideShow() {
     return (
         <div className="slide-container">
             {transitioning && prevIndex !== null && (
-                <div className="slide-content slide-content--exit">
-                    <Markdown>{slides[prevIndex].content}</Markdown>
-                </div>
+                <div className="slide-content slide-content--exit"
+                     dangerouslySetInnerHTML={{ __html: slides[prevIndex].content }}
+                />
             )}
-            <div className={`slide-content${transitioning ? ' slide-content--enter' : ''}`}>
-                <Markdown>{slide.content}</Markdown>
-            </div>
+            <div
+                className={`slide-content${transitioning ? ' slide-content--enter' : ''}`}
+                dangerouslySetInnerHTML={{ __html: slide.content }}
+            />
             <div className="slide-counter">
                 {currentIndex + 1}
                 {' / '}

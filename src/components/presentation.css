@@ -232,56 +232,85 @@ html, body, #root {
     font-size: 1.1rem;
 }
 
-/* Large preview area */
+/* Large preview / editor area */
 
 .editor-preview-area {
     flex: 1 1 0;
     display: flex;
-    align-items: center;
+    align-items: stretch;
     justify-content: center;
-    padding: 2rem 3rem;
+    padding: 1rem 3rem;
     overflow: hidden;
 }
 
-.editor-preview-slide {
-    position: relative;
+.editor-quill-wrapper {
+    display: flex;
+    flex-direction: column;
     width: 100%;
     max-width: 900px;
     height: 100%;
-    background-color: #1a1a2e;
-    border: 2px dashed #2e2e6e;
-    border-radius: 10px;
+}
+
+.editor-quill-wrapper .quill {
     display: flex;
     flex-direction: column;
+    height: 100%;
+    background-color: #1e1e3f;
+    border-radius: 8px;
+    border: 1px solid #2e2e6e;
     overflow: hidden;
 }
 
-.editor-preview-label {
-    position: absolute;
-    top: 0.5rem;
-    right: 0.8rem;
-    font-size: 0.7rem;
-    font-family: monospace;
-    color: #555;
-    pointer-events: none;
-    user-select: none;
+.editor-quill-wrapper .ql-toolbar {
+    background-color: #1a1a3e;
+    border: none;
+    border-bottom: 1px solid #2e2e6e;
+    flex-shrink: 0;
 }
 
-.editor-preview-content {
-    position: static;
-    width: 100%;
-    height: 100%;
-    max-width: 100%;
-    padding: 2.5rem 3rem;
+.editor-quill-wrapper .ql-toolbar .ql-stroke {
+    stroke: #90caf9;
+}
+
+.editor-quill-wrapper .ql-toolbar .ql-fill {
+    fill: #90caf9;
+}
+
+.editor-quill-wrapper .ql-toolbar button:hover .ql-stroke,
+.editor-quill-wrapper .ql-toolbar button.ql-active .ql-stroke {
+    stroke: #bbdefb;
+}
+
+.editor-quill-wrapper .ql-toolbar button:hover .ql-fill,
+.editor-quill-wrapper .ql-toolbar button.ql-active .ql-fill {
+    fill: #bbdefb;
+}
+
+.editor-quill-wrapper .ql-container {
+    flex: 1 1 0;
+    border: none;
     overflow-y: auto;
-    font-size: 1.4rem;
+    font-size: 1.3rem;
+    font-family: inherit;
 }
 
-.editor-preview-empty {
-    color: #555;
-    font-size: 1rem;
-    font-family: monospace;
+.editor-quill-wrapper .ql-editor {
+    color: #e0e0e0;
+    min-height: 100%;
+    padding: 2rem 2.5rem;
 }
+
+.editor-quill-wrapper .ql-editor h1,
+.editor-quill-wrapper .ql-editor h2,
+.editor-quill-wrapper .ql-editor h3 {
+    color: #90caf9;
+}
+
+.editor-quill-wrapper .ql-editor.ql-blank::before {
+    color: #555;
+    font-style: italic;
+}
+
 
 /* Carousel */
 
