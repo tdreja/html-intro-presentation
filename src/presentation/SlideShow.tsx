@@ -1,13 +1,13 @@
 // noinspection HtmlUnknownAnchorTarget
 
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import { PresentationContext } from '../model/PresentationContext.ts';
+import { ActivePresentationContext } from '../model/ActivePresentationContext.ts';
 import { SECONDS_PER_SLIDE } from '../settings.ts';
 import './presentation.css';
 
 export function SlideShow() {
-    const presentation = useContext(PresentationContext);
-    const { slides, target } = presentation;
+    const activePresentation = useContext(ActivePresentationContext);
+    const { slides, target } = activePresentation.presentation;
     const [expired, setExpired] = useState(() => target.getTime() <= Date.now());
 
     useEffect(() => {
@@ -79,8 +79,9 @@ export function SlideShow() {
     return (
         <div className="slide-container d-flex align-items-center justify-content-center position-relative overflow-hidden">
             {transitioning && prevIndex !== null && (
-                <div className="slide-content slide-content--exit"
-                     dangerouslySetInnerHTML={{ __html: slides[prevIndex].content }}
+                <div
+                    className="slide-content slide-content--exit"
+                    dangerouslySetInnerHTML={{ __html: slides[prevIndex].content }}
                 />
             )}
             <div

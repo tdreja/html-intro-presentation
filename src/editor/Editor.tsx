@@ -1,8 +1,8 @@
 import React, { useCallback, useContext, useState } from 'react';
 import ReactQuill from 'react-quill-new';
 import 'react-quill-new/dist/quill.snow.css';
-import { PresentationContext, PresentationEditorContext } from '../model/PresentationContext.ts';
-import './presentation.css';
+import { ActivePresentationContext } from '../model/ActivePresentationContext.ts';
+import './editor.css';
 
 function toDateTimeLocal(date: Date): string {
     const pad = (n: number) => String(n).padStart(2, '0');
@@ -10,9 +10,8 @@ function toDateTimeLocal(date: Date): string {
 }
 
 export function Editor() {
-    const presentation = useContext(PresentationContext);
-    const setPresentation = useContext(PresentationEditorContext);
-    const { slides, target } = presentation;
+    const activePresentation = useContext(ActivePresentationContext);
+    const { slides, target } = activePresentation.presentation;
     const isPast = target.getTime() <= Date.now();
 
     const [selectedIndex, setSelectedIndex] = useState(0);
@@ -21,28 +20,28 @@ export function Editor() {
     const updateTarget = useCallback((value: string) => {
         const parsed = new Date(value);
         if (!isNaN(parsed.getTime())) {
-            setPresentation({ ...presentation, target: parsed });
+            activePresentation.updatePresentation({ ...activePresentation.presentation, target: parsed });
         }
-    }, [presentation, setPresentation]);
+    }, [activePresentation]);
 
     const addSlide = useCallback(() => {
         const newSlides = [...slides, { content: '<h1>Neue Folie</h1><p>Inhalt hier...</p>' }];
-        setPresentation({ ...presentation, slides: newSlides });
+        activePresentation.updatePresentation({ ...activePresentation.presentation, slides: newSlides });
         setSelectedIndex(newSlides.length - 1);
-    }, [presentation, slides, setPresentation]);
+    }, [activePresentation, slides]);
 
     const removeSlide = useCallback((index: number) => {
         if (slides.length <= 1) return;
         const newSlides = slides.filter((_, i) => i !== index);
-        setPresentation({ ...presentation, slides: newSlides });
+        activePresentation.updatePresentation({ ...activePresentation.presentation, slides: newSlides });
         setSelectedIndex(Math.min(selectedIndex, newSlides.length - 1));
-    }, [presentation, slides, selectedIndex, setPresentation]);
+    }, [activePresentation, slides, selectedIndex]);
 
     const updateCurrentSlide = useCallback((content: string) => {
         const newSlides = slides.map((slide, i) =>
             i === selectedIndex ? { ...slide, content } : slide);
-        setPresentation({ ...presentation, slides: newSlides });
-    }, [presentation, slides, selectedIndex, setPresentation]);
+        activePresentation.updatePresentation({ ...activePresentation.presentation, slides: newSlides });
+    }, [activePresentation, slides, selectedIndex]);
 
     return (
         <div className="editor-layout d-flex flex-column vw-100 vh-100 overflow-hidden">

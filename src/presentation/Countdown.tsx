@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { PresentationContext } from '../model/PresentationContext.ts';
+import { ActivePresentationContext } from '../model/ActivePresentationContext.ts';
 import './presentation.css';
 
 function formatCountdown(ms: number): string {
@@ -17,7 +17,8 @@ function formatCountdown(ms: number): string {
 }
 
 export function Countdown() {
-    const { target } = useContext(PresentationContext);
+    const { presentation } = useContext(ActivePresentationContext);
+    const { target } = presentation;
     const [remaining, setRemaining] = useState<number>(() => target.getTime() - Date.now());
 
     useEffect(() => {
