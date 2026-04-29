@@ -2,18 +2,19 @@
 
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { ActivePresentationContext } from '../model/ActivePresentationContext.ts';
-import { SECONDS_PER_SLIDE } from '../settings.ts';
 import './presentation.css';
+import { LocalDateTime } from '@js-joda/core';
+import { DURATION_PER_SLIDE } from '../settings.ts';
 
 export function SlideShow() {
     const activePresentation = useContext(ActivePresentationContext);
     const { slides, target } = activePresentation.presentation;
-    const [expired, setExpired] = useState(() => target.getTime() <= Date.now());
+    const [expired, setExpired] = useState(() => LocalDateTime.now().isAfter(target));
 
     useEffect(() => {
-        setExpired(target.getTime() <= Date.now());
+        setExpired(LocalDateTime.now().isAfter(target));
         const id = setInterval(() => {
-            if (target.getTime() <= Date.now()) {
+            if (LocalDateTime.now().isAfter(target)) {
                 setExpired(true);
                 clearInterval(id);
             }
@@ -47,7 +48,7 @@ export function SlideShow() {
                 setTransitioning(false);
                 setPrevIndex(null);
             }, 600);
-        }, SECONDS_PER_SLIDE * 1000);
+        }, DURATION_PER_SLIDE.toMillis());
         return () => {
             clearInterval(id);
             if (transitionTimerRef.current) clearTimeout(transitionTimerRef.current);

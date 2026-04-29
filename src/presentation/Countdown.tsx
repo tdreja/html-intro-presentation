@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { ActivePresentationContext } from '../model/ActivePresentationContext.ts';
 import './presentation.css';
+import { ChronoUnit, LocalDateTime } from '@js-joda/core';
 
 function formatCountdown(ms: number): string {
     if (ms <= 0) return '00:00';
@@ -19,12 +20,12 @@ function formatCountdown(ms: number): string {
 export function Countdown() {
     const { presentation } = useContext(ActivePresentationContext);
     const { target } = presentation;
-    const [remaining, setRemaining] = useState<number>(() => target.getTime() - Date.now());
+    const [remaining, setRemaining] = useState<number>(() => LocalDateTime.now().until(target, ChronoUnit.MILLIS));
 
     useEffect(() => {
-        setRemaining(target.getTime() - Date.now());
+        setRemaining(LocalDateTime.now().until(target, ChronoUnit.MILLIS));
         const id = setInterval(() => {
-            setRemaining(target.getTime() - Date.now());
+            setRemaining(LocalDateTime.now().until(target, ChronoUnit.MILLIS));
         }, 500);
         return () => clearInterval(id);
     }, [target]);

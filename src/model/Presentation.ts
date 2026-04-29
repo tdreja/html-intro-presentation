@@ -1,3 +1,6 @@
+import { LocalDateTime } from '@js-joda/core';
+import { LocalDateTimeInput, printLocalDateTime, toLocalDateTime } from '../utils/DateTimeUtils.ts';
+
 export type Html = string;
 
 export interface Slide {
@@ -6,14 +9,14 @@ export interface Slide {
 
 export interface Presentation {
     slides: Slide[],
-    target: Date,
+    target: LocalDateTime,
 }
 
 export type JsonSlide = Partial<Slide>;
 
 export interface JsonPresentation {
     slides?: JsonSlide[],
-    target?: string | number | Date,
+    target?: LocalDateTimeInput | null,
 }
 
 export function toJson(presentation?: Presentation | null): JsonPresentation {
@@ -22,21 +25,15 @@ export function toJson(presentation?: Presentation | null): JsonPresentation {
     }
     return {
         slides: presentation.slides,
-        target: presentation.target.toISOString(),
+        target: printLocalDateTime(presentation.target),
     };
-}
-
-function oneHourAgo(): Date {
-    const date = new Date();
-    date.setHours(date.getHours() - 1);
-    return date;
 }
 
 export function fromJson(json?: JsonPresentation | null): Presentation {
     if (!json) {
         return {
             slides: [],
-            target: oneHourAgo(),
+            target: LocalDateTime.now().minusMinutes(1),
         };
     }
     const slides: Array<Slide> = [];
@@ -49,13 +46,14 @@ export function fromJson(json?: JsonPresentation | null): Presentation {
             }
         }
     }
+    const target: LocalDateTime | null = toLocalDateTime(json.target);
     return {
         slides,
-        target: json.target ? new Date(json.target) : oneHourAgo(),
+        target: target || LocalDateTime.now().minusMinutes(1),
     };
 }
 
 export const inactivePresentation: Presentation = {
     slides: [],
-    target: oneHourAgo(),
+    target: LocalDateTime.now().minusMinutes(1),
 };

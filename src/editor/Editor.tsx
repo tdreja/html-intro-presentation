@@ -3,23 +3,20 @@ import ReactQuill from 'react-quill-new';
 import 'react-quill-new/dist/quill.snow.css';
 import { ActivePresentationContext } from '../model/ActivePresentationContext.ts';
 import './editor.css';
-
-function toDateTimeLocal(date: Date): string {
-    const pad = (n: number) => String(n).padStart(2, '0');
-    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
-}
+import { LocalDateTime } from '@js-joda/core';
+import { printLocalDateTime, toLocalDateTime } from '../utils/DateTimeUtils.ts';
 
 export function Editor() {
     const activePresentation = useContext(ActivePresentationContext);
     const { slides, target } = activePresentation.presentation;
-    const isPast = target.getTime() <= Date.now();
+    const isPast = target.isBefore(LocalDateTime.now());
 
     const [selectedIndex, setSelectedIndex] = useState(0);
     const currentSlide = slides[selectedIndex] ?? null;
 
     const updateTarget = useCallback((value: string) => {
-        const parsed = new Date(value);
-        if (!isNaN(parsed.getTime())) {
+        const parsed = toLocalDateTime(value);
+        if (parsed) {
             activePresentation.updatePresentation({ ...activePresentation.presentation, target: parsed });
         }
     }, [activePresentation]);
@@ -91,7 +88,7 @@ export function Editor() {
                     id="target-datetime"
                     type="datetime-local"
                     className="form-control form-control-sm w-auto"
-                    value={toDateTimeLocal(target)}
+                    value={printLocalDateTime(target)}
                     onChange={(e) => updateTarget(e.target.value)}
                 />
             </div>

@@ -3,10 +3,11 @@ import { ActivePresentation, ActivePresentationContext } from './model/ActivePre
 import { SlideShow } from './presentation/SlideShow.tsx';
 import { Countdown } from './presentation/Countdown.tsx';
 import { Editor } from './editor/Editor.tsx';
-import { EDITOR_REDIRECT_THRESHOLD_SECONDS } from './settings.ts';
+import { EDITOR_REDIRECT_THRESHOLD } from './settings.ts';
 import { Route } from './model/Route.ts';
 import { useRoute } from './utils/UseRoute.tsx';
 import { useStoredPresentation } from './utils/UseStoredPresentation.tsx';
+import { ChronoUnit, LocalDateTime } from '@js-joda/core';
 
 function App() {
     const route = useRoute();
@@ -18,17 +19,19 @@ function App() {
 
     // Auto-redirect to editor after threshold has passed since presentation ended
     useEffect(() => {
-        if (route === Route.EDITOR) return;
-        const targetTime = presentation.target.getTime();
-        const redirectAt = targetTime + EDITOR_REDIRECT_THRESHOLD_SECONDS * 1000;
-        const delay = redirectAt - Date.now();
-        if (delay <= 0) {
+        if (route === Route.EDITOR) {
+            return;
+        }
+        const endOfPresentation = presentation.target.plus(EDITOR_REDIRECT_THRESHOLD);
+        const now = LocalDateTime.now();
+        if (now.isAfter(endOfPresentation)) {
             window.location.hash = 'editor';
             return;
         }
+        const remainingMillis = now.until(endOfPresentation, ChronoUnit.MILLIS);
         const id = setTimeout(() => {
             window.location.hash = 'editor';
-        }, delay);
+        }, remainingMillis);
         return () => clearTimeout(id);
     }, [presentation.target, route]);
 
