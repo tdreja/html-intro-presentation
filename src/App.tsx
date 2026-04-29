@@ -8,6 +8,7 @@ import { Route } from './model/Route.ts';
 import { useRoute } from './utils/UseRoute.tsx';
 import { useStoredPresentation } from './utils/UseStoredPresentation.tsx';
 import { ChronoUnit, LocalDateTime } from '@js-joda/core';
+import { CountdownContext, useCountdown } from './utils/UseCountdown.tsx';
 
 function App() {
     const route = useRoute();
@@ -16,6 +17,7 @@ function App() {
         presentation,
         updatePresentation: setPresentation,
     }), [presentation, setPresentation]);
+    const timeRemaining = useCountdown(activePresentation);
 
     // Auto-redirect to editor after threshold has passed since presentation ended
     useEffect(() => {
@@ -37,15 +39,17 @@ function App() {
 
     return (
         <ActivePresentationContext.Provider value={activePresentation}>
-            {route === Route.EDITOR && (
-                <Editor />
-            )}
-            {route === Route.PRESENTATION && (
-                <>
-                    <SlideShow />
-                    <Countdown />
-                </>
-            )}
+            <CountdownContext.Provider value={timeRemaining}>
+                {route === Route.EDITOR && (
+                    <Editor />
+                )}
+                {route === Route.PRESENTATION && (
+                    <>
+                        <SlideShow />
+                        <Countdown />
+                    </>
+                )}
+            </CountdownContext.Provider>
         </ActivePresentationContext.Provider>
     );
 }

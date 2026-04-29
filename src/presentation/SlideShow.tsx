@@ -5,22 +5,12 @@ import { ActivePresentationContext } from '../model/ActivePresentationContext.ts
 import './presentation.css';
 import { LocalDateTime } from '@js-joda/core';
 import { DURATION_PER_SLIDE } from '../settings.ts';
+import { CountdownContext } from '../utils/UseCountdown.tsx';
 
 export function SlideShow() {
     const activePresentation = useContext(ActivePresentationContext);
-    const { slides, target } = activePresentation.presentation;
-    const [expired, setExpired] = useState(() => LocalDateTime.now().isAfter(target));
-
-    useEffect(() => {
-        setExpired(LocalDateTime.now().isAfter(target));
-        const id = setInterval(() => {
-            if (LocalDateTime.now().isAfter(target)) {
-                setExpired(true);
-                clearInterval(id);
-            }
-        }, 500);
-        return () => clearInterval(id);
-    }, [target]);
+    const { slides } = activePresentation.presentation;
+    const timeRemaining = useContext(CountdownContext);
 
     const [currentIndex, setCurrentIndex] = useState(0);
     const [prevIndex, setPrevIndex] = useState<number | null>(null);
@@ -55,7 +45,7 @@ export function SlideShow() {
         };
     }, [slides]);
 
-    if (expired) {
+    if (!timeRemaining) {
         return (
             <div className="slide-container d-flex flex-column align-items-center justify-content-center position-relative overflow-hidden gap-4">
                 <a href="#editor" className="editor-button--center">
