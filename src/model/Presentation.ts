@@ -4,6 +4,7 @@ import { LocalDateTimeInput, printLocalDateTime, toLocalDateTime } from '../util
 export type Html = string;
 
 export interface Slide {
+    readonly id: LocalDateTime,
     content: Html,
 }
 
@@ -12,7 +13,10 @@ export interface Presentation {
     target: LocalDateTime,
 }
 
-export type JsonSlide = Partial<Slide>;
+export interface JsonSlide {
+    id?: LocalDateTimeInput | null,
+    content?: Html | null,
+}
 
 export interface JsonPresentation {
     slides?: JsonSlide[],
@@ -24,7 +28,10 @@ export function toJson(presentation?: Presentation | null): JsonPresentation {
         return {};
     }
     return {
-        slides: presentation.slides,
+        slides: presentation.slides.map((slide) => ({
+            ...slide,
+            id: printLocalDateTime(slide.id),
+        })),
         target: printLocalDateTime(presentation.target),
     };
 }
@@ -42,6 +49,7 @@ export function fromJson(json?: JsonPresentation | null): Presentation {
             if (slide.content) {
                 slides.push({
                     content: slide.content,
+                    id: toLocalDateTime(slide.id) || LocalDateTime.now(),
                 });
             }
         }

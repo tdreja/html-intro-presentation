@@ -64,6 +64,11 @@ html, body, #root {
     font-size: 0.9em;
 }
 
+.slide-content img {
+    max-width: 80vw;
+    max-height: 80vh;
+}
+
 .slide-content pre {
     background: #2d2d2d;
     padding: 1em;

@@ -43,7 +43,8 @@
 /* Quill wrapper */
 
 .editor-quill-wrapper {
-    max-width: 900px;
+    max-width: 70vw;
+    max-height: 70vh;
 }
 
 .editor-quill-wrapper .quill {
@@ -143,8 +144,8 @@
 .editor-thumb-inner {
     transform: scale(0.22);
     transform-origin: top left;
-    width: calc(100% / 0.22);
-    height: calc(100% / 0.22);
+    width: 2200%;
+    height: 2200%;
     padding: 1.5rem 2rem;
     font-size: 1.5rem;
     line-height: 1.7;
@@ -158,6 +159,11 @@
 .editor-thumb-inner h3 {
     color: #90caf9;
     margin-top: 0.5em;
+}
+
+.editor-thumb-inner img {
+    max-width: 50vw;
+    max-height: 50vh;
 }
 
 /* Remove button */
