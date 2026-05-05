@@ -8,6 +8,7 @@ import { SlideEditor } from './SlideEditor.tsx';
 import { BottomBar } from './BottomBar.tsx';
 import { SlideId } from '../../model/Slide.ts';
 import { emptySlideShow, SlideShow } from '../../model/SlideShow.ts';
+import '../global-style.css';
 
 export const Editor = (): ReactElement => {
     const [changeSet, setChangeSet] = useState<ChangeSet>(emptyChangeSet);
