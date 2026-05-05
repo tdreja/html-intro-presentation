@@ -14,6 +14,7 @@ import {
 } from './ChangeEvent';
 import { emptySlideShow } from './SlideShow';
 import { getNextSlideId, asHtml } from './Slide';
+import { CHANGE_SET_SIZE } from '../settings.ts';
 
 // ── helpers ────────────────────────────────────────────────────────────────
 function emptySlideShowWithSlides(count: number) {
@@ -95,19 +96,18 @@ describe('addChange', () => {
         expect(result.futureEvents).toHaveLength(0);
     });
 
-    it('caps previousEvents at 20, dropping oldest', () => {
+    it(`caps previousEvents at ${CHANGE_SET_SIZE}, dropping oldest`, () => {
         let changeSet = emptyChangeSet;
-        for (let i = 0; i < 20; i++) {
+        for (let i = 0; i < CHANGE_SET_SIZE; i++) {
             changeSet = addChange(changeSet, new AddSlideEvent());
         }
-        expect(changeSet.previousEvents).toHaveLength(20);
+        expect(changeSet.previousEvents).toHaveLength(CHANGE_SET_SIZE);
         const oldest = changeSet.previousEvents[0];
         const newChange = new AddSlideEvent();
         changeSet = addChange(changeSet, newChange);
-        expect(changeSet.previousEvents).toHaveLength(20);
+        expect(changeSet.previousEvents).toHaveLength(CHANGE_SET_SIZE);
         expect(changeSet.previousEvents[0]).not.toBe(oldest);
-        expect(changeSet.previousEvents).toHaveLength(20);
-        expect(changeSet.previousEvents[19]).toBe(newChange);
+        expect(changeSet.previousEvents[CHANGE_SET_SIZE - 1]).toBe(newChange);
     });
 });
 

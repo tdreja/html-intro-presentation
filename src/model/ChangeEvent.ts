@@ -2,6 +2,7 @@ import { LocalDateTime } from '@js-joda/core';
 import { isEqual, TypeContainer, uniqueIdentifier } from './TypeContainer.ts';
 import { SlideShow } from './SlideShow.ts';
 import { asHtml, getNextSlideId, Html, Slide, SlideId } from './Slide.ts';
+import { CHANGE_SET_SIZE } from '../settings.ts';
 
 export type ChangeId = TypeContainer<string> & {
     value: `${string}-${string}-${string}-${string}-${string}`,
@@ -47,7 +48,7 @@ export function addChange(changes: ChangeSet, change?: ChangeEvent | null): Chan
         return changes;
     }
     const previousEvents = [...changes.previousEvents, change];
-    if (previousEvents.length > 20) {
+    if (previousEvents.length > CHANGE_SET_SIZE) {
         return {
             previousEvents: previousEvents.slice(1),
             futureEvents: [],
