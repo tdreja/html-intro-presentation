@@ -17,3 +17,14 @@ p {
     margin-bottom: 0.2em !important;
     font-family: var(--bs-body-font-family), sans-serif !important;
 }
+
+/** Transmit Quill Styles to other slides **/
+.ql-align-center {
+    text-align: center;
+}
+.ql-align-right {
+    text-align: right;
+}
+.ql-align-justify {
+    text-align: justify;
+}

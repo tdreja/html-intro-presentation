@@ -48,22 +48,19 @@ export const SlideEditor = ({ editedSlideShow, editedSlideId, onAddChange }: Edi
     return (
         <div id="slide-editor-wrapper">
             {slideIndex > 0 && (<h5>{`Slide ${slideIndex}`}</h5>)}
-            <div id="quill-toolbar">
-                <button className="ql-header" value="1" />
-                <button className="ql-header" value="2" />
-                <button className="ql-header" value="3" />
-                <button className="ql-bold" />
-                <button className="ql-italic" />
-                <button className="ql-underline" />
-                <button className="ql-list" value="ordered" />
-                <button className="ql-list" value="bullet" />
-                <button className="ql-image" />
-            </div>
             <ReactQuill
                 theme="snow"
                 value={slideContent}
                 onChange={setSlideContent}
-                modules={quillModules}
+                modules={{
+                    toolbar: [
+                        [{ header: 1 }, { header: 2 }, { header: 3 }],
+                        ['bold', 'italic', 'underline'],
+                        [{ align: [] }],
+                        ['image'],
+                        ['clean'],
+                    ],
+                }}
                 onBlur={onBlur}
             />
         </div>

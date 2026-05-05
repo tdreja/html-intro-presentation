@@ -135,6 +135,11 @@ body {
     font-size: 0.22rem;
 }
 
+.thumb-preview img {
+    max-width: 2.2vw;
+    max-height: 2.2vh;
+}
+
 .slide-thumb.active .thumb-preview {
     border-color: var(--bs-primary-border-subtle);
 }
@@ -210,6 +215,11 @@ body {
 
 #slide-editor-wrapper .ql-toolbar :hover {
     color: var(--bs-primary);
+}
+
+#slide-editor-wrapper img {
+    max-height: 50vh;
+    max-width: 70vw;
 }
 
 /* ── Bottom Bar ── */
