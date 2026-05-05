@@ -11,6 +11,7 @@ const config: JestConfigWithTsJest = {
                 moduleResolution: 'node',
                 rootDir: './src',
                 ignoreDeprecations: '6.0',
+                jsx: 'react',
             },
         }],
     },
