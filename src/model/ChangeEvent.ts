@@ -1,8 +1,16 @@
 import { LocalDateTime } from '@js-joda/core';
-import { Presentation, Slide } from './Presentation.ts';
+import { isEqual, TypeContainer, uniqueIdentifier } from './TypeContainer.ts';
+import { SlideShow } from './SlideShow.ts';
+import { asHtml, getNextSlideId, Html, Slide, SlideId } from './Slide.ts';
+
+export type ChangeId = TypeContainer<string> & {
+    value: `${string}-${string}-${string}-${string}-${string}`,
+    typeId: 'ChangeId',
+};
 
 export interface ChangeEvent {
-    readonly apply: (editedPresentation: Presentation, editedSlide: LocalDateTime | null) => [Presentation, LocalDateTime | null],
+    readonly id: ChangeId,
+    readonly apply: (slideShow: SlideShow, editedSlideId: SlideId | null) => [SlideShow, SlideId | null],
 }
 
 export interface ChangeSet {
@@ -22,16 +30,16 @@ export const emptyChangeSet: ChangeSet = {
 };
 
 export function applyChanges(
-    presentation: Presentation,
-    editedSlide: LocalDateTime | null,
+    slideShow: SlideShow,
+    editedSlideId: SlideId | null,
     changeSet: ChangeSet,
-): [Presentation, LocalDateTime | null] {
-    let editedPresentation = presentation;
-    let nextEditedSlide = editedSlide;
+): [SlideShow, SlideId | null] {
+    let editShow = slideShow;
+    let editSlId = editedSlideId;
     for (const event of changeSet.previousEvents) {
-        [editedPresentation, nextEditedSlide] = event.apply(editedPresentation, nextEditedSlide);
+        [editShow, editSlId] = event.apply(editShow, editSlId);
     }
-    return [editedPresentation, nextEditedSlide];
+    return [editShow, editSlId];
 }
 
 export function addChange(changes: ChangeSet, change?: ChangeEvent | null): ChangeSet {
@@ -79,57 +87,75 @@ export function redoLastChange(changes: ChangeSet): ChangeSet {
     };
 }
 
-export class TargetChangeEvent implements ChangeEvent {
-    private readonly _target: LocalDateTime;
+abstract class AbstractChangeEvent implements ChangeEvent {
+    protected readonly _id: ChangeId;
 
-    public constructor(target: LocalDateTime) {
+    protected constructor() {
+        this._id = uniqueIdentifier('ChangeId');
+    }
+
+    public get id(): ChangeId {
+        return this._id;
+    }
+
+    public abstract apply(slideShow: SlideShow, editedSlideId: SlideId | null): [SlideShow, SlideId | null];
+}
+
+export class TargetChangeEvent extends AbstractChangeEvent {
+    private readonly _target: LocalDateTime | null;
+
+    public constructor(target: LocalDateTime | null) {
+        super();
         this._target = target;
     }
 
-    public apply(editedPresentation: Presentation, editedSlide: LocalDateTime | null): [Presentation, LocalDateTime | null] {
+    public apply(slideShow: SlideShow, editedSlideId: SlideId | null): [SlideShow, SlideId | null] {
         return [
             {
-                ...editedPresentation,
-                target: this._target,
+                ...slideShow,
+                countdownTarget: this._target,
             },
-            editedSlide,
+            editedSlideId,
         ];
     }
 }
 
-export class AddSlideEvent implements ChangeEvent {
+export class AddSlideEvent extends AbstractChangeEvent {
     private readonly _slide: Slide;
 
-    public constructor(content: string) {
+    public constructor(content?: string | null) {
+        super();
         this._slide = {
-            id: LocalDateTime.now(),
-            content: content,
+            id: getNextSlideId(),
+            content: asHtml(content),
         };
     }
 
-    public apply(editedPresentation: Presentation): [Presentation, LocalDateTime | null] {
+    public apply(slideShow: SlideShow): [SlideShow, SlideId | null] {
         return [
             {
-                ...editedPresentation,
-                slides: [...editedPresentation.slides, this._slide],
-            }, this._slide.id,
+                ...slideShow,
+                slides: [...slideShow.slides, this._slide],
+            },
+            this._slide.id,
         ];
     }
 }
 
-export class RemoveSlideEvent implements ChangeEvent {
-    private readonly _id: LocalDateTime;
+export class RemoveSlideEvent extends AbstractChangeEvent {
+    private readonly _slideId: SlideId;
 
-    public constructor(id: LocalDateTime) {
-        this._id = id;
+    public constructor(id: SlideId) {
+        super();
+        this._slideId = id;
     }
 
-    public apply(editedPresentation: Presentation, editedSlide: LocalDateTime | null): [Presentation, LocalDateTime | null] {
-        const slides: Array<Slide> = editedPresentation.slides.filter((slide) => slide.id !== this._id);
-        const nextEditedSlide = (editedSlide === this._id) ? null : editedSlide;
+    public apply(slideShow: SlideShow, editedSlideId: SlideId | null): [SlideShow, SlideId | null] {
+        const slides: Array<Slide> = slideShow.slides.filter((slide) => !isEqual(slide.id, this._slideId));
+        const nextEditedSlide = isEqual(this._slideId, editedSlideId) ? null : editedSlideId;
         return [
             {
-                ...editedPresentation,
+                ...slideShow,
                 slides: slides,
             },
             nextEditedSlide,
@@ -137,19 +163,20 @@ export class RemoveSlideEvent implements ChangeEvent {
     }
 }
 
-export class UpdateSlideContentEvent implements ChangeEvent {
-    private readonly _id: LocalDateTime;
-    private readonly _content: string;
+export class UpdateSlideContentEvent extends AbstractChangeEvent {
+    private readonly _slideId: SlideId;
+    private readonly _content: Html;
 
-    public constructor(id: LocalDateTime, content: string) {
-        this._id = id;
-        this._content = content;
+    public constructor(id: SlideId, content?: string | null) {
+        super();
+        this._slideId = id;
+        this._content = asHtml(content);
     }
 
-    public apply(editedPresentation: Presentation, editedSlide: LocalDateTime | null): [Presentation, LocalDateTime | null] {
+    public apply(slideShow: SlideShow, editedSlideId: SlideId | null): [SlideShow, SlideId | null] {
         const slides: Array<Slide> = [];
-        for (const slide of editedPresentation.slides) {
-            if (slide.id === this._id) {
+        for (const slide of slideShow.slides) {
+            if (isEqual(slide.id, this._slideId)) {
                 slides.push({
                     ...slide,
                     content: this._content,
@@ -160,22 +187,23 @@ export class UpdateSlideContentEvent implements ChangeEvent {
         }
         return [
             {
-                ...editedPresentation,
+                ...slideShow,
                 slides: slides,
             },
-            editedSlide,
+            editedSlideId,
         ];
     }
 }
 
-export class UpdateSelectedSlideEvent implements ChangeEvent {
-    private readonly _id: LocalDateTime | null;
+export class UpdateSelectedSlideEvent extends AbstractChangeEvent {
+    private readonly _slideId: SlideId | null;
 
-    public constructor(id: LocalDateTime | null) {
-        this._id = id;
+    public constructor(slideId: SlideId | null) {
+        super();
+        this._slideId = slideId;
     }
 
-    public apply(editedPresentation: Presentation): [Presentation, LocalDateTime | null] {
-        return [editedPresentation, this._id];
+    public apply(slideShow: SlideShow): [SlideShow, SlideId | null] {
+        return [slideShow, this._slideId];
     }
 }

@@ -34,3 +34,11 @@ export interface SlideShow {
 export function getNextSlideShowId(): SlideShowId {
     return uniqueIdentifier('SlideShowId');
 }
+
+export function emptySlideShow(): SlideShow {
+    return {
+        id: getNextSlideShowId(),
+        slides: [],
+        countdownTarget: null,
+    };
+}
