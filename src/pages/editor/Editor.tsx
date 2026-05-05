@@ -3,18 +3,16 @@ import './editor-style.css';
 import 'material-symbols';
 import { TopBar } from './TopBar.tsx';
 import { addChange, applyChanges, ChangeEvent, ChangeSet, emptyChangeSet } from '../../model/ChangeEvent.ts';
-import { SlideCarousell } from './SlideCarousell.tsx';
+import { SlideCarousel } from './SlideCarousel.tsx';
 import { SlideEditor } from './SlideEditor.tsx';
 import { BottomBar } from './BottomBar.tsx';
 import { SlideId } from '../../model/Slide.ts';
 import { emptySlideShow, SlideShow } from '../../model/SlideShow.ts';
-import { isEqual } from '../../model/TypeContainer.ts';
 
 export const Editor = (): ReactElement => {
     const [changeSet, setChangeSet] = useState<ChangeSet>(emptyChangeSet);
     const [editedSlideshow, setEditedSlideshow] = useState<SlideShow>(emptySlideShow());
     const [editedSlideId, setEditedSlideId] = useState<SlideId | null>(null);
-    const editedSlide = editedSlideshow.slides.find((slide) => isEqual(slide.id, editedSlideId));
 
     const onAddChange = useCallback((event: ChangeEvent) => {
         setChangeSet((prev) => addChange(prev, event));
@@ -25,7 +23,7 @@ export const Editor = (): ReactElement => {
     }, [changeSet, setChangeSet]);
 
     useEffect(() => {
-        const [nextSlideShow, nextEditedSlideId] = applyChanges(editedSlideshow, editedSlideId, changeSet);
+        const [nextSlideShow, nextEditedSlideId] = applyChanges(emptySlideShow(), null, changeSet);
         setEditedSlideshow(nextSlideShow);
         setEditedSlideId(nextEditedSlideId);
     }, [changeSet]);
@@ -34,7 +32,7 @@ export const Editor = (): ReactElement => {
         <div id="editor-page">
             {/* ══ TOP BAR ══ */}
             <TopBar
-                editedSlide={editedSlide}
+                editedSlideId={editedSlideId}
                 editedSlideShow={editedSlideshow}
                 changeSet={changeSet}
                 onAddChange={onAddChange}
@@ -46,8 +44,8 @@ export const Editor = (): ReactElement => {
             <div id="editor-area">
 
                 {/* Slide Carousel */}
-                <SlideCarousell
-                    editedSlide={editedSlide}
+                <SlideCarousel
+                    editedSlideId={editedSlideId}
                     editedSlideShow={editedSlideshow}
                     changeSet={changeSet}
                     onAddChange={onAddChange}
@@ -57,7 +55,7 @@ export const Editor = (): ReactElement => {
 
                 {/* Slide Editor */}
                 <SlideEditor
-                    editedSlide={editedSlide}
+                    editedSlideId={editedSlideId}
                     editedSlideShow={editedSlideshow}
                     onAddChange={onAddChange}
                     changeSet={changeSet}
@@ -69,7 +67,7 @@ export const Editor = (): ReactElement => {
 
             {/* ══ BOTTOM BAR ══ */}
             <BottomBar
-                editedSlide={editedSlide}
+                editedSlideId={editedSlideId}
                 editedSlideShow={editedSlideshow}
                 onAddChange={onAddChange}
                 changeSet={changeSet}
