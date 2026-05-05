@@ -1,3 +1,14 @@
+@property --slide-carousel-width {
+    initial-value: 200px;
+    syntax: "<length>";
+    inherits: false;
+}
+@property --panel-gap-md {
+    initial-value: 0.75rem;
+    syntax: "<length>";
+    inherits: false;
+}
+
 #root {
     height: 100vh;
     overflow: hidden;
@@ -8,6 +19,8 @@
     display: flex;
     flex-direction: column;
     background-color: #f8f9fa;
+    --slide-carousel-width: 200px;
+    --panel-gap-md: 0.75rem;
 }
 
 /* ── Material Symbols ── */
@@ -63,13 +76,13 @@
     flex: 1 1 0;
     display: flex;
     overflow: hidden;
-    padding: 0.75rem;
-    gap: 0.75rem;
+    padding: var(--panel-gap-md, 0.75rem);
+    gap: var(--panel-gap-md, 0.75rem);
 }
 
 /* Slide Carousel (left panel) */
 #slide-carousel {
-    flex: 0 0 200px;
+    flex: 0 0 var(--slide-carousel-width, 200px);
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
@@ -119,17 +132,6 @@
 .slide-thumb.active .thumb-preview {
     border-color: #93beff;
 }
-.fake-line {
-    border-radius: 2px;
-    background: #ced4da;
-}
-.fake-title  { height: 5px; width: 55%; background: #adb5bd; }
-.fake-line-l { height: 3px; width: 80%; }
-.fake-line-m { height: 3px; width: 65%; }
-.fake-line-s { height: 3px; width: 45%; }
-.fake-gap    { height: 2px; }
-.fake-img    { height: 14px; width: 40%; background: #dee2e6; border-radius: 2px; align-self: center; }
-
 .thumb-footer {
     display: flex;
     align-items: center;
@@ -162,40 +164,33 @@
 }
 
 /* Slide Editor (right panel) */
-#slide-editor {
+#slide-editor-wrapper {
     flex: 1 1 0;
     display: flex;
     flex-direction: column;
     background: #fff;
     border: 1px solid #dee2e6;
     border-radius: 0.5rem;
-    padding: 0.75rem;
     overflow: hidden;
     align-items: center;
     justify-content: flex-start;
+    height: fit-content;
 }
-#slide-editor label {
-    font-size: 0.8rem;
-    color: #6c757d;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin-bottom: 0.4rem;
-    align-self: flex-start;
+
+#slide-editor-wrapper .quill {
     width: 100%;
-    max-width: calc((100vh - 200px) * 16 / 9);
 }
-#slide-16-9-wrap {
-    width: 100%;
-    max-width: calc((100vh - 200px) * 16 / 9);
+
+#slide-editor-wrapper .ql-container {
+    width: calc(100vw - var(--slide-carousel-width, 200px) - 3 * var(--panel-gap-md, 0.75rem));
     aspect-ratio: 16 / 9;
+    border: none;
+    max-height: 70vh;
 }
-#slide-16-9-wrap textarea {
-    width: 100%;
-    height: 100%;
-    resize: none;
-    font-family: monospace;
-    font-size: 0.9rem;
+
+#slide-editor-wrapper .ql-toolbar {
+    border: none;
+    border-bottom: 1px solid #dee2e6;
 }
 
 /* ── Bottom Bar ── */
