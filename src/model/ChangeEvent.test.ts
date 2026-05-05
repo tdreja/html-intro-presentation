@@ -13,14 +13,14 @@ import {
     UpdateSelectedSlideEvent,
 } from './ChangeEvent';
 import { emptySlideShow } from './SlideShow';
-import { getNextSlideId, asHtml } from './Slide';
+import { asHtml } from './Slide';
 import { CHANGE_SET_SIZE } from '../settings.ts';
 
 // ── helpers ────────────────────────────────────────────────────────────────
 function emptySlideShowWithSlides(count: number) {
     const show = emptySlideShow();
     const slides = Array.from({ length: count }, () => ({
-        id: getNextSlideId(),
+        id: crypto.randomUUID(),
         content: asHtml('<p>slide</p>'),
     }));
     return { ...show, slides };
@@ -54,8 +54,8 @@ describe('applyChanges', () => {
         const changeSet = { previousEvents: [e1, e2], futureEvents: [] };
         const [result] = applyChanges(show, null, changeSet);
         expect(result.slides).toHaveLength(2);
-        expect(result.slides[0].content.value).toBe('<p>A</p>');
-        expect(result.slides[1].content.value).toBe('<p>B</p>');
+        expect(result.slides[0].content).toBe('<p>A</p>');
+        expect(result.slides[1].content).toBe('<p>B</p>');
     });
 
     it('threads editedSlideId through events', () => {
@@ -176,8 +176,7 @@ describe('TargetChangeEvent', () => {
     it('has unique ChangeId', () => {
         const e1 = new TargetChangeEvent(null);
         const e2 = new TargetChangeEvent(null);
-        expect(e1.id.value).not.toBe(e2.id.value);
-        expect(e1.id.typeId).toBe('ChangeId');
+        expect(e1.id).not.toBe(e2.id);
     });
 
     it('sets countdownTarget to given LocalDateTime', () => {
@@ -194,7 +193,7 @@ describe('TargetChangeEvent', () => {
     });
 
     it('preserves editedSlideId', () => {
-        const id = getNextSlideId();
+        const id = crypto.randomUUID();
         const [, resultId] = new TargetChangeEvent(null).apply(emptySlideShow(), id);
         expect(resultId).toBe(id);
     });
@@ -206,14 +205,14 @@ describe('AddSlideEvent', () => {
     it('has unique ChangeId', () => {
         const e1 = new AddSlideEvent();
         const e2 = new AddSlideEvent();
-        expect(e1.id.value).not.toBe(e2.id.value);
+        expect(e1.id).not.toBe(e2.id);
     });
 
     it('appends new slide to slideShow', () => {
         const show = emptySlideShow();
         const [result] = new AddSlideEvent('<p>hello</p>').apply(show);
         expect(result.slides).toHaveLength(1);
-        expect(result.slides[0].content.value).toBe('<p>hello</p>');
+        expect(result.slides[0].content).toBe('<p>hello</p>');
     });
 
     it('sets editedSlideId to new slide id', () => {
@@ -225,7 +224,7 @@ describe('AddSlideEvent', () => {
 
     it('creates slide with empty content when called without args', () => {
         const [result] = new AddSlideEvent().apply(emptySlideShow());
-        expect(result.slides[0].content.value).toBe('');
+        expect(result.slides[0].content).toBe('');
     });
 });
 
@@ -233,8 +232,8 @@ describe('AddSlideEvent', () => {
 
 describe('RemoveSlideEvent', () => {
     it('has unique ChangeId', () => {
-        const id = getNextSlideId();
-        expect(new RemoveSlideEvent(id).id.value).not.toBe(new RemoveSlideEvent(id).id.value);
+        const id = crypto.randomUUID();
+        expect(new RemoveSlideEvent(id).id).not.toBe(new RemoveSlideEvent(id).id);
     });
 
     it('removes slide with matching id', () => {
@@ -265,9 +264,9 @@ describe('RemoveSlideEvent', () => {
 
 describe('UpdateSlideContentEvent', () => {
     it('has unique ChangeId', () => {
-        const id = getNextSlideId();
-        expect(new UpdateSlideContentEvent(id).id.value).not.toBe(
-            new UpdateSlideContentEvent(id).id.value,
+        const id = crypto.randomUUID();
+        expect(new UpdateSlideContentEvent(id).id).not.toBe(
+            new UpdateSlideContentEvent(id).id,
         );
     });
 
@@ -275,22 +274,22 @@ describe('UpdateSlideContentEvent', () => {
         const show = emptySlideShowWithSlides(2);
         const targetId = show.slides[0].id;
         const [result] = new UpdateSlideContentEvent(targetId, '<p>new</p>').apply(show, null);
-        expect(result.slides[0].content.value).toBe('<p>new</p>');
-        expect(result.slides[1].content.value).toBe(show.slides[1].content.value);
+        expect(result.slides[0].content).toBe('<p>new</p>');
+        expect(result.slides[1].content).toBe(show.slides[1].content);
     });
 
     it('does not modify other slides', () => {
         const show = emptySlideShowWithSlides(3);
         const targetId = show.slides[1].id;
         const [result] = new UpdateSlideContentEvent(targetId, '<b>x</b>').apply(show, null);
-        expect(result.slides[0].content.value).toBe(show.slides[0].content.value);
-        expect(result.slides[2].content.value).toBe(show.slides[2].content.value);
+        expect(result.slides[0].content).toBe(show.slides[0].content);
+        expect(result.slides[2].content).toBe(show.slides[2].content);
     });
 
     it('preserves editedSlideId', () => {
         const show = emptySlideShowWithSlides(1);
         const targetId = show.slides[0].id;
-        const otherId = getNextSlideId();
+        const otherId = crypto.randomUUID();
         const [, resultId] = new UpdateSlideContentEvent(targetId, '<p>x</p>').apply(show, otherId);
         expect(resultId).toEqual(otherId);
     });
@@ -302,12 +301,12 @@ describe('UpdateSelectedSlideEvent', () => {
     it('has unique ChangeId', () => {
         const e1 = new UpdateSelectedSlideEvent(null);
         const e2 = new UpdateSelectedSlideEvent(null);
-        expect(e1.id.value).not.toBe(e2.id.value);
+        expect(e1.id).not.toBe(e2.id);
     });
 
     it('sets editedSlideId to given id', () => {
         const show = emptySlideShow();
-        const id = getNextSlideId();
+        const id = crypto.randomUUID();
         const [, resultId] = new UpdateSelectedSlideEvent(id).apply(show);
         expect(resultId).toEqual(id);
     });

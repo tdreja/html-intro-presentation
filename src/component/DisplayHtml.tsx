@@ -1,12 +1,11 @@
 import React, { ReactElement } from 'react';
-import { Html } from '../model/Slide.ts';
-import { get } from '../model/TypeContainer.ts';
+import { HtmlData } from '../model/Slide.ts';
 
 type Props = {
-    html: Html,
+    html: HtmlData,
 };
 export const DisplayHtml = ({ html }: Props): ReactElement => {
     return (
-        <div className="display-html" dangerouslySetInnerHTML={{ __html: get(html) }} />
+        <div className="display-html" dangerouslySetInnerHTML={{ __html: html }} />
     );
 };

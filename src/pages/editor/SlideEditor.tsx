@@ -7,18 +7,34 @@ import { UpdateSlideContentEvent } from '../../model/ChangeEvent.ts';
 
 export const SlideEditor = ({ editedSlideShow, editedSlideId, onAddChange }: EditorProps): ReactElement => {
     const [slideId, setSlideId] = useState<SlideId | null>(editedSlideId);
+    const [slideIndex, setSlideIndex] = useState<number>(0);
     const [slideContent, setSlideContent] = useState<string>('');
 
     useEffect(() => {
-        if (slideId !== editedSlideId) {
-            setSlideId(editedSlideId);
-            const editedSlide = editedSlideShow.slides.find((slide) => slide.id === editedSlideId);
-            setSlideContent(editedSlide ? editedSlide.content.value : '');
+        // No change here!
+        if (slideId === editedSlideId) {
+            return;
         }
-    }, [slideId, editedSlideId]);
+        // Old content was changed?
+        const oldSlide = editedSlideShow.slides.find((slide) => slide.id === slideId);
+        if (slideId && oldSlide && oldSlide.content !== slideContent) {
+            onAddChange(new UpdateSlideContentEvent(slideId, slideContent));
+        }
+        // Update current content
+        setSlideId(editedSlideId);
+        for (const [index, slide] of editedSlideShow.slides.entries()) {
+            if (slide.id === editedSlideId) {
+                setSlideIndex(index + 1);
+                setSlideContent(slide.content);
+                return;
+            }
+        }
+        setSlideContent('');
+    }, [editedSlideId]);
 
     return (
         <div id="slide-editor-wrapper">
+            {slideIndex > 0 && (<h5>{`Slide ${slideIndex}`}</h5>)}
             <ReactQuill
                 theme="snow"
                 value={slideContent}
@@ -31,11 +47,8 @@ export const SlideEditor = ({ editedSlideShow, editedSlideId, onAddChange }: Edi
                     ],
                 }}
                 onBlur={() => {
-                    if (!slideId) {
-                        return;
-                    }
                     const slide = editedSlideShow.slides.find((slide) => slide.id === slideId);
-                    if (slide && slide.content.value !== slideContent) {
+                    if (slideId && slide && slide.content !== slideContent) {
                         onAddChange(new UpdateSlideContentEvent(slideId, slideContent));
                     }
                 }}

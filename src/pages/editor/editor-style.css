@@ -129,6 +129,11 @@
     gap: 0.2rem;
     overflow: hidden;
 }
+.thumb-preview .display-html {
+    transform: scale(0.22);
+    transform-origin: top left;
+}
+
 .slide-thumb.active .thumb-preview {
     border-color: #93beff;
 }

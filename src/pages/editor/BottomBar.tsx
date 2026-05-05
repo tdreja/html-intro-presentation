@@ -1,7 +1,19 @@
-import React, { ReactElement } from 'react';
+import React, { ReactElement, useEffect, useState } from 'react';
 import { EditorProps } from './EditorProps.ts';
+import { TargetChangeEvent } from '../../model/ChangeEvent.ts';
 
-export const BottomBar = ({}: EditorProps): ReactElement => {
+export const BottomBar = ({ editedSlideShow, onAddChange }: EditorProps): ReactElement => {
+    const [countdownTime, setCountdownTime] = useState<string>('2026-05-05T18:00');
+    const [useCountdown, setUseCountdown] = useState<boolean>(!!editedSlideShow.countdownTarget);
+
+    useEffect(() => {
+        if (useCountdown) {
+            // TODO Alter countdown
+        } else if (editedSlideShow.countdownTarget) {
+            onAddChange(new TargetChangeEvent(null));
+        }
+    }, [countdownTime, useCountdown]);
+
     return (
         <div id="bottom-bar">
 
@@ -11,7 +23,13 @@ export const BottomBar = ({}: EditorProps): ReactElement => {
             </button>
 
             <div className="form-check mb-0">
-                <input className="form-check-input" type="checkbox" id="withCountdown" checked />
+                <input
+                    className="form-check-input"
+                    type="checkbox"
+                    id="withCountdown"
+                    checked={useCountdown}
+                    onChange={(e) => setUseCountdown(e.target.checked)}
+                />
                 <label className="form-check-label" htmlFor="withCountdown">
                     Mit Countdown
                 </label>
@@ -23,7 +41,8 @@ export const BottomBar = ({}: EditorProps): ReactElement => {
                     className="form-control"
                     type="datetime-local"
                     id="countdownEnd"
-                    value="2026-05-05T18:00"
+                    value={countdownTime}
+                    onChange={(e) => setCountdownTime(e.target.value)}
                     style={{ width: '220px' }}
                 />
             </div>

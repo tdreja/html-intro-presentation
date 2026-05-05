@@ -1,19 +1,9 @@
-import { TypeContainer, uniqueIdentifier } from './TypeContainer';
+export type SlideId = `${string}-${string}-${string}-${string}-${string}`;
 
 /**
  * Container for HTML content
  */
-export type Html = TypeContainer<string> & {
-    typeId: 'Html',
-};
-
-/**
- * Unique ID for each slide
- */
-export type SlideId = TypeContainer<string> & {
-    value: `${string}-${string}-${string}-${string}-${string}`,
-    typeId: 'SlideId',
-};
+export type HtmlData = `<${string}>${string}</${string}>`;
 
 /**
  * A single slide within the presentation, with a unique identifier and the displayed content
@@ -26,28 +16,18 @@ export interface Slide {
     /**
      * Content of the slide
      */
-    content: Html,
-}
-
-/**
- * Generates a new slide ID based on the current timestamp
- */
-export function getNextSlideId(): SlideId {
-    return uniqueIdentifier('SlideId');
+    content: HtmlData,
 }
 
 /**
  * Wraps the given content as HTML
  */
-export function asHtml(value?: string | null): Html {
+export function asHtml(value?: string | null): HtmlData {
     if (!value || value.length === 0) {
-        return {
-            value: '',
-            typeId: 'Html',
-        };
+        return '<span></span>';
     }
-    return {
-        value,
-        typeId: 'Html',
-    };
+    if (value.startsWith('<') && value.endsWith('>')) {
+        return value as HtmlData;
+    }
+    return `<div>${value}</div>` as HtmlData;
 }

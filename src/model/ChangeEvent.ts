@@ -1,16 +1,12 @@
 import { LocalDateTime } from '@js-joda/core';
-import { isEqual, TypeContainer, uniqueIdentifier } from './TypeContainer.ts';
 import { SlideShow } from './SlideShow.ts';
-import { asHtml, getNextSlideId, Html, Slide, SlideId } from './Slide.ts';
+import { asHtml, HtmlData, Slide, SlideId } from './Slide.ts';
 import { CHANGE_SET_SIZE } from '../settings.ts';
 
-export type ChangeId = TypeContainer<string> & {
-    value: `${string}-${string}-${string}-${string}-${string}`,
-    typeId: 'ChangeId',
-};
+export type ChangeEventId = `${string}-${string}-${string}-${string}-${string}`;
 
 export interface ChangeEvent {
-    readonly id: ChangeId,
+    readonly id: ChangeEventId,
     readonly apply: (slideShow: SlideShow, editedSlideId: SlideId | null) => [SlideShow, SlideId | null],
 }
 
@@ -89,13 +85,13 @@ export function redoLastChange(changes: ChangeSet): ChangeSet {
 }
 
 abstract class AbstractChangeEvent implements ChangeEvent {
-    protected readonly _id: ChangeId;
+    protected readonly _id: ChangeEventId;
 
     protected constructor() {
-        this._id = uniqueIdentifier('ChangeId');
+        this._id = crypto.randomUUID();
     }
 
-    public get id(): ChangeId {
+    public get id(): ChangeEventId {
         return this._id;
     }
 
@@ -127,7 +123,7 @@ export class AddSlideEvent extends AbstractChangeEvent {
     public constructor(content?: string | null) {
         super();
         this._slide = {
-            id: getNextSlideId(),
+            id: crypto.randomUUID(),
             content: asHtml(content),
         };
     }
@@ -152,8 +148,8 @@ export class RemoveSlideEvent extends AbstractChangeEvent {
     }
 
     public apply(slideShow: SlideShow, editedSlideId: SlideId | null): [SlideShow, SlideId | null] {
-        const slides: Array<Slide> = slideShow.slides.filter((slide) => !isEqual(slide.id, this._slideId));
-        const nextEditedSlide = isEqual(this._slideId, editedSlideId) ? null : editedSlideId;
+        const slides: Array<Slide> = slideShow.slides.filter((slide) => slide.id !== this._slideId);
+        const nextEditedSlide = this._slideId === editedSlideId ? null : editedSlideId;
         return [
             {
                 ...slideShow,
@@ -166,7 +162,7 @@ export class RemoveSlideEvent extends AbstractChangeEvent {
 
 export class UpdateSlideContentEvent extends AbstractChangeEvent {
     private readonly _slideId: SlideId;
-    private readonly _content: Html;
+    private readonly _content: HtmlData;
 
     public constructor(id: SlideId, content?: string | null) {
         super();
@@ -177,7 +173,7 @@ export class UpdateSlideContentEvent extends AbstractChangeEvent {
     public apply(slideShow: SlideShow, editedSlideId: SlideId | null): [SlideShow, SlideId | null] {
         const slides: Array<Slide> = [];
         for (const slide of slideShow.slides) {
-            if (isEqual(slide.id, this._slideId)) {
+            if (this._slideId === slide.id) {
                 slides.push({
                     ...slide,
                     content: this._content,

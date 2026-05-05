@@ -2,7 +2,6 @@ import React, { ReactElement } from 'react';
 import { EditorProps } from './EditorProps.ts';
 import { Slide } from '../../model/Slide.ts';
 import { DisplayHtml } from '../../component/DisplayHtml.tsx';
-import { get, isEqual } from '../../model/TypeContainer.ts';
 import { AddSlideEvent, ChangeEvent, RemoveSlideEvent, UpdateSelectedSlideEvent } from '../../model/ChangeEvent.ts';
 
 type SlideProps = {
@@ -16,7 +15,10 @@ const SlidePreview = ({ slide, current, index, onAddChange }: SlideProps): React
     return (
         <div
             className={`slide-thumb ${current ? 'active' : ''}`}
-            onClick={() => onAddChange(new UpdateSelectedSlideEvent(slide.id))}
+            onClick={(ev) => {
+                ev.stopPropagation();
+                onAddChange(new UpdateSelectedSlideEvent(slide.id));
+            }}
         >
             <div className="thumb-preview">
                 <DisplayHtml html={slide.content} />
@@ -26,8 +28,8 @@ const SlidePreview = ({ slide, current, index, onAddChange }: SlideProps): React
                 <button
                     className="btn btn-outline-danger btn-remove btn-sm"
                     onClick={(e) => {
-                        onAddChange(new RemoveSlideEvent(slide.id));
                         e.stopPropagation();
+                        onAddChange(new RemoveSlideEvent(slide.id));
                     }}
                 >
                     <span className="material-symbols-outlined">close</span>
@@ -44,9 +46,9 @@ export const SlideCarousel = ({ editedSlideShow, editedSlideId, onAddChange }: E
 
             {editedSlideShow.slides.map((slide, index) => (
                 <SlidePreview
-                    key={get(slide.id)}
+                    key={slide.id}
                     slide={slide}
-                    current={isEqual(slide.id, editedSlideId)}
+                    current={editedSlideId === slide.id}
                     index={index + 1}
                     onAddChange={onAddChange}
                 />
@@ -55,7 +57,10 @@ export const SlideCarousel = ({ editedSlideShow, editedSlideId, onAddChange }: E
             <div id="carousel-actions">
                 <button
                     className="btn btn-outline-success btn-add"
-                    onClick={() => onAddChange(new AddSlideEvent())}
+                    onClick={(ev) => {
+                        ev.stopPropagation();
+                        onAddChange(new AddSlideEvent());
+                    }}
                 >
                     <span className="material-symbols-outlined">add</span>
                     Neue Slide
