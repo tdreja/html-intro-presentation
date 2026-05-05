@@ -1,14 +1,12 @@
 import React, { useEffect, useMemo } from 'react';
-import { ActivePresentation, ActivePresentationContext } from './model/ActivePresentationContext.ts';
-import { SlideShow } from './presentation/SlideShow.tsx';
-import { Countdown } from './presentation/Countdown.tsx';
-import { Editor } from './editor/Editor.tsx';
+import { ActivePresentation } from './model/ActivePresentationContext.ts';
 import { EDITOR_REDIRECT_THRESHOLD } from './settings.ts';
 import { Route } from './model/Route.ts';
 import { useRoute } from './utils/UseRoute.tsx';
 import { useStoredPresentation } from './utils/UseStoredPresentation.tsx';
 import { ChronoUnit, LocalDateTime } from '@js-joda/core';
-import { CountdownContext, useCountdown } from './utils/UseCountdown.tsx';
+import { useCountdown } from './utils/UseCountdown.tsx';
+import { Editor } from './pages/editor/Editor.tsx';
 
 function App() {
     const route = useRoute();
@@ -37,7 +35,7 @@ function App() {
         return () => clearTimeout(id);
     }, [presentation.target, route]);
 
-    return (
+    /* return (
         <ActivePresentationContext.Provider value={activePresentation}>
             <CountdownContext.Provider value={timeRemaining}>
                 {route === Route.EDITOR && (
@@ -51,7 +49,8 @@ function App() {
                 )}
             </CountdownContext.Provider>
         </ActivePresentationContext.Provider>
-    );
+    ); */
+    return (<Editor />);
 }
 
 export default App;
