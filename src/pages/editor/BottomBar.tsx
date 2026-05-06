@@ -41,18 +41,18 @@ export const BottomBar = ({
         <Form id="bottom-bar">
             <ButtonGroup size="sm">
                 <Button
-                    variant={changeSet.appliedEvents.length === 0 ? 'outline-secondary' : 'outline-primary'}
-                    disabled={changeSet.appliedEvents.length === 0}
+                    variant={changeSet.appliedEvents.isEmpty() ? 'outline-secondary' : 'outline-primary'}
+                    disabled={changeSet.appliedEvents.isEmpty()}
                     onClick={onUndoLastChange}
                 >
-                    {describeChangeEvent(i18n, i18n.editor.btnUndo, changeSet.appliedEvents[changeSet.appliedEvents.length - 1])}
+                    {describeChangeEvent(i18n, i18n.editor.btnUndo, changeSet.appliedEvents.peek())}
                 </Button>
                 <Button
-                    variant={changeSet.pendingEvents.length === 0 ? 'outline-secondary' : 'outline-primary'}
-                    disabled={changeSet.pendingEvents.length === 0}
+                    variant={changeSet.pendingEvents.isEmpty() ? 'outline-secondary' : 'outline-primary'}
+                    disabled={changeSet.pendingEvents.isEmpty()}
                     onClick={onRedoLastChange}
                 >
-                    {describeChangeEvent(i18n, i18n.editor.btnRedo, changeSet.pendingEvents[0])}
+                    {describeChangeEvent(i18n, i18n.editor.btnRedo, changeSet.pendingEvents.peek())}
                 </Button>
             </ButtonGroup>
 

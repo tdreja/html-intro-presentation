@@ -3,12 +3,14 @@ import { Slideshow } from './Slideshow.ts';
 import { asHtml, HtmlData, Slide, SlideId } from './Slide.ts';
 import { CHANGE_SET_SIZE } from '../settings.ts';
 import { I18N } from '../i18n/I18N.ts';
+import { Stack } from '../utils/Stack.ts';
 
 export type ChangeEventId = `${string}-${string}-${string}-${string}-${string}`;
 
 export interface ChangeEvent {
     readonly id: ChangeEventId,
-    readonly apply: (slideShow: Slideshow, editedSlideId: SlideId | null) => [Slideshow, SlideId | null],
+    readonly relevantSlideId: SlideId | null,
+    readonly apply: (slideShow: Slideshow) => Slideshow,
     readonly describe: (i18n: I18N) => string,
 }
 
@@ -16,88 +18,79 @@ export interface ChangeSet {
     /**
      * Events that can be reverted by Ctrl-Z
      */
-    readonly appliedEvents: Array<ChangeEvent>,
+    readonly appliedEvents: Stack<ChangeEvent>,
     /**
      * Events that can be recreated by Ctrl-Y
      */
-    readonly pendingEvents: Array<ChangeEvent>,
+    readonly pendingEvents: Stack<ChangeEvent>,
 }
 
 export const emptyChangeSet: ChangeSet = {
-    appliedEvents: [],
-    pendingEvents: [],
+    appliedEvents: new Stack<ChangeEvent>(CHANGE_SET_SIZE),
+    pendingEvents: new Stack<ChangeEvent>(CHANGE_SET_SIZE),
 };
 
 export function applyChanges(
     slideShow: Slideshow,
-    editedSlideId: SlideId | null,
     changeSet: ChangeSet,
-): [Slideshow, SlideId | null] {
+): Slideshow {
     let editShow = slideShow;
-    let editSlId = editedSlideId;
     for (const event of changeSet.appliedEvents) {
-        [editShow, editSlId] = event.apply(editShow, editSlId);
+        editShow = event.apply(editShow);
     }
-    return [editShow, editSlId];
+    return editShow;
 }
 
 export function addChange(changes: ChangeSet, change?: ChangeEvent | null): ChangeSet {
     if (!change) {
         return changes;
     }
-    const previousEvents = [...changes.appliedEvents, change];
-    if (previousEvents.length > CHANGE_SET_SIZE) {
-        return {
-            appliedEvents: previousEvents.slice(1),
-            pendingEvents: [],
-        };
-    }
+    changes.appliedEvents.push(change);
     return {
-        appliedEvents: previousEvents,
-        pendingEvents: [],
+        ...changes,
     };
 }
 
 export function revertLastChange(changes: ChangeSet): ChangeSet {
-    if (changes.appliedEvents.length === 0) {
+    const lastChange = changes.appliedEvents.pop();
+    if (!lastChange) {
         return changes;
     }
-    const previousEvents = [...changes.appliedEvents];
-    const futureEvents = [...changes.pendingEvents];
-    const lastEvent = previousEvents.pop()!;
-    futureEvents.unshift(lastEvent);
+    changes.pendingEvents.push(lastChange);
     return {
-        appliedEvents: previousEvents,
-        pendingEvents: futureEvents,
+        ...changes,
     };
 }
 
 export function redoLastChange(changes: ChangeSet): ChangeSet {
-    if (changes.pendingEvents.length === 0) {
+    const pendingChange = changes.pendingEvents.pop();
+    if (!pendingChange) {
         return changes;
     }
-    const previousEvents = [...changes.appliedEvents];
-    const futureEvents = [...changes.pendingEvents];
-    const nextEvent = futureEvents.shift()!;
-    previousEvents.push(nextEvent);
+    changes.appliedEvents.push(pendingChange);
     return {
-        appliedEvents: previousEvents,
-        pendingEvents: futureEvents,
+        ...changes,
     };
 }
 
 abstract class AbstractChangeEvent implements ChangeEvent {
     protected readonly _id: ChangeEventId;
+    protected readonly _relevantSlideId: SlideId | null;
 
-    protected constructor() {
+    protected constructor(relevantSlideId: SlideId | null) {
         this._id = crypto.randomUUID();
+        this._relevantSlideId = relevantSlideId;
     }
 
     public get id(): ChangeEventId {
         return this._id;
     }
 
-    public abstract apply(slideShow: Slideshow, editedSlideId: SlideId | null): [Slideshow, SlideId | null];
+    public get relevantSlideId(): SlideId | null {
+        return this._relevantSlideId;
+    }
+
+    public abstract apply(slideShow: Slideshow): Slideshow;
 
     public abstract describe(i18n: I18N): string;
 }
@@ -106,18 +99,15 @@ export class TargetChangeEvent extends AbstractChangeEvent {
     private readonly _target: LocalDateTime | null;
 
     public constructor(target: LocalDateTime | null) {
-        super();
+        super(null);
         this._target = target;
     }
 
-    public apply(slideShow: Slideshow, editedSlideId: SlideId | null): [Slideshow, SlideId | null] {
-        return [
-            {
-                ...slideShow,
-                countdownTarget: this._target,
-            },
-            editedSlideId,
-        ];
+    public apply(slideShow: Slideshow): Slideshow {
+        return {
+            ...slideShow,
+            countdownTarget: this._target,
+        };
     }
 
     public describe(i18n: I18N): string {
@@ -129,21 +119,18 @@ export class AddSlideEvent extends AbstractChangeEvent {
     private readonly _slide: Slide;
 
     public constructor(content?: string | null) {
-        super();
+        super(crypto.randomUUID());
         this._slide = {
-            id: crypto.randomUUID(),
+            id: this._relevantSlideId!,
             content: asHtml(content),
         };
     }
 
-    public apply(slideShow: Slideshow): [Slideshow, SlideId | null] {
-        return [
-            {
-                ...slideShow,
-                slides: [...slideShow.slides, this._slide],
-            },
-            this._slide.id,
-        ];
+    public apply(slideShow: Slideshow): Slideshow {
+        return {
+            ...slideShow,
+            slides: [...slideShow.slides, this._slide],
+        };
     }
 
     public describe(i18n: I18N): string {
@@ -152,23 +139,20 @@ export class AddSlideEvent extends AbstractChangeEvent {
 }
 
 export class RemoveSlideEvent extends AbstractChangeEvent {
-    private readonly _slideId: SlideId;
-
     public constructor(id: SlideId) {
-        super();
-        this._slideId = id;
+        super(id);
     }
 
-    public apply(slideShow: Slideshow, editedSlideId: SlideId | null): [Slideshow, SlideId | null] {
-        const slides: Array<Slide> = slideShow.slides.filter((slide) => slide.id !== this._slideId);
-        const nextEditedSlide = this._slideId === editedSlideId ? null : editedSlideId;
-        return [
-            {
-                ...slideShow,
-                slides: slides,
-            },
-            nextEditedSlide,
-        ];
+    public get relevantSlideId(): SlideId {
+        return this._relevantSlideId!;
+    }
+
+    public apply(slideShow: Slideshow): Slideshow {
+        const slides: Array<Slide> = slideShow.slides.filter((slide) => slide.id !== this.relevantSlideId);
+        return {
+            ...slideShow,
+            slides: slides,
+        };
     }
 
     public describe(i18n: I18N): string {
@@ -177,19 +161,21 @@ export class RemoveSlideEvent extends AbstractChangeEvent {
 }
 
 export class UpdateSlideContentEvent extends AbstractChangeEvent {
-    private readonly _slideId: SlideId;
     private readonly _content: HtmlData;
 
     public constructor(id: SlideId, content?: string | null) {
-        super();
-        this._slideId = id;
+        super(id);
         this._content = asHtml(content);
     }
 
-    public apply(slideShow: Slideshow, editedSlideId: SlideId | null): [Slideshow, SlideId | null] {
+    public get relevantSlideId(): SlideId {
+        return this._relevantSlideId!;
+    }
+
+    public apply(slideShow: Slideshow): Slideshow {
         const slides: Array<Slide> = [];
         for (const slide of slideShow.slides) {
-            if (this._slideId === slide.id) {
+            if (this.relevantSlideId === slide.id) {
                 slides.push({
                     ...slide,
                     content: this._content,
@@ -198,33 +184,13 @@ export class UpdateSlideContentEvent extends AbstractChangeEvent {
                 slides.push(slide);
             }
         }
-        return [
-            {
-                ...slideShow,
-                slides: slides,
-            },
-            editedSlideId,
-        ];
+        return {
+            ...slideShow,
+            slides: slides,
+        };
     }
 
     public describe(i18n: I18N): string {
         return i18n.changeEvent.updateSlide;
-    }
-}
-
-export class UpdateSelectedSlideEvent extends AbstractChangeEvent {
-    private readonly _slideId: SlideId | null;
-
-    public constructor(slideId: SlideId | null) {
-        super();
-        this._slideId = slideId;
-    }
-
-    public apply(slideShow: Slideshow): [Slideshow, SlideId | null] {
-        return [slideShow, this._slideId];
-    }
-
-    public describe(i18n: I18N): string {
-        return i18n.changeEvent.updateSelectedSlide;
     }
 }

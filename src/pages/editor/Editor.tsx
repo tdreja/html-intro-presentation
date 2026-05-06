@@ -35,7 +35,9 @@ export const Editor = (): ReactElement => {
     const onApplyChanges = useCallback((newChangeset: ChangeSet) => {
         // First apply all changes to the slideshow!
         let finalizedChangeset: ChangeSet = newChangeset;
-        const [nextSlideShow, nextEditedSlideId] = applyChanges(slideshow, null, finalizedChangeset);
+        const nextSlideShow = applyChanges(slideshow, finalizedChangeset);
+        const nextEditedSlideId
+            = finalizedChangeset.appliedEvents.peek()?.relevantSlideId || editedSlideId;
 
         // We may have edited an existing slide?
         if (editedSlideId && nextEditedSlideId !== editedSlideId) {

@@ -2,7 +2,7 @@ import React, { ReactElement } from 'react';
 import { EditorProps } from './EditorProps.ts';
 import { Slide } from '../../model/Slide.ts';
 import { DisplayHtml } from '../../component/DisplayHtml.tsx';
-import { AddSlideEvent, ChangeEvent, RemoveSlideEvent, UpdateSelectedSlideEvent } from '../../model/ChangeEvent.ts';
+import { AddSlideEvent, ChangeEvent, RemoveSlideEvent } from '../../model/ChangeEvent.ts';
 import { Button, ButtonGroup, Dropdown } from 'react-bootstrap';
 import { useI18N } from '../../i18n/I18NContext.tsx';
 
@@ -19,7 +19,6 @@ const SlidePreview = ({ slide, current, index, onAddChange }: SlideProps): React
             className={`slide-thumb ${current ? 'active' : ''}`}
             onClick={(ev) => {
                 ev.stopPropagation();
-                onAddChange(new UpdateSelectedSlideEvent(slide.id));
             }}
         >
             <div className="thumb-preview">
