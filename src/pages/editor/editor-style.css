@@ -96,12 +96,6 @@ body {
     border-radius: 0.5rem;
     padding: 0.75rem;
 }
-#slide-carousel h6 {
-    font-size: 0.8rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin-bottom: 0.25rem;
-}
 .slide-thumb {
     border: 2px solid var(--bs-dark-border-subtle);
     border-radius: 0.375rem;
@@ -191,6 +185,11 @@ body {
     overflow: hidden;
     align-items: center;
     justify-content: flex-start;
+    padding-top: 0.75rem;
+}
+
+#slide-editor-wrapper h6 {
+    margin-left: 0.75rem;
 }
 
 #slide-editor-wrapper .quill {

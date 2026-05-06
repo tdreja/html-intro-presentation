@@ -17,6 +17,15 @@ p {
     margin-bottom: 0.2em !important;
     font-family: var(--bs-body-font-family), sans-serif !important;
 }
+p:empty {
+    height: 1em;
+}
+h6 {
+    font-size: 0.8em;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.25em;
+}
 
 /** Transmit Quill Styles to other slides **/
 .ql-align-center {
@@ -27,4 +36,12 @@ p {
 }
 .ql-align-justify {
     text-align: justify;
+}
+
+/** Adjust boostrap layouting **/
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 0.5em;
 }

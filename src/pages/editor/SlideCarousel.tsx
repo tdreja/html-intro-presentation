@@ -3,6 +3,7 @@ import { EditorProps } from './EditorProps.ts';
 import { Slide } from '../../model/Slide.ts';
 import { DisplayHtml } from '../../component/DisplayHtml.tsx';
 import { AddSlideEvent, ChangeEvent, RemoveSlideEvent, UpdateSelectedSlideEvent } from '../../model/ChangeEvent.ts';
+import { Button, ButtonGroup, Dropdown, DropdownMenu } from 'react-bootstrap';
 
 type SlideProps = {
     slide: Slide,
@@ -55,16 +56,23 @@ export const SlideCarousel = ({ editedSlideShow, editedSlideId, onAddChange }: E
             ))}
 
             <div id="carousel-actions">
-                <button
-                    className="btn btn-outline-success btn-add"
-                    onClick={(ev) => {
-                        ev.stopPropagation();
-                        onAddChange(new AddSlideEvent());
-                    }}
-                >
-                    <span className="material-symbols-outlined">add</span>
-                    Neue Slide
-                </button>
+                <Dropdown as={ButtonGroup}>
+                    <Button
+                        type="button"
+                        variant="outline-success"
+                        onClick={(ev) => {
+                            ev.stopPropagation();
+                            onAddChange(new AddSlideEvent());
+                        }}
+                    >
+                        <span className="material-symbols-outlined">add</span>
+                        Neue Slide
+                    </Button>
+                    <Dropdown.Toggle variant="outline-success"></Dropdown.Toggle>
+                    <Dropdown.Menu>
+                        <Dropdown.Item>Test</Dropdown.Item>
+                    </Dropdown.Menu>
+                </Dropdown>
             </div>
         </div>
     );

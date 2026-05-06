@@ -4,12 +4,7 @@ import ReactQuill from 'react-quill-new';
 import 'react-quill-new/dist/quill.snow.css';
 import { SlideId } from '../../model/Slide.ts';
 import { UpdateSlideContentEvent } from '../../model/ChangeEvent.ts';
-
-const quillModules = {
-    toolbar: {
-        container: '#quill-toolbar',
-    },
-};
+import { updateSlideContent } from './UpdateSlideContent.ts';
 
 export const SlideEditor = ({ editedSlideShow, editedSlideId, onAddChange }: EditorProps): ReactElement => {
     const [slideId, setSlideId] = useState<SlideId | null>(editedSlideId);
@@ -17,25 +12,17 @@ export const SlideEditor = ({ editedSlideShow, editedSlideId, onAddChange }: Edi
     const [slideContent, setSlideContent] = useState<string>('');
 
     useEffect(() => {
+        const update
+            = updateSlideContent(editedSlideShow, editedSlideId, onAddChange, slideId, slideContent);
         // No change here!
-        if (slideId === editedSlideId) {
+        if (!update) {
             return;
         }
-        // Old content was changed?
-        const oldSlide = editedSlideShow.slides.find((slide) => slide.id === slideId);
-        if (slideId && oldSlide && oldSlide.content !== slideContent) {
-            onAddChange(new UpdateSlideContentEvent(slideId, slideContent));
-        }
-        // Update current content
-        setSlideId(editedSlideId);
-        for (const [index, slide] of editedSlideShow.slides.entries()) {
-            if (slide.id === editedSlideId) {
-                setSlideIndex(index + 1);
-                setSlideContent(slide.content);
-                return;
-            }
-        }
-        setSlideContent('');
+        // Forward the changes to the editor
+        const [newContent, newId, newIndex] = update;
+        setSlideId(newId);
+        setSlideIndex(newIndex);
+        setSlideContent(newContent);
     }, [editedSlideId]);
 
     const onBlur = useCallback(() => {
@@ -47,7 +34,9 @@ export const SlideEditor = ({ editedSlideShow, editedSlideId, onAddChange }: Edi
 
     return (
         <div id="slide-editor-wrapper">
-            {slideIndex > 0 && (<h5>{`Slide ${slideIndex}`}</h5>)}
+            {slideIndex > 0 && (
+                <h6 className="align-self-start">{`Slide ${slideIndex}`}</h6>
+            )}
             <ReactQuill
                 theme="snow"
                 value={slideContent}

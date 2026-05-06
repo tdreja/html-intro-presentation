@@ -18,6 +18,7 @@
     "material-symbols": "^0.44.1",
     "quill": "^2.0.2",
     "react": "^19.2.5",
+    "react-bootstrap": "^2.10.10",
     "react-dom": "^19.2.5",
     "react-quill-new": "^3.7.0"
   },
