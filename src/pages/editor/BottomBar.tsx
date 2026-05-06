@@ -1,11 +1,13 @@
-import React, { ReactElement, useEffect, useState } from 'react';
+import React, { ReactElement, useCallback, useContext, useEffect, useState } from 'react';
 import { EditorProps } from './EditorProps.ts';
 import { TargetChangeEvent } from '../../model/ChangeEvent.ts';
-import { Button, Form } from 'react-bootstrap';
+import { Form } from 'react-bootstrap';
 import { useI18N } from '../../i18n/I18NContext.tsx';
+import { SlideshowContext } from '../../component/SlideshowContext.ts';
 
-export const BottomBar = ({ editedSlideshow, onAddChange }: EditorProps): ReactElement => {
+export const BottomBar = ({ editedSlideshow, changeSet, onAddChange }: EditorProps): ReactElement => {
     const i18n = useI18N();
+    const [_, setSlideshow] = useContext(SlideshowContext);
     const [countdownTime, setCountdownTime] = useState<string>('2026-05-05T18:00');
     const [useCountdown, setUseCountdown] = useState<boolean>(!!editedSlideshow.countdownTarget);
 
@@ -17,12 +19,27 @@ export const BottomBar = ({ editedSlideshow, onAddChange }: EditorProps): ReactE
         }
     }, [countdownTime, useCountdown]);
 
+    // Apply our current data and start the slideshow!
+    const onStartSlideshow = useCallback(() => {
+        // Update the current slideshow!
+        if (changeSet.appliedEvents.length > 0) {
+            setSlideshow(editedSlideshow);
+        }
+        // TODO set route!
+    }, [editedSlideshow, changeSet, setSlideshow]);
+
+    // noinspection HtmlUnknownAnchorTarget
     return (
         <Form id="bottom-bar">
-            <Button role="button" variant="success">
+            <a
+                role="button"
+                href="#presentation"
+                className="btn btn-primary"
+                onClick={onStartSlideshow}
+            >
                 <span className="material-symbols-outlined">play_arrow</span>
                 {i18n.editor.btnStartSlideshow}
-            </Button>
+            </a>
 
             <Form.Group controlId="useCountdown">
                 <Form.Check

@@ -14,16 +14,16 @@ export interface ChangeSet {
     /**
      * Events that can be reverted by Ctrl-Z
      */
-    readonly previousEvents: Array<ChangeEvent>,
+    readonly appliedEvents: Array<ChangeEvent>,
     /**
      * Events that can be recreated by Ctrl-Y
      */
-    readonly futureEvents: Array<ChangeEvent>,
+    readonly pendingEvents: Array<ChangeEvent>,
 }
 
 export const emptyChangeSet: ChangeSet = {
-    previousEvents: [],
-    futureEvents: [],
+    appliedEvents: [],
+    pendingEvents: [],
 };
 
 export function applyChanges(
@@ -33,7 +33,7 @@ export function applyChanges(
 ): [Slideshow, SlideId | null] {
     let editShow = slideShow;
     let editSlId = editedSlideId;
-    for (const event of changeSet.previousEvents) {
+    for (const event of changeSet.appliedEvents) {
         [editShow, editSlId] = event.apply(editShow, editSlId);
     }
     return [editShow, editSlId];
@@ -43,44 +43,44 @@ export function addChange(changes: ChangeSet, change?: ChangeEvent | null): Chan
     if (!change) {
         return changes;
     }
-    const previousEvents = [...changes.previousEvents, change];
+    const previousEvents = [...changes.appliedEvents, change];
     if (previousEvents.length > CHANGE_SET_SIZE) {
         return {
-            previousEvents: previousEvents.slice(1),
-            futureEvents: [],
+            appliedEvents: previousEvents.slice(1),
+            pendingEvents: [],
         };
     }
     return {
-        previousEvents,
-        futureEvents: [],
+        appliedEvents: previousEvents,
+        pendingEvents: [],
     };
 }
 
 export function revertLastChange(changes: ChangeSet): ChangeSet {
-    if (changes.previousEvents.length === 0) {
+    if (changes.appliedEvents.length === 0) {
         return changes;
     }
-    const previousEvents = [...changes.previousEvents];
-    const futureEvents = [...changes.futureEvents];
+    const previousEvents = [...changes.appliedEvents];
+    const futureEvents = [...changes.pendingEvents];
     const lastEvent = previousEvents.pop()!;
     futureEvents.unshift(lastEvent);
     return {
-        previousEvents,
-        futureEvents,
+        appliedEvents: previousEvents,
+        pendingEvents: futureEvents,
     };
 }
 
 export function redoLastChange(changes: ChangeSet): ChangeSet {
-    if (changes.futureEvents.length === 0) {
+    if (changes.pendingEvents.length === 0) {
         return changes;
     }
-    const previousEvents = [...changes.previousEvents];
-    const futureEvents = [...changes.futureEvents];
+    const previousEvents = [...changes.appliedEvents];
+    const futureEvents = [...changes.pendingEvents];
     const nextEvent = futureEvents.shift()!;
     previousEvents.push(nextEvent);
     return {
-        previousEvents,
-        futureEvents,
+        appliedEvents: previousEvents,
+        pendingEvents: futureEvents,
     };
 }
 

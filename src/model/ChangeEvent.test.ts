@@ -30,11 +30,11 @@ function emptySlideShowWithSlides(count: number) {
 
 describe('emptyChangeSet', () => {
     it('has empty previousEvents', () => {
-        expect(emptyChangeSet.previousEvents).toHaveLength(0);
+        expect(emptyChangeSet.appliedEvents).toHaveLength(0);
     });
 
     it('has empty futureEvents', () => {
-        expect(emptyChangeSet.futureEvents).toHaveLength(0);
+        expect(emptyChangeSet.pendingEvents).toHaveLength(0);
     });
 });
 
@@ -84,8 +84,8 @@ describe('addChange', () => {
     it('appends event to previousEvents', () => {
         const event = new AddSlideEvent();
         const result = addChange(emptyChangeSet, event);
-        expect(result.previousEvents).toHaveLength(1);
-        expect(result.previousEvents[0]).toBe(event);
+        expect(result.appliedEvents).toHaveLength(1);
+        expect(result.appliedEvents[0]).toBe(event);
     });
 
     it('clears futureEvents when new event added', () => {
@@ -93,7 +93,7 @@ describe('addChange', () => {
         const future = new AddSlideEvent();
         const changeSet = { previousEvents: [existing], futureEvents: [future] };
         const result = addChange(changeSet, new AddSlideEvent());
-        expect(result.futureEvents).toHaveLength(0);
+        expect(result.pendingEvents).toHaveLength(0);
     });
 
     it(`caps previousEvents at ${CHANGE_SET_SIZE}, dropping oldest`, () => {
@@ -101,13 +101,13 @@ describe('addChange', () => {
         for (let i = 0; i < CHANGE_SET_SIZE; i++) {
             changeSet = addChange(changeSet, new AddSlideEvent());
         }
-        expect(changeSet.previousEvents).toHaveLength(CHANGE_SET_SIZE);
-        const oldest = changeSet.previousEvents[0];
+        expect(changeSet.appliedEvents).toHaveLength(CHANGE_SET_SIZE);
+        const oldest = changeSet.appliedEvents[0];
         const newChange = new AddSlideEvent();
         changeSet = addChange(changeSet, newChange);
-        expect(changeSet.previousEvents).toHaveLength(CHANGE_SET_SIZE);
-        expect(changeSet.previousEvents[0]).not.toBe(oldest);
-        expect(changeSet.previousEvents[CHANGE_SET_SIZE - 1]).toBe(newChange);
+        expect(changeSet.appliedEvents).toHaveLength(CHANGE_SET_SIZE);
+        expect(changeSet.appliedEvents[0]).not.toBe(oldest);
+        expect(changeSet.appliedEvents[CHANGE_SET_SIZE - 1]).toBe(newChange);
     });
 });
 
@@ -124,10 +124,10 @@ describe('revertLastChange', () => {
         const e2 = new AddSlideEvent();
         const changeSet = { previousEvents: [e1, e2], futureEvents: [] };
         const result = revertLastChange(changeSet);
-        expect(result.previousEvents).toHaveLength(1);
-        expect(result.previousEvents[0]).toBe(e1);
-        expect(result.futureEvents).toHaveLength(1);
-        expect(result.futureEvents[0]).toBe(e2);
+        expect(result.appliedEvents).toHaveLength(1);
+        expect(result.appliedEvents[0]).toBe(e1);
+        expect(result.pendingEvents).toHaveLength(1);
+        expect(result.pendingEvents[0]).toBe(e2);
     });
 
     it('prepends to existing futureEvents', () => {
@@ -136,8 +136,8 @@ describe('revertLastChange', () => {
         const e3 = new AddSlideEvent();
         const changeSet = { previousEvents: [e1, e2], futureEvents: [e3] };
         const result = revertLastChange(changeSet);
-        expect(result.futureEvents[0]).toBe(e2);
-        expect(result.futureEvents[1]).toBe(e3);
+        expect(result.pendingEvents[0]).toBe(e2);
+        expect(result.pendingEvents[1]).toBe(e3);
     });
 });
 
@@ -154,9 +154,9 @@ describe('redoLastChange', () => {
         const e2 = new AddSlideEvent();
         const changeSet = { previousEvents: [e1], futureEvents: [e2] };
         const result = redoLastChange(changeSet);
-        expect(result.futureEvents).toHaveLength(0);
-        expect(result.previousEvents).toHaveLength(2);
-        expect(result.previousEvents[1]).toBe(e2);
+        expect(result.pendingEvents).toHaveLength(0);
+        expect(result.appliedEvents).toHaveLength(2);
+        expect(result.appliedEvents[1]).toBe(e2);
     });
 
     it('keeps remaining futureEvents in order', () => {
@@ -164,9 +164,9 @@ describe('redoLastChange', () => {
         const e2 = new AddSlideEvent();
         const changeSet = { previousEvents: [], futureEvents: [e1, e2] };
         const result = redoLastChange(changeSet);
-        expect(result.futureEvents).toHaveLength(1);
-        expect(result.futureEvents[0]).toBe(e2);
-        expect(result.previousEvents[0]).toBe(e1);
+        expect(result.pendingEvents).toHaveLength(1);
+        expect(result.pendingEvents[0]).toBe(e2);
+        expect(result.appliedEvents[0]).toBe(e1);
     });
 });
 
