@@ -5,6 +5,7 @@ import { Editor } from './pages/editor/Editor.tsx';
 import { i18n, I18NContext } from './i18n/I18NContext.tsx';
 import { Route } from './model/Route.ts';
 import { SlideshowContext } from './component/SlideshowContext.ts';
+import { SlideshowController } from './pages/slideshow/SlideshowController.tsx';
 
 function App() {
     // I18N for translations
@@ -25,7 +26,7 @@ function App() {
                     <Editor />
                 )}
                 {route === Route.PRESENTATION && (
-                    <Editor />
+                    <SlideshowController />
                 )}
             </SlideshowContext>
         </I18NContext.Provider>

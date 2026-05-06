@@ -1,0 +1,10 @@
+.carousel-item {
+    aspect-ratio: 16 / 9;
+    font-size: 2rem;
+}
+
+#slideshow-bottom {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+}
