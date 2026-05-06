@@ -7,8 +7,13 @@ import { useStoredPresentation } from './utils/UseStoredPresentation.tsx';
 import { ChronoUnit, LocalDateTime } from '@js-joda/core';
 import { useCountdown } from './utils/UseCountdown.tsx';
 import { Editor } from './pages/editor/Editor.tsx';
+import { i18n, I18NContext } from './i18n/I18NContext.tsx';
 
 function App() {
+    const currentI18N = useMemo(() => {
+        return i18n();
+    }, []);
+
     const route = useRoute();
     const [presentation, setPresentation] = useStoredPresentation();
     const activePresentation: ActivePresentation = useMemo(() => ({
@@ -50,7 +55,11 @@ function App() {
             </CountdownContext.Provider>
         </ActivePresentationContext.Provider>
     ); */
-    return (<Editor />);
+    return (
+        <I18NContext.Provider value={currentI18N}>
+            <Editor />
+        </I18NContext.Provider>
+    );
 }
 
 export default App;

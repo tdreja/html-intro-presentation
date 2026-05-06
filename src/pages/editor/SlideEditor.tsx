@@ -5,8 +5,10 @@ import 'react-quill-new/dist/quill.snow.css';
 import { SlideId } from '../../model/Slide.ts';
 import { UpdateSlideContentEvent } from '../../model/ChangeEvent.ts';
 import { updateSlideContent } from './UpdateSlideContent.ts';
+import { useI18N } from '../../i18n/I18NContext.tsx';
 
 export const SlideEditor = ({ editedSlideShow, editedSlideId, onAddChange }: EditorProps): ReactElement => {
+    const i18n = useI18N();
     const [slideId, setSlideId] = useState<SlideId | null>(editedSlideId);
     const [slideIndex, setSlideIndex] = useState<number>(0);
     const [slideContent, setSlideContent] = useState<string>('');
@@ -35,7 +37,7 @@ export const SlideEditor = ({ editedSlideShow, editedSlideId, onAddChange }: Edi
     return (
         <div id="slide-editor-wrapper">
             {slideIndex > 0 && (
-                <h6 className="align-self-start">{`Slide ${slideIndex}`}</h6>
+                <h6 className="align-self-start">{`${i18n.editor.titleSlide} ${slideIndex}`}</h6>
             )}
             <ReactQuill
                 theme="snow"

@@ -3,7 +3,8 @@ import { EditorProps } from './EditorProps.ts';
 import { Slide } from '../../model/Slide.ts';
 import { DisplayHtml } from '../../component/DisplayHtml.tsx';
 import { AddSlideEvent, ChangeEvent, RemoveSlideEvent, UpdateSelectedSlideEvent } from '../../model/ChangeEvent.ts';
-import { Button, ButtonGroup, Dropdown, DropdownMenu } from 'react-bootstrap';
+import { Button, ButtonGroup, Dropdown } from 'react-bootstrap';
+import { useI18N } from '../../i18n/I18NContext.tsx';
 
 type SlideProps = {
     slide: Slide,
@@ -41,9 +42,10 @@ const SlidePreview = ({ slide, current, index, onAddChange }: SlideProps): React
 };
 
 export const SlideCarousel = ({ editedSlideShow, editedSlideId, onAddChange }: EditorProps): ReactElement => {
+    const i18n = useI18N();
     return (
         <div id="slide-carousel">
-            <h6>Slides</h6>
+            <h6>{i18n.editor.titleSlides}</h6>
 
             {editedSlideShow.slides.map((slide, index) => (
                 <SlidePreview
@@ -66,7 +68,7 @@ export const SlideCarousel = ({ editedSlideShow, editedSlideId, onAddChange }: E
                         }}
                     >
                         <span className="material-symbols-outlined">add</span>
-                        Neue Slide
+                        {i18n.editor.btnAddSlide}
                     </Button>
                     <Dropdown.Toggle variant="outline-success"></Dropdown.Toggle>
                     <Dropdown.Menu>
