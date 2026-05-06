@@ -1,24 +1,24 @@
-import { describe, it, expect } from '@jest/globals';
+import { describe, expect, it } from '@jest/globals';
 import { LocalDateTime } from '@js-joda/core';
 import {
-    emptyChangeSet,
-    applyChanges,
     addChange,
-    revertLastChange,
-    redoLastChange,
-    TargetChangeEvent,
     AddSlideEvent,
+    applyChanges,
+    emptyChangeSet,
+    redoLastChange,
     RemoveSlideEvent,
-    UpdateSlideContentEvent,
+    revertLastChange,
+    TargetChangeEvent,
     UpdateSelectedSlideEvent,
+    UpdateSlideContentEvent,
 } from './ChangeEvent';
-import { emptySlideShow } from './SlideShow';
+import { emptySlideshow } from './Slideshow';
 import { asHtml } from './Slide';
 import { CHANGE_SET_SIZE } from '../settings.ts';
 
 // ── helpers ────────────────────────────────────────────────────────────────
 function emptySlideShowWithSlides(count: number) {
-    const show = emptySlideShow();
+    const show = emptySlideshow();
     const slides = Array.from({ length: count }, () => ({
         id: crypto.randomUUID(),
         content: asHtml('<p>slide</p>'),
@@ -42,13 +42,13 @@ describe('emptyChangeSet', () => {
 
 describe('applyChanges', () => {
     it('returns unchanged slideShow when no events', () => {
-        const show = emptySlideShow();
+        const show = emptySlideshow();
         const [result] = applyChanges(show, null, emptyChangeSet);
         expect(result).toBe(show);
     });
 
     it('applies multiple events in order', () => {
-        const show = emptySlideShow();
+        const show = emptySlideshow();
         const e1 = new AddSlideEvent('<p>A</p>');
         const e2 = new AddSlideEvent('<p>B</p>');
         const changeSet = { previousEvents: [e1, e2], futureEvents: [] };
@@ -59,7 +59,7 @@ describe('applyChanges', () => {
     });
 
     it('threads editedSlideId through events', () => {
-        const show = emptySlideShow();
+        const show = emptySlideshow();
         const e1 = new AddSlideEvent();
         const changeSet = { previousEvents: [e1], futureEvents: [] };
         const [resultShow, resultId] = applyChanges(show, null, changeSet);
@@ -181,20 +181,20 @@ describe('TargetChangeEvent', () => {
 
     it('sets countdownTarget to given LocalDateTime', () => {
         const target = LocalDateTime.of(2026, 1, 1, 12, 0);
-        const show = emptySlideShow();
+        const show = emptySlideshow();
         const [result] = new TargetChangeEvent(target).apply(show, null);
         expect(result.countdownTarget).toEqual(target);
     });
 
     it('sets countdownTarget to null', () => {
-        const show = { ...emptySlideShow(), countdownTarget: LocalDateTime.of(2025, 6, 1, 9, 0) };
+        const show = { ...emptySlideshow(), countdownTarget: LocalDateTime.of(2025, 6, 1, 9, 0) };
         const [result] = new TargetChangeEvent(null).apply(show, null);
         expect(result.countdownTarget).toBeNull();
     });
 
     it('preserves editedSlideId', () => {
         const id = crypto.randomUUID();
-        const [, resultId] = new TargetChangeEvent(null).apply(emptySlideShow(), id);
+        const [, resultId] = new TargetChangeEvent(null).apply(emptySlideshow(), id);
         expect(resultId).toBe(id);
     });
 });
@@ -209,21 +209,21 @@ describe('AddSlideEvent', () => {
     });
 
     it('appends new slide to slideShow', () => {
-        const show = emptySlideShow();
+        const show = emptySlideshow();
         const [result] = new AddSlideEvent('<p>hello</p>').apply(show);
         expect(result.slides).toHaveLength(1);
         expect(result.slides[0].content).toBe('<p>hello</p>');
     });
 
     it('sets editedSlideId to new slide id', () => {
-        const show = emptySlideShow();
+        const show = emptySlideshow();
         const [result, slideId] = new AddSlideEvent().apply(show);
         expect(slideId).not.toBeNull();
         expect(result.slides[0].id).toEqual(slideId);
     });
 
     it('creates slide with empty content when called without args', () => {
-        const [result] = new AddSlideEvent().apply(emptySlideShow());
+        const [result] = new AddSlideEvent().apply(emptySlideshow());
         expect(result.slides[0].content).toBe('');
     });
 });
@@ -305,20 +305,20 @@ describe('UpdateSelectedSlideEvent', () => {
     });
 
     it('sets editedSlideId to given id', () => {
-        const show = emptySlideShow();
+        const show = emptySlideshow();
         const id = crypto.randomUUID();
         const [, resultId] = new UpdateSelectedSlideEvent(id).apply(show);
         expect(resultId).toEqual(id);
     });
 
     it('sets editedSlideId to null', () => {
-        const show = emptySlideShow();
+        const show = emptySlideshow();
         const [, resultId] = new UpdateSelectedSlideEvent(null).apply(show);
         expect(resultId).toBeNull();
     });
 
     it('does not mutate slideShow', () => {
-        const show = emptySlideShow();
+        const show = emptySlideshow();
         const [result] = new UpdateSelectedSlideEvent(null).apply(show);
         expect(result).toBe(show);
     });

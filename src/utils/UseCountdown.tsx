@@ -1,4 +1,4 @@
-import { ActivePresentation } from '../model/ActivePresentationContext.ts';
+import { ActivePresentation } from '../component/SlideshowContext.ts';
 import { ChronoUnit, Duration, LocalDateTime } from '@js-joda/core';
 import { Context, createContext, useEffect, useState } from 'react';
 

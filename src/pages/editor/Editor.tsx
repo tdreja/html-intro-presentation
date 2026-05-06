@@ -1,4 +1,4 @@
-import React, { ReactElement, useCallback, useEffect, useState } from 'react';
+import React, { ReactElement, useCallback, useContext, useEffect, useState } from 'react';
 import './editor-style.css';
 import 'material-symbols';
 import { TopBar } from './TopBar.tsx';
@@ -7,14 +7,20 @@ import { SlideCarousel } from './SlideCarousel.tsx';
 import { SlideEditor } from './SlideEditor.tsx';
 import { BottomBar } from './BottomBar.tsx';
 import { SlideId } from '../../model/Slide.ts';
-import { emptySlideShow, SlideShow } from '../../model/SlideShow.ts';
+import { Slideshow } from '../../model/Slideshow.ts';
 import '../global-style.css';
+import { SlideshowContext } from '../../component/SlideshowContext.ts';
 
 export const Editor = (): ReactElement => {
+    // Attach to the overall UI
+    const [slideshow] = useContext(SlideshowContext);
+
+    // Hold the edited changes as internal state!
     const [changeSet, setChangeSet] = useState<ChangeSet>(emptyChangeSet);
-    const [editedSlideshow, setEditedSlideshow] = useState<SlideShow>(emptySlideShow());
+    const [editedSlideshow, setEditedSlideshow] = useState<Slideshow>(slideshow);
     const [editedSlideId, setEditedSlideId] = useState<SlideId | null>(null);
 
+    // Callbacks to add, undo and redo changes
     const onAddChange = useCallback((event: ChangeEvent) => {
         setChangeSet((prev) => addChange(prev, event));
     }, [setChangeSet]);
@@ -23,18 +29,26 @@ export const Editor = (): ReactElement => {
     const onRedoLastChange = useCallback(() => {
     }, [changeSet, setChangeSet]);
 
+    // Changes to the changeset affect the presentation state!
     useEffect(() => {
-        const [nextSlideShow, nextEditedSlideId] = applyChanges(emptySlideShow(), null, changeSet);
+        const [nextSlideShow, nextEditedSlideId] = applyChanges(slideshow, null, changeSet);
         setEditedSlideshow(nextSlideShow);
         setEditedSlideId(nextEditedSlideId);
     }, [changeSet]);
+
+    // Reset the editor, if the slideshow was changed!
+    useEffect(() => {
+        setEditedSlideshow(slideshow);
+        setEditedSlideId(null);
+        setChangeSet(emptyChangeSet);
+    }, [slideshow]);
 
     return (
         <div id="editor-page">
             {/* ══ TOP BAR ══ */}
             <TopBar
                 editedSlideId={editedSlideId}
-                editedSlideShow={editedSlideshow}
+                editedSlideshow={editedSlideshow}
                 changeSet={changeSet}
                 onAddChange={onAddChange}
                 onRedoLastChange={onRedoLastChange}
@@ -47,7 +61,7 @@ export const Editor = (): ReactElement => {
                 {/* Slide Carousel */}
                 <SlideCarousel
                     editedSlideId={editedSlideId}
-                    editedSlideShow={editedSlideshow}
+                    editedSlideshow={editedSlideshow}
                     changeSet={changeSet}
                     onAddChange={onAddChange}
                     onRedoLastChange={onRedoLastChange}
@@ -57,7 +71,7 @@ export const Editor = (): ReactElement => {
                 {/* Slide Editor */}
                 <SlideEditor
                     editedSlideId={editedSlideId}
-                    editedSlideShow={editedSlideshow}
+                    editedSlideshow={editedSlideshow}
                     onAddChange={onAddChange}
                     changeSet={changeSet}
                     onRedoLastChange={onRedoLastChange}
@@ -69,7 +83,7 @@ export const Editor = (): ReactElement => {
             {/* ══ BOTTOM BAR ══ */}
             <BottomBar
                 editedSlideId={editedSlideId}
-                editedSlideShow={editedSlideshow}
+                editedSlideshow={editedSlideshow}
                 onAddChange={onAddChange}
                 changeSet={changeSet}
                 onRedoLastChange={onRedoLastChange}

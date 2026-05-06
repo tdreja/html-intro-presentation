@@ -1,14 +1,13 @@
 // noinspection HtmlUnknownAnchorTarget
 
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import { ActivePresentationContext } from '../model/ActivePresentationContext.ts';
+import { SlideshowContext } from '../component/SlideshowContext.ts';
 import './presentation.css';
-import { LocalDateTime } from '@js-joda/core';
 import { DURATION_PER_SLIDE } from '../settings.ts';
 import { CountdownContext } from '../utils/UseCountdown.tsx';
 
 export function SlideShow() {
-    const activePresentation = useContext(ActivePresentationContext);
+    const activePresentation = useContext(SlideshowContext);
     const { slides } = activePresentation.presentation;
     const timeRemaining = useContext(CountdownContext);
 

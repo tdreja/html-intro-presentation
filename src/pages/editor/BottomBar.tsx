@@ -4,15 +4,15 @@ import { TargetChangeEvent } from '../../model/ChangeEvent.ts';
 import { Button, Form } from 'react-bootstrap';
 import { useI18N } from '../../i18n/I18NContext.tsx';
 
-export const BottomBar = ({ editedSlideShow, onAddChange }: EditorProps): ReactElement => {
+export const BottomBar = ({ editedSlideshow, onAddChange }: EditorProps): ReactElement => {
     const i18n = useI18N();
     const [countdownTime, setCountdownTime] = useState<string>('2026-05-05T18:00');
-    const [useCountdown, setUseCountdown] = useState<boolean>(!!editedSlideShow.countdownTarget);
+    const [useCountdown, setUseCountdown] = useState<boolean>(!!editedSlideshow.countdownTarget);
 
     useEffect(() => {
         if (useCountdown) {
             // TODO Alter countdown
-        } else if (editedSlideShow.countdownTarget) {
+        } else if (editedSlideshow.countdownTarget) {
             onAddChange(new TargetChangeEvent(null));
         }
     }, [countdownTime, useCountdown]);

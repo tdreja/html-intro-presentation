@@ -6,7 +6,7 @@ export type SlideShowId = `${string}-${string}-${string}-${string}-${string}`;
 /**
  * Container for the entire slideshow
  */
-export interface SlideShow {
+export interface Slideshow {
     /**
      * Unique ID of the current slideshow
      */
@@ -21,7 +21,7 @@ export interface SlideShow {
     countdownTarget: LocalDateTime | null,
 }
 
-export function emptySlideShow(): SlideShow {
+export function emptySlideshow(): Slideshow {
     return {
         id: crypto.randomUUID(),
         slides: [],

@@ -1,5 +1,5 @@
 import { describe, expect, it } from '@jest/globals';
-import { getNextSlideShowId } from './SlideShow.ts';
+import { getNextSlideShowId } from './Slideshow.ts';
 
 describe('getNextSlideId', () => {
     it('returns object with typeId SlideId', () => {

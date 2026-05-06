@@ -2,7 +2,7 @@ import { describe, expect, it } from '@jest/globals';
 import { ChangeEvent, UpdateSlideContentEvent } from '../../model/ChangeEvent.ts';
 import { updateSlideContent } from './UpdateSlideContent.ts';
 import { asHtml, SlideId } from '../../model/Slide.ts';
-import { emptySlideShow, SlideShow } from '../../model/SlideShow.ts';
+import { emptySlideshow, Slideshow } from '../../model/Slideshow.ts';
 
 describe('UpdateSlideContent', () => {
     const slideIdA: SlideId = crypto.randomUUID();
@@ -10,7 +10,7 @@ describe('UpdateSlideContent', () => {
 
     let events: Array<ChangeEvent> = [];
     const onAddChange = (event: ChangeEvent) => events.push(event);
-    const slideShow: SlideShow = emptySlideShow();
+    const slideShow: Slideshow = emptySlideshow();
 
     // --- No-op cases ---
 
@@ -50,8 +50,8 @@ describe('UpdateSlideContent', () => {
 
     const contentA = asHtml('<p>Hello A</p>');
     const contentB = asHtml('<p>Hello B</p>');
-    const slideShowWithSlides: SlideShow = {
-        ...emptySlideShow(),
+    const slideShowWithSlides: Slideshow = {
+        ...emptySlideshow(),
         slides: [
             { id: slideIdA, content: contentA },
             { id: slideIdB, content: contentB },

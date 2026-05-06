@@ -1,5 +1,5 @@
 import { LocalDateTime } from '@js-joda/core';
-import { SlideShow } from './SlideShow.ts';
+import { Slideshow } from './Slideshow.ts';
 import { asHtml, HtmlData, Slide, SlideId } from './Slide.ts';
 import { CHANGE_SET_SIZE } from '../settings.ts';
 
@@ -7,7 +7,7 @@ export type ChangeEventId = `${string}-${string}-${string}-${string}-${string}`;
 
 export interface ChangeEvent {
     readonly id: ChangeEventId,
-    readonly apply: (slideShow: SlideShow, editedSlideId: SlideId | null) => [SlideShow, SlideId | null],
+    readonly apply: (slideShow: Slideshow, editedSlideId: SlideId | null) => [Slideshow, SlideId | null],
 }
 
 export interface ChangeSet {
@@ -27,10 +27,10 @@ export const emptyChangeSet: ChangeSet = {
 };
 
 export function applyChanges(
-    slideShow: SlideShow,
+    slideShow: Slideshow,
     editedSlideId: SlideId | null,
     changeSet: ChangeSet,
-): [SlideShow, SlideId | null] {
+): [Slideshow, SlideId | null] {
     let editShow = slideShow;
     let editSlId = editedSlideId;
     for (const event of changeSet.previousEvents) {
@@ -95,7 +95,7 @@ abstract class AbstractChangeEvent implements ChangeEvent {
         return this._id;
     }
 
-    public abstract apply(slideShow: SlideShow, editedSlideId: SlideId | null): [SlideShow, SlideId | null];
+    public abstract apply(slideShow: Slideshow, editedSlideId: SlideId | null): [Slideshow, SlideId | null];
 }
 
 export class TargetChangeEvent extends AbstractChangeEvent {
@@ -106,7 +106,7 @@ export class TargetChangeEvent extends AbstractChangeEvent {
         this._target = target;
     }
 
-    public apply(slideShow: SlideShow, editedSlideId: SlideId | null): [SlideShow, SlideId | null] {
+    public apply(slideShow: Slideshow, editedSlideId: SlideId | null): [Slideshow, SlideId | null] {
         return [
             {
                 ...slideShow,
@@ -128,7 +128,7 @@ export class AddSlideEvent extends AbstractChangeEvent {
         };
     }
 
-    public apply(slideShow: SlideShow): [SlideShow, SlideId | null] {
+    public apply(slideShow: Slideshow): [Slideshow, SlideId | null] {
         return [
             {
                 ...slideShow,
@@ -147,7 +147,7 @@ export class RemoveSlideEvent extends AbstractChangeEvent {
         this._slideId = id;
     }
 
-    public apply(slideShow: SlideShow, editedSlideId: SlideId | null): [SlideShow, SlideId | null] {
+    public apply(slideShow: Slideshow, editedSlideId: SlideId | null): [Slideshow, SlideId | null] {
         const slides: Array<Slide> = slideShow.slides.filter((slide) => slide.id !== this._slideId);
         const nextEditedSlide = this._slideId === editedSlideId ? null : editedSlideId;
         return [
@@ -170,7 +170,7 @@ export class UpdateSlideContentEvent extends AbstractChangeEvent {
         this._content = asHtml(content);
     }
 
-    public apply(slideShow: SlideShow, editedSlideId: SlideId | null): [SlideShow, SlideId | null] {
+    public apply(slideShow: Slideshow, editedSlideId: SlideId | null): [Slideshow, SlideId | null] {
         const slides: Array<Slide> = [];
         for (const slide of slideShow.slides) {
             if (this._slideId === slide.id) {
@@ -200,7 +200,7 @@ export class UpdateSelectedSlideEvent extends AbstractChangeEvent {
         this._slideId = slideId;
     }
 
-    public apply(slideShow: SlideShow): [SlideShow, SlideId | null] {
+    public apply(slideShow: Slideshow): [Slideshow, SlideId | null] {
         return [slideShow, this._slideId];
     }
 }

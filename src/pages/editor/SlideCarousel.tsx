@@ -41,13 +41,13 @@ const SlidePreview = ({ slide, current, index, onAddChange }: SlideProps): React
     );
 };
 
-export const SlideCarousel = ({ editedSlideShow, editedSlideId, onAddChange }: EditorProps): ReactElement => {
+export const SlideCarousel = ({ editedSlideshow, editedSlideId, onAddChange }: EditorProps): ReactElement => {
     const i18n = useI18N();
     return (
         <div id="slide-carousel">
             <h6>{i18n.editor.titleSlides}</h6>
 
-            {editedSlideShow.slides.map((slide, index) => (
+            {editedSlideshow.slides.map((slide, index) => (
                 <SlidePreview
                     key={slide.id}
                     slide={slide}

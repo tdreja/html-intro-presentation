@@ -7,7 +7,7 @@ import { UpdateSlideContentEvent } from '../../model/ChangeEvent.ts';
 import { updateSlideContent } from './UpdateSlideContent.ts';
 import { useI18N } from '../../i18n/I18NContext.tsx';
 
-export const SlideEditor = ({ editedSlideShow, editedSlideId, onAddChange }: EditorProps): ReactElement => {
+export const SlideEditor = ({ editedSlideshow, editedSlideId, onAddChange }: EditorProps): ReactElement => {
     const i18n = useI18N();
     const [slideId, setSlideId] = useState<SlideId | null>(editedSlideId);
     const [slideIndex, setSlideIndex] = useState<number>(0);
@@ -15,7 +15,7 @@ export const SlideEditor = ({ editedSlideShow, editedSlideId, onAddChange }: Edi
 
     useEffect(() => {
         const update
-            = updateSlideContent(editedSlideShow, editedSlideId, onAddChange, slideId, slideContent);
+            = updateSlideContent(editedSlideshow, editedSlideId, onAddChange, slideId, slideContent);
         // No change here!
         if (!update) {
             return;
@@ -28,11 +28,11 @@ export const SlideEditor = ({ editedSlideShow, editedSlideId, onAddChange }: Edi
     }, [editedSlideId]);
 
     const onBlur = useCallback(() => {
-        const slide = editedSlideShow.slides.find((slide) => slide.id === slideId);
+        const slide = editedSlideshow.slides.find((slide) => slide.id === slideId);
         if (slideId && slide && slide.content !== slideContent) {
             onAddChange(new UpdateSlideContentEvent(slideId, slideContent));
         }
-    }, [slideId, slideContent, editedSlideShow]);
+    }, [slideId, slideContent, editedSlideshow]);
 
     return (
         <div id="slide-editor-wrapper">

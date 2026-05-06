@@ -1,6 +1,6 @@
 import { SlideId } from '../../model/Slide.ts';
 import { ChangeEvent, UpdateSlideContentEvent } from '../../model/ChangeEvent.ts';
-import { SlideShow } from '../../model/SlideShow.ts';
+import { Slideshow } from '../../model/Slideshow.ts';
 
 function isEmptyHtml(html: string | null) {
     if (!html) {
@@ -13,7 +13,7 @@ function isEmptyHtml(html: string | null) {
 }
 
 export function updateSlideContent(
-    editedSlideShow: SlideShow,
+    editedSlideshow: Slideshow,
     editedSlideId: SlideId | null,
     onAddChange: (event: ChangeEvent) => void,
     lastEditedSlideId: SlideId | null,
@@ -26,7 +26,7 @@ export function updateSlideContent(
 
     // Check if we have changed an old slide!
     const oldSlide
-        = editedSlideShow.slides.find((slide) => slide.id === lastEditedSlideId);
+        = editedSlideshow.slides.find((slide) => slide.id === lastEditedSlideId);
     if (lastEditedSlideId && oldSlide && oldSlide.content !== slideContent) {
         // Fire the changes to the current slide!
         onAddChange(new UpdateSlideContentEvent(lastEditedSlideId, slideContent));
@@ -41,7 +41,7 @@ export function updateSlideContent(
     }
 
     // Find the matching data for the current slide
-    for (const [index, slide] of editedSlideShow.slides.entries()) {
+    for (const [index, slide] of editedSlideshow.slides.entries()) {
         if (slide.id === editedSlideId) {
             return [overrideSlideContent ? overrideSlideContent : slide.content, slide.id, index + 1];
         }
