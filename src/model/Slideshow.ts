@@ -1,5 +1,6 @@
-import { Slide } from './Slide.ts';
+import { Slide, SlideId } from './Slide.ts';
 import { LocalDateTime } from '@js-joda/core';
+import { Html } from './Presentation.ts';
 
 export type SlideShowId = `${string}-${string}-${string}-${string}-${string}`;
 
@@ -27,4 +28,15 @@ export function emptySlideshow(): Slideshow {
         slides: [],
         countdownTarget: null,
     };
+}
+
+/**
+ * Tries to fetch the content of a slide with the given ID within the slideshow
+ */
+export function findSlideContent(slideshow?: Slideshow | null, slideId?: SlideId | null): Html | null {
+    if (!slideshow || !slideId) {
+        return null;
+    }
+    const slide = slideshow.slides.find((s) => s.id === slideId);
+    return slide ? slide.content : null;
 }

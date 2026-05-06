@@ -1,5 +1,8 @@
+.carousel {
+    height: 100vh;
+}
+
 .carousel-item {
-    aspect-ratio: 16 / 9;
     font-size: 2rem;
 }
 

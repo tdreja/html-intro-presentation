@@ -1,14 +1,7 @@
 /**
- * Basic shared type of all translations
- */
-export type I18NTranslation = {
-    [key: string]: string,
-};
-
-/**
  * Translations for the editor UI
  */
-export interface EditorI18N extends I18NTranslation {
+export interface EditorI18N {
     btnStartSlideshow: string,
     btnAddSlide: string,
     btnDownloadSlideshow: string,
@@ -25,7 +18,7 @@ export interface EditorI18N extends I18NTranslation {
     formDatePickerCountdown: string,
 }
 
-export interface ChangeEventI18N extends I18NTranslation {
+export interface ChangeEventI18N {
     changeTarget: string,
     addSlide: string,
     removeSlide: string,

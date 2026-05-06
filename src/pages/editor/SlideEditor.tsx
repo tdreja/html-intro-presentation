@@ -1,44 +1,33 @@
-import React, { ReactElement, useCallback, useEffect, useState } from 'react';
+import React, { Dispatch, ReactElement, SetStateAction, useCallback } from 'react';
 import { EditorProps } from './EditorProps.ts';
 import ReactQuill from 'react-quill-new';
 import 'react-quill-new/dist/quill.snow.css';
-import { SlideId } from '../../model/Slide.ts';
 import { UpdateSlideContentEvent } from '../../model/ChangeEvent.ts';
-import { updateSlideContent } from './UpdateSlideContent.ts';
 import { useI18N } from '../../i18n/I18NContext.tsx';
 
-export const SlideEditor = ({ editedSlideshow, changeSet, editedSlideId, onAddChange }: EditorProps): ReactElement => {
-    const i18n = useI18N();
-    const [slideId, setSlideId] = useState<SlideId | null>(editedSlideId);
-    const [slideIndex, setSlideIndex] = useState<number>(0);
-    const [slideContent, setSlideContent] = useState<string>('');
+type SlideEditorProps = EditorProps & {
+    slideContent: string,
+    setSlideContent: Dispatch<SetStateAction<string>>,
+};
 
-    useEffect(() => {
-        const update
-            = updateSlideContent(editedSlideshow, editedSlideId, onAddChange, slideId, slideContent);
-        // No change here!
-        if (!update) {
-            return;
-        }
-        // Forward the changes to the editor
-        const [newContent, newId, newIndex] = update;
-        setSlideId(newId);
-        setSlideIndex(newIndex);
-        setSlideContent(newContent);
-    }, [editedSlideId, changeSet]);
+export const SlideEditor = ({
+    editedSlideshow,
+    editedSlideId,
+    onAddChange,
+    slideContent,
+    setSlideContent,
+}: SlideEditorProps): ReactElement => {
+    const i18n = useI18N();
 
     const onBlur = useCallback(() => {
-        const slide = editedSlideshow.slides.find((slide) => slide.id === slideId);
-        if (slideId && slide && slide.content !== slideContent) {
-            onAddChange(new UpdateSlideContentEvent(slideId, slideContent));
+        const slide = editedSlideshow.slides.find((slide) => slide.id === editedSlideId);
+        if (editedSlideId && slide && slide.content !== slideContent) {
+            onAddChange(new UpdateSlideContentEvent(editedSlideId, slideContent));
         }
-    }, [slideId, slideContent, editedSlideshow]);
+    }, [editedSlideId, slideContent, editedSlideshow]);
 
     return (
         <div id="slide-editor-wrapper">
-            {slideIndex > 0 && (
-                <h6 className="align-self-start">{`${i18n.editor.titleSlide} ${slideIndex}`}</h6>
-            )}
             <ReactQuill
                 theme="snow"
                 value={slideContent}
