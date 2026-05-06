@@ -2,12 +2,14 @@ import { LocalDateTime } from '@js-joda/core';
 import { Slideshow } from './Slideshow.ts';
 import { asHtml, HtmlData, Slide, SlideId } from './Slide.ts';
 import { CHANGE_SET_SIZE } from '../settings.ts';
+import { I18N } from '../i18n/I18N.ts';
 
 export type ChangeEventId = `${string}-${string}-${string}-${string}-${string}`;
 
 export interface ChangeEvent {
     readonly id: ChangeEventId,
     readonly apply: (slideShow: Slideshow, editedSlideId: SlideId | null) => [Slideshow, SlideId | null],
+    readonly describe: (i18n: I18N) => string,
 }
 
 export interface ChangeSet {
@@ -96,6 +98,8 @@ abstract class AbstractChangeEvent implements ChangeEvent {
     }
 
     public abstract apply(slideShow: Slideshow, editedSlideId: SlideId | null): [Slideshow, SlideId | null];
+
+    public abstract describe(i18n: I18N): string;
 }
 
 export class TargetChangeEvent extends AbstractChangeEvent {
@@ -114,6 +118,10 @@ export class TargetChangeEvent extends AbstractChangeEvent {
             },
             editedSlideId,
         ];
+    }
+
+    public describe(i18n: I18N): string {
+        return i18n.changeEvent.changeTarget;
     }
 }
 
@@ -137,6 +145,10 @@ export class AddSlideEvent extends AbstractChangeEvent {
             this._slide.id,
         ];
     }
+
+    public describe(i18n: I18N): string {
+        return i18n.changeEvent.addSlide;
+    }
 }
 
 export class RemoveSlideEvent extends AbstractChangeEvent {
@@ -157,6 +169,10 @@ export class RemoveSlideEvent extends AbstractChangeEvent {
             },
             nextEditedSlide,
         ];
+    }
+
+    public describe(i18n: I18N): string {
+        return i18n.changeEvent.removeSlide;
     }
 }
 
@@ -190,6 +206,10 @@ export class UpdateSlideContentEvent extends AbstractChangeEvent {
             editedSlideId,
         ];
     }
+
+    public describe(i18n: I18N): string {
+        return i18n.changeEvent.updateSlide;
+    }
 }
 
 export class UpdateSelectedSlideEvent extends AbstractChangeEvent {
@@ -202,5 +222,9 @@ export class UpdateSelectedSlideEvent extends AbstractChangeEvent {
 
     public apply(slideShow: Slideshow): [Slideshow, SlideId | null] {
         return [slideShow, this._slideId];
+    }
+
+    public describe(i18n: I18N): string {
+        return i18n.changeEvent.updateSelectedSlide;
     }
 }

@@ -61,7 +61,7 @@ export const SlideCarousel = ({ editedSlideshow, editedSlideId, onAddChange }: E
                 <Dropdown as={ButtonGroup}>
                     <Button
                         type="button"
-                        variant="outline-success"
+                        variant="outline-primary"
                         onClick={(ev) => {
                             ev.stopPropagation();
                             onAddChange(new AddSlideEvent());
@@ -70,7 +70,7 @@ export const SlideCarousel = ({ editedSlideshow, editedSlideId, onAddChange }: E
                         <span className="material-symbols-outlined">add</span>
                         {i18n.editor.btnAddSlide}
                     </Button>
-                    <Dropdown.Toggle variant="outline-success"></Dropdown.Toggle>
+                    <Dropdown.Toggle variant="outline-primary"></Dropdown.Toggle>
                     <Dropdown.Menu>
                         <Dropdown.Item>Test</Dropdown.Item>
                     </Dropdown.Menu>

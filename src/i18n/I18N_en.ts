@@ -14,5 +14,14 @@ export const I18N_en: I18N = {
         titleSlide: 'Slide',
         formCheckboxWithCountdown: 'Form checkbox with countdown',
         formDatePickerCountdown: 'From date picker countdown',
+        btnUndo: 'Undo',
+        btnRedo: 'Redo',
+    },
+    changeEvent: {
+        changeTarget: 'Change countdown target',
+        addSlide: 'Add slide',
+        removeSlide: 'Remove slide',
+        updateSlide: 'Update slide content',
+        updateSelectedSlide: 'Select slide',
     },
 };

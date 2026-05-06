@@ -7,7 +7,7 @@ import { UpdateSlideContentEvent } from '../../model/ChangeEvent.ts';
 import { updateSlideContent } from './UpdateSlideContent.ts';
 import { useI18N } from '../../i18n/I18NContext.tsx';
 
-export const SlideEditor = ({ editedSlideshow, editedSlideId, onAddChange }: EditorProps): ReactElement => {
+export const SlideEditor = ({ editedSlideshow, changeSet, editedSlideId, onAddChange }: EditorProps): ReactElement => {
     const i18n = useI18N();
     const [slideId, setSlideId] = useState<SlideId | null>(editedSlideId);
     const [slideIndex, setSlideIndex] = useState<number>(0);
@@ -25,7 +25,7 @@ export const SlideEditor = ({ editedSlideshow, editedSlideId, onAddChange }: Edi
         setSlideId(newId);
         setSlideIndex(newIndex);
         setSlideContent(newContent);
-    }, [editedSlideId]);
+    }, [editedSlideId, changeSet]);
 
     const onBlur = useCallback(() => {
         const slide = editedSlideshow.slides.find((slide) => slide.id === slideId);

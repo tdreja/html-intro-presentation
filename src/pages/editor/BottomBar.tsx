@@ -1,11 +1,25 @@
 import React, { ReactElement, useCallback, useContext, useEffect, useState } from 'react';
 import { EditorProps } from './EditorProps.ts';
-import { TargetChangeEvent } from '../../model/ChangeEvent.ts';
-import { Form } from 'react-bootstrap';
+import { ChangeEvent, TargetChangeEvent } from '../../model/ChangeEvent.ts';
+import { Button, ButtonGroup, Form } from 'react-bootstrap';
 import { useI18N } from '../../i18n/I18NContext.tsx';
 import { SlideshowContext } from '../../component/SlideshowContext.ts';
+import { I18N } from '../../i18n/I18N.ts';
 
-export const BottomBar = ({ editedSlideshow, changeSet, onAddChange }: EditorProps): ReactElement => {
+function describeChangeEvent(i18n: I18N, action: string, event?: ChangeEvent | null): string {
+    if (!event) {
+        return action;
+    }
+    return `${action}: ${event.describe(i18n)}`;
+}
+
+export const BottomBar = ({
+    editedSlideshow,
+    changeSet,
+    onAddChange,
+    onUndoLastChange,
+    onRedoLastChange,
+}: EditorProps): ReactElement => {
     const i18n = useI18N();
     const [_, setSlideshow] = useContext(SlideshowContext);
     const [countdownTime, setCountdownTime] = useState<string>('2026-05-05T18:00');
@@ -31,6 +45,42 @@ export const BottomBar = ({ editedSlideshow, changeSet, onAddChange }: EditorPro
     // noinspection HtmlUnknownAnchorTarget
     return (
         <Form id="bottom-bar">
+            <ButtonGroup size="sm">
+                <Button
+                    variant={changeSet.appliedEvents.length === 0 ? 'outline-secondary' : 'outline-primary'}
+                    disabled={changeSet.appliedEvents.length === 0}
+                    onClick={onUndoLastChange}
+                >
+                    {describeChangeEvent(i18n, i18n.editor.btnUndo, changeSet.appliedEvents[changeSet.appliedEvents.length - 1])}
+                </Button>
+                <Button
+                    variant={changeSet.pendingEvents.length === 0 ? 'outline-secondary' : 'outline-primary'}
+                    disabled={changeSet.pendingEvents.length === 0}
+                    onClick={onRedoLastChange}
+                >
+                    {describeChangeEvent(i18n, i18n.editor.btnRedo, changeSet.pendingEvents[0])}
+                </Button>
+            </ButtonGroup>
+
+            <div className="d-flex flex-row align-items-center gap-4">
+                <Form.Group controlId="useCountdown">
+                    <Form.Check
+                        checked={useCountdown}
+                        onChange={(e) => setUseCountdown(e.target.checked)}
+                        label={i18n.editor.formCheckboxWithCountdown}
+                    />
+                </Form.Group>
+
+                <Form.Group controlId="countdownEnd">
+                    <Form.Label>{i18n.editor.formDatePickerCountdown}</Form.Label>
+                    <Form.Control
+                        type="datetime-local"
+                        value={countdownTime}
+                        onChange={(e) => setCountdownTime(e.target.value)}
+                    />
+                </Form.Group>
+            </div>
+
             <a
                 role="button"
                 href="#presentation"
@@ -40,24 +90,6 @@ export const BottomBar = ({ editedSlideshow, changeSet, onAddChange }: EditorPro
                 <span className="material-symbols-outlined">play_arrow</span>
                 {i18n.editor.btnStartSlideshow}
             </a>
-
-            <Form.Group controlId="useCountdown">
-                <Form.Check
-                    checked={useCountdown}
-                    onChange={(e) => setUseCountdown(e.target.checked)}
-                    label={i18n.editor.formCheckboxWithCountdown}
-                />
-            </Form.Group>
-
-            <Form.Group controlId="countdownEnd">
-                <Form.Label>{i18n.editor.formDatePickerCountdown}</Form.Label>
-                <Form.Control
-                    type="datetime-local"
-                    value={countdownTime}
-                    onChange={(e) => setCountdownTime(e.target.value)}
-                />
-            </Form.Group>
-
         </Form>
     );
 };

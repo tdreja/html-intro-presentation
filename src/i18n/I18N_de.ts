@@ -14,5 +14,14 @@ export const I18N_de: I18N = {
         titleSlide: 'Folie',
         formCheckboxWithCountdown: 'Mit Countdown?',
         formDatePickerCountdown: 'Countdown Ende',
+        btnUndo: 'Rückgängig',
+        btnRedo: 'Wiederherstellen',
+    },
+    changeEvent: {
+        changeTarget: 'Countdown anpassen',
+        addSlide: 'Folie hinzufügen',
+        removeSlide: 'Folie entfernen',
+        updateSlide: 'Folieninhalt ändern',
+        updateSelectedSlide: 'Folie auswählen',
     },
 };

@@ -2,7 +2,15 @@ import React, { ReactElement, useCallback, useContext, useEffect, useState } fro
 import './editor-style.css';
 import 'material-symbols';
 import { TopBar } from './TopBar.tsx';
-import { addChange, applyChanges, ChangeEvent, ChangeSet, emptyChangeSet } from '../../model/ChangeEvent.ts';
+import {
+    addChange,
+    applyChanges,
+    ChangeEvent,
+    ChangeSet,
+    emptyChangeSet,
+    redoLastChange,
+    revertLastChange,
+} from '../../model/ChangeEvent.ts';
 import { SlideCarousel } from './SlideCarousel.tsx';
 import { SlideEditor } from './SlideEditor.tsx';
 import { BottomBar } from './BottomBar.tsx';
@@ -25,9 +33,11 @@ export const Editor = (): ReactElement => {
         setChangeSet((prev) => addChange(prev, event));
     }, [setChangeSet]);
     const onUndoLastChange = useCallback(() => {
-    }, [changeSet, setChangeSet]);
+        setChangeSet((prev) => revertLastChange(prev));
+    }, [setChangeSet]);
     const onRedoLastChange = useCallback(() => {
-    }, [changeSet, setChangeSet]);
+        setChangeSet((prev) => redoLastChange(prev));
+    }, [setChangeSet]);
 
     // Changes to the changeset affect the presentation state!
     useEffect(() => {
