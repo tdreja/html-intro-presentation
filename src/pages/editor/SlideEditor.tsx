@@ -9,12 +9,19 @@ type SlideEditorProps = EditorProps & {
 };
 
 export const SlideEditor = ({
+    editedSlideshow,
+    editedSlideId,
     editedSlideContent,
     setEditedSlideContent,
 }: SlideEditorProps): ReactElement => {
     const i18n = useI18N();
+    const slideIndex
+        = (editedSlideId && editedSlideshow.slides.findIndex((s) => s.id === editedSlideId) + 1) || 0;
     return (
         <div id="slide-editor-wrapper">
+            {slideIndex > 0 && (
+                <h6>{`${i18n.editor.titleSlide} ${slideIndex}`}</h6>
+            )}
             <ReactQuill
                 theme="snow"
                 value={editedSlideContent}

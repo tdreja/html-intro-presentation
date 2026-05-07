@@ -15,7 +15,7 @@ import { SlideCarousel } from './SlideCarousel.tsx';
 import { SlideEditor } from './SlideEditor.tsx';
 import { BottomBar } from './BottomBar.tsx';
 import { SlideId } from '../../model/Slide.ts';
-import { findSlideContent, Slideshow } from '../../model/Slideshow.ts';
+import { Slideshow } from '../../model/Slideshow.ts';
 import '../global-style.css';
 import { SlideshowContext } from '../../component/SlideshowContext.ts';
 import { RouteContext } from '../../component/RouteContext.ts';
@@ -45,10 +45,18 @@ export const Editor = (): ReactElement => {
     ) => {
         const newSlideshow = applyChanges(slideshow, newChangeSet);
         setEditedSlideshow(newSlideshow);
-        const moveTo: SlideId | null = moveToSlide || editedSlideId;
-        setEditedSlideId(moveTo);
-        setEditedSlideContent(findSlideContent(newSlideshow, moveTo) || emptyHtmlParagraph);
         setChangeSet(newChangeSet);
+
+        // Ensure that we either move to a valid slide or reset the editor!
+        const idToMoveTo: SlideId | null = moveToSlide || editedSlideId;
+        const slideToMoveTo = newSlideshow.slides.find((slide) => slide.id === idToMoveTo);
+        if (slideToMoveTo) {
+            setEditedSlideId(idToMoveTo);
+            setEditedSlideContent(slideToMoveTo.content);
+        } else {
+            setEditedSlideId(null);
+            setEditedSlideContent(emptyHtmlParagraph);
+        }
     }, [setChangeSet, slideshow, setEditedSlideshow, editedSlideId, setEditedSlideId, setEditedSlideContent]);
 
     // Adds another event to the changeset
@@ -81,6 +89,18 @@ export const Editor = (): ReactElement => {
     const onRedoLastChange = useCallback(() => {
         onApplyChanges(redoLastChange(changeSet), null);
     }, [changeSet, onApplyChanges]);
+
+    // Moves to another slide for editing
+    const onChangeEditedSlideId = useCallback((slideId: SlideId | null) => {
+        const check = onCheckSlideContent(slideId);
+        let newChangeSet: ChangeSet = changeSet;
+        if (check.prependChange) {
+            newChangeSet = addChange(newChangeSet, check.prependChange);
+        } else if (check.appendChange) {
+            newChangeSet = addChange(newChangeSet, check.appendChange);
+        }
+        onApplyChanges(newChangeSet, slideId);
+    }, [changeSet, editedSlideId, setEditedSlideId, onCheckSlideContent, onApplyChanges]);
 
     const onStartSlideshow = () => {};
 
@@ -117,6 +137,7 @@ export const Editor = (): ReactElement => {
                     onAddChange={onAddChange}
                     onRedoLastChange={onRedoLastChange}
                     onUndoLastChange={onUndoLastChange}
+                    onChangeEditedSlideId={onChangeEditedSlideId}
                 />
 
                 {/* Slide Editor */}

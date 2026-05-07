@@ -1,6 +1,6 @@
 import React, { ReactElement } from 'react';
 import { EditorProps } from './EditorProps.ts';
-import { Slide } from '../../model/Slide.ts';
+import { Slide, SlideId } from '../../model/Slide.ts';
 import { DisplayHtml } from '../../component/DisplayHtml.tsx';
 import { AddSlideEvent, ChangeEvent, RemoveSlideEvent } from '../../model/ChangeEvent.ts';
 import { Button, ButtonGroup, Dropdown } from 'react-bootstrap';
@@ -11,14 +11,22 @@ type SlideProps = {
     current: boolean,
     index: number,
     onAddChange: (ev: ChangeEvent) => void,
+    onChangeEditedSlideId: (slideId: SlideId | null) => void,
 };
 
-const SlidePreview = ({ slide, current, index, onAddChange }: SlideProps): ReactElement => {
+const SlidePreview = ({
+    slide,
+    current,
+    index,
+    onAddChange,
+    onChangeEditedSlideId,
+}: SlideProps): ReactElement => {
     return (
         <div
             className={`slide-thumb ${current ? 'active' : ''}`}
             onClick={(ev) => {
                 ev.stopPropagation();
+                onChangeEditedSlideId(slide.id);
             }}
         >
             <div className="thumb-preview">
@@ -40,7 +48,16 @@ const SlidePreview = ({ slide, current, index, onAddChange }: SlideProps): React
     );
 };
 
-export const SlideCarousel = ({ editedSlideshow, editedSlideId, onAddChange }: EditorProps): ReactElement => {
+type SlideCarouselProps = EditorProps & {
+    onChangeEditedSlideId: (slideId: SlideId | null) => void,
+};
+
+export const SlideCarousel = ({
+    editedSlideshow,
+    editedSlideId,
+    onAddChange,
+    onChangeEditedSlideId,
+}: SlideCarouselProps): ReactElement => {
     const i18n = useI18N();
     return (
         <div id="slide-carousel">
@@ -53,6 +70,7 @@ export const SlideCarousel = ({ editedSlideshow, editedSlideId, onAddChange }: E
                     current={editedSlideId === slide.id}
                     index={index + 1}
                     onAddChange={onAddChange}
+                    onChangeEditedSlideId={onChangeEditedSlideId}
                 />
             ))}
 
