@@ -31,6 +31,7 @@ export const SlideEditor = ({
                         [{ header: 1 }, { header: 2 }, { header: 3 }],
                         ['bold', 'italic', 'underline'],
                         [{ align: null }, { align: 'center' }, { align: 'right' }],
+                        [{ indent: '-1' }, { indent: '+1' }],
                         ['image'],
                         ['clean'],
                     ],
