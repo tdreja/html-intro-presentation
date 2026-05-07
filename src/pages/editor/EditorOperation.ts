@@ -1,4 +1,4 @@
-import { ChangeEvent, UpdateSlideContentEvent } from '../../model/ChangeEvent.ts';
+import { addChange, ChangeEvent, ChangeSet, emptyChangeSet, UpdateSlideContentEvent } from '../../model/ChangeEvent.ts';
 import { findSlideContent, Slideshow } from '../../model/Slideshow.ts';
 import { SlideId } from '../../model/Slide.ts';
 import { isEmptyHtml } from '../../model/Html.ts';
@@ -60,4 +60,22 @@ export function checkForSlideContentChanges(
 
     // No changes occurred!
     return noChanges;
+}
+
+export function mergeAdditionalChanges(
+    changeSet?: ChangeSet | null,
+    additionalChanges?: AdditionalChange | null,
+    mainEvent?: ChangeEvent | null,
+): ChangeSet {
+    let newChangeSet: ChangeSet = changeSet || emptyChangeSet();
+    if (additionalChanges?.prependChange) {
+        newChangeSet = addChange(newChangeSet, additionalChanges.prependChange);
+    }
+    if (mainEvent) {
+        newChangeSet = addChange(newChangeSet, mainEvent);
+    }
+    if (additionalChanges?.appendChange) {
+        newChangeSet = addChange(newChangeSet, additionalChanges.appendChange);
+    }
+    return newChangeSet;
 }

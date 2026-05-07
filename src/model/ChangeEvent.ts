@@ -38,10 +38,12 @@ export interface ChangeSet {
     readonly pendingEvents: Stack<ChangeEvent>,
 }
 
-export const emptyChangeSet: ChangeSet = {
-    appliedEvents: new Stack<ChangeEvent>(CHANGE_SET_SIZE),
-    pendingEvents: new Stack<ChangeEvent>(CHANGE_SET_SIZE),
-};
+export function emptyChangeSet(): ChangeSet {
+    return {
+        appliedEvents: new Stack<ChangeEvent>(CHANGE_SET_SIZE),
+        pendingEvents: new Stack<ChangeEvent>(CHANGE_SET_SIZE),
+    };
+}
 
 export function applyChanges(
     slideShow: Slideshow,

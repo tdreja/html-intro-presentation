@@ -3,7 +3,6 @@ import './editor-style.css';
 import 'material-symbols';
 import { TopBar } from './TopBar.tsx';
 import {
-    addChange,
     applyChanges,
     ChangeEvent,
     ChangeSet,
@@ -19,8 +18,9 @@ import { Slideshow } from '../../model/Slideshow.ts';
 import '../global-style.css';
 import { SlideshowContext } from '../../component/SlideshowContext.ts';
 import { RouteContext } from '../../component/RouteContext.ts';
-import { checkForSlideContentChanges } from './EditorOperation.ts';
+import { checkForSlideContentChanges, mergeAdditionalChanges } from './EditorOperation.ts';
 import { emptyHtmlParagraph } from '../../model/Html.ts';
+import { Route } from '../../model/Route.ts';
 
 export const Editor = (): ReactElement => {
     // Attach to the overall UI
@@ -28,7 +28,7 @@ export const Editor = (): ReactElement => {
     const [_, setRoute] = useContext(RouteContext);
 
     // Hold the edited changes as internal state!
-    const [changeSet, setChangeSet] = useState<ChangeSet>(emptyChangeSet);
+    const [changeSet, setChangeSet] = useState<ChangeSet>(emptyChangeSet());
     const [editedSlideshow, setEditedSlideshow] = useState<Slideshow>(slideshow);
     const [editedSlideId, setEditedSlideId] = useState<SlideId | null>(null);
     const [editedSlideContent, setEditedSlideContent] = useState<string>(emptyHtmlParagraph);
@@ -57,31 +57,21 @@ export const Editor = (): ReactElement => {
             setEditedSlideId(null);
             setEditedSlideContent(emptyHtmlParagraph);
         }
+
+        return newSlideshow;
     }, [setChangeSet, slideshow, setEditedSlideshow, editedSlideId, setEditedSlideId, setEditedSlideContent]);
 
     // Adds another event to the changeset
     const onAddChange = useCallback((event: ChangeEvent) => {
         const check = onCheckSlideContent(event.moveToSlide);
-        let newChangeSet: ChangeSet = changeSet;
-        if (check.prependChange) {
-            newChangeSet = addChange(newChangeSet, check.prependChange);
-        }
-        newChangeSet = addChange(newChangeSet, event);
-        if (check.appendChange) {
-            newChangeSet = addChange(newChangeSet, check.appendChange);
-        }
+        const newChangeSet = mergeAdditionalChanges(changeSet, check, event);
         onApplyChanges(newChangeSet, event.moveToSlide);
     }, [changeSet, onApplyChanges, onCheckSlideContent]);
 
     // Undos the last change, if possible!
     const onUndoLastChange = useCallback(() => {
         const check = onCheckSlideContent(null);
-        let newChangeSet: ChangeSet = changeSet;
-        if (check.prependChange) {
-            newChangeSet = addChange(newChangeSet, check.prependChange);
-        } else if (check.appendChange) {
-            newChangeSet = addChange(newChangeSet, check.appendChange);
-        }
+        const newChangeSet = mergeAdditionalChanges(changeSet, check, null);
         onApplyChanges(revertLastChange(newChangeSet), null);
     }, [changeSet, onApplyChanges]);
 
@@ -93,16 +83,20 @@ export const Editor = (): ReactElement => {
     // Moves to another slide for editing
     const onChangeEditedSlideId = useCallback((slideId: SlideId | null) => {
         const check = onCheckSlideContent(slideId);
-        let newChangeSet: ChangeSet = changeSet;
-        if (check.prependChange) {
-            newChangeSet = addChange(newChangeSet, check.prependChange);
-        } else if (check.appendChange) {
-            newChangeSet = addChange(newChangeSet, check.appendChange);
-        }
+        const newChangeSet = mergeAdditionalChanges(changeSet, check, null);
         onApplyChanges(newChangeSet, slideId);
     }, [changeSet, editedSlideId, setEditedSlideId, onCheckSlideContent, onApplyChanges]);
 
-    const onStartSlideshow = () => {};
+    const onStartSlideshow = useCallback(() => {
+        // Check for any missing changes!
+        const check = onCheckSlideContent(null);
+        const newChangeSet = mergeAdditionalChanges(changeSet, check, null);
+        const newSlideshow = onApplyChanges(newChangeSet, null);
+
+        // Apply the new data and start the presentation!
+        setSlideshow(newSlideshow);
+        setRoute(Route.PRESENTATION);
+    }, [onCheckSlideContent, onApplyChanges, setRoute, setSlideshow]);
 
     // Reset the editor, if the slideshow was changed!
     useEffect(() => {

@@ -41,12 +41,13 @@ function makeChangeSet(applied: ChangeEvent[], pending: ChangeEvent[] = []): Cha
 // ── emptyChangeSet ─────────────────────────────────────────────────────────
 
 describe('emptyChangeSet', () => {
+    const empty = emptyChangeSet();
     it('has empty appliedEvents', () => {
-        expect(emptyChangeSet.appliedEvents.isEmpty()).toBe(true);
+        expect(empty.appliedEvents.isEmpty()).toBe(true);
     });
 
     it('has empty pendingEvents', () => {
-        expect(emptyChangeSet.pendingEvents.isEmpty()).toBe(true);
+        expect(empty.pendingEvents.isEmpty()).toBe(true);
     });
 });
 
