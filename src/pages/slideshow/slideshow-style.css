@@ -10,4 +10,18 @@
     position: absolute;
     bottom: 0;
     width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    font-size: 1.25rem;
+}
+
+#to-editor-button {
+    border: none;
+    opacity: 0.25;
+}
+#to-editor-button:hover {
+    opacity: 1;
 }
