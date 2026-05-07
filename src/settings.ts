@@ -3,7 +3,7 @@ import { Duration } from '@js-joda/core';
 /**
  * How long do we show each slide to the user?
  */
-export const DURATION_PER_SLIDE: Duration = Duration.ofSeconds(10);
+export const DURATION_PER_SLIDE: Duration = Duration.ofSeconds(6);
 
 /**
  * How many change events do we keep, until we drop the oldest ones?

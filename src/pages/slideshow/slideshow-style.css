@@ -1,3 +1,11 @@
+@property --indicator-animation-time {
+    syntax: '<time>';
+    inherits: true;
+    initial-value: 4s;
+}
+
+/*** Settings for the carousel itself***/
+
 .carousel {
     height: 100vh;
 }
@@ -6,12 +14,13 @@
     font-size: 2rem;
 }
 
+/*** Settings for the bottom interaction area ***/
+
 #slideshow-bottom {
     position: absolute;
     bottom: 0;
     width: 100%;
     display: flex;
-    justify-content: space-between;
     align-items: center;
     padding-left: 1rem;
     padding-right: 1rem;
@@ -24,4 +33,59 @@
 }
 #to-editor-button:hover {
     opacity: 1;
+}
+
+/* Widths for both sides */
+#to-editor-button,
+.countdown {
+    width: 10rem;
+}
+
+.carousel-indicators {
+    flex-grow: 1;
+    grid-column: slides;
+    position: relative;
+    margin: 0;
+}
+
+/* Inactive indicators: small circles */
+.carousel-indicators [data-bs-target] {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: none;
+    background-color: rgba(255, 255, 255, 0.5);
+    padding: 0;
+    margin: 0 4px;
+    transition: width 0.3s ease, border-radius 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+/* Active indicator: pill shape, acts as progress container */
+.carousel-indicators [data-bs-target].active {
+    width: 48px;
+    height: 10px;
+    border-radius: 5px;
+    background-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Progress fill animation on active indicator */
+.carousel-indicators [data-bs-target].active::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 0;
+    background-color: rgba(255, 255, 255, 0.95);
+    border-radius: 5px;
+    animation: indicator-progress linear forwards;
+    animation-duration: var(--indicator-animation-time);
+}
+
+@keyframes indicator-progress {
+    from { width: 0; }
+    to   { width: 100%; }
 }

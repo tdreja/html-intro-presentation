@@ -16,7 +16,7 @@ function formatTimeRemaining(duration: Duration): string {
     return `${minutes}:${seconds}`;
 }
 
-export const Countdown = (): ReactElement | undefined => {
+export const Countdown = (): ReactElement => {
     const [slideshow] = useContext(SlideshowContext);
     const [timeRemaining, setTimeRemaining] = useState<Duration>(Duration.ZERO);
     const [highlightCountdown, setHighlightCountdown] = useState<boolean>(false);
@@ -53,12 +53,12 @@ export const Countdown = (): ReactElement | undefined => {
 
     // Skip any missing countdowns
     if (!slideshow.countdownTarget) {
-        return undefined;
+        return (<span className="countdown" />);
     }
     if (highlightCountdown) {
-        return (<h1>{formatTimeRemaining(timeRemaining)}</h1>);
+        return (<h1 className="countdown">{formatTimeRemaining(timeRemaining)}</h1>);
     }
     return (
-        <h2>{formatTimeRemaining(timeRemaining)}</h2>
+        <h2 className="countdown">{formatTimeRemaining(timeRemaining)}</h2>
     );
 };
