@@ -10,7 +10,6 @@ import {
     emptyChangeSet,
     redoLastChange,
     revertLastChange,
-    UpdateSlideContentEvent,
 } from '../../model/ChangeEvent.ts';
 import { SlideCarousel } from './SlideCarousel.tsx';
 import { SlideEditor } from './SlideEditor.tsx';
@@ -20,6 +19,8 @@ import { findSlideContent, Slideshow } from '../../model/Slideshow.ts';
 import '../global-style.css';
 import { SlideshowContext } from '../../component/SlideshowContext.ts';
 import { RouteContext } from '../../component/RouteContext.ts';
+import { checkForSlideContentChanges } from './EditorOperation.ts';
+import { emptyHtmlParagraph } from '../../model/Html.ts';
 
 export const Editor = (): ReactElement => {
     // Attach to the overall UI
@@ -30,59 +31,56 @@ export const Editor = (): ReactElement => {
     const [changeSet, setChangeSet] = useState<ChangeSet>(emptyChangeSet);
     const [editedSlideshow, setEditedSlideshow] = useState<Slideshow>(slideshow);
     const [editedSlideId, setEditedSlideId] = useState<SlideId | null>(null);
-    const [slideContent, setSlideContent] = useState<string>('');
+    const [editedSlideContent, setEditedSlideContent] = useState<string>(emptyHtmlParagraph);
 
-    const onApplyChanges = useCallback((newChangeset: ChangeSet) => {
-        // First apply all changes to the slideshow!
-        let finalizedChangeset: ChangeSet = newChangeset;
-        const nextSlideShow = applyChanges(slideshow, finalizedChangeset);
-        const nextEditedSlideId
-            = finalizedChangeset.appliedEvents.peek()?.relevantSlideId || editedSlideId;
+    // Checks if we need to save the current slide content, before we move to another slide!
+    const onCheckSlideContent = useCallback((moveToSlide?: SlideId | null) => {
+        return checkForSlideContentChanges(editedSlideshow, editedSlideId, editedSlideContent, moveToSlide);
+    }, [editedSlideshow, editedSlideId, editedSlideContent]);
 
-        // We may have edited an existing slide?
-        if (editedSlideId && nextEditedSlideId !== editedSlideId) {
-            const currentContent = findSlideContent(nextSlideShow, editedSlideId);
-            // We have unsaved changes, so we need to add an update event for the current slide!
-            if (currentContent !== slideContent) {
-                finalizedChangeset
-                    = addChange(finalizedChangeset, new UpdateSlideContentEvent(editedSlideId, slideContent));
-            }
-        }
+    // Applies the finalized changeset to the slideshow and shows these to the user!
+    const onApplyChanges = useCallback((
+        newChangeSet: ChangeSet,
+        moveToSlide: SlideId | null,
+    ) => {
+        const newSlideshow = applyChanges(slideshow, newChangeSet);
+        setEditedSlideshow(newSlideshow);
+        const moveTo: SlideId | null = moveToSlide || editedSlideId;
+        setEditedSlideId(moveTo);
+        setEditedSlideContent(findSlideContent(newSlideshow, moveTo) || emptyHtmlParagraph);
+        setChangeSet(newChangeSet);
+    }, [setChangeSet, slideshow, setEditedSlideshow, editedSlideId, setEditedSlideId, setEditedSlideContent]);
 
-        // We apply our unsaved content to the newly selected slide!
-        if (editedSlideId === null && nextEditedSlideId && slideContent !== '') {
-
-        }
-
-        // Update our slideshow state
-        setEditedSlideshow(nextSlideShow);
-        setEditedSlideId(nextEditedSlideId);
-        setSlideContent(findSlideContent(nextSlideShow, nextEditedSlideId) || '');
-
-        console.log('Changes?', finalizedChangeset.appliedEvents);
-        return finalizedChangeset;
-    }, [
-        editedSlideId,
-        setEditedSlideId,
-        editedSlideshow,
-        setEditedSlideshow,
-        slideContent,
-        setSlideContent,
-        slideshow]);
-
-    // Callbacks to add, undo and redo changes
+    // Adds another event to the changeset
     const onAddChange = useCallback((event: ChangeEvent) => {
-        const newChangeset = onApplyChanges(addChange(changeSet, event));
-        setChangeSet(newChangeset);
-    }, [changeSet, setChangeSet]);
+        const check = onCheckSlideContent(event.moveToSlide);
+        let newChangeSet: ChangeSet = changeSet;
+        if (check.prependChange) {
+            newChangeSet = addChange(newChangeSet, check.prependChange);
+        }
+        newChangeSet = addChange(newChangeSet, event);
+        if (check.appendChange) {
+            newChangeSet = addChange(newChangeSet, check.appendChange);
+        }
+        onApplyChanges(newChangeSet, event.moveToSlide);
+    }, [changeSet, onApplyChanges, onCheckSlideContent]);
+
+    // Undos the last change, if possible!
     const onUndoLastChange = useCallback(() => {
-        const newChangeset = onApplyChanges(revertLastChange(changeSet));
-        setChangeSet(newChangeset);
-    }, [changeSet, setChangeSet]);
+        const check = onCheckSlideContent(null);
+        let newChangeSet: ChangeSet = changeSet;
+        if (check.prependChange) {
+            newChangeSet = addChange(newChangeSet, check.prependChange);
+        } else if (check.appendChange) {
+            newChangeSet = addChange(newChangeSet, check.appendChange);
+        }
+        onApplyChanges(revertLastChange(newChangeSet), null);
+    }, [changeSet, onApplyChanges]);
+
+    // Redos the last change, if possible!
     const onRedoLastChange = useCallback(() => {
-        const newChangeset = onApplyChanges(redoLastChange(changeSet));
-        setChangeSet(newChangeset);
-    }, [changeSet, setChangeSet]);
+        onApplyChanges(redoLastChange(changeSet), null);
+    }, [changeSet, onApplyChanges]);
 
     const onStartSlideshow = () => {};
 
@@ -91,7 +89,7 @@ export const Editor = (): ReactElement => {
         setEditedSlideshow(slideshow);
         setEditedSlideId(null);
         setChangeSet(emptyChangeSet);
-        setSlideContent('');
+        setEditedSlideContent('');
     }, [slideshow]);
 
     return (
@@ -100,6 +98,7 @@ export const Editor = (): ReactElement => {
             <TopBar
                 editedSlideId={editedSlideId}
                 editedSlideshow={editedSlideshow}
+                editedSlideContent={editedSlideContent}
                 changeSet={changeSet}
                 onAddChange={onAddChange}
                 onRedoLastChange={onRedoLastChange}
@@ -113,6 +112,7 @@ export const Editor = (): ReactElement => {
                 <SlideCarousel
                     editedSlideId={editedSlideId}
                     editedSlideshow={editedSlideshow}
+                    editedSlideContent={editedSlideContent}
                     changeSet={changeSet}
                     onAddChange={onAddChange}
                     onRedoLastChange={onRedoLastChange}
@@ -123,12 +123,12 @@ export const Editor = (): ReactElement => {
                 <SlideEditor
                     editedSlideId={editedSlideId}
                     editedSlideshow={editedSlideshow}
-                    onAddChange={onAddChange}
+                    editedSlideContent={editedSlideContent}
+                    setEditedSlideContent={setEditedSlideContent}
                     changeSet={changeSet}
+                    onAddChange={onAddChange}
                     onRedoLastChange={onRedoLastChange}
                     onUndoLastChange={onUndoLastChange}
-                    slideContent={slideContent}
-                    setSlideContent={setSlideContent}
                 />
 
             </div>
@@ -137,6 +137,7 @@ export const Editor = (): ReactElement => {
             <BottomBar
                 editedSlideId={editedSlideId}
                 editedSlideshow={editedSlideshow}
+                editedSlideContent={editedSlideContent}
                 onAddChange={onAddChange}
                 changeSet={changeSet}
                 onRedoLastChange={onRedoLastChange}

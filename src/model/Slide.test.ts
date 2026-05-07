@@ -1,5 +1,6 @@
-import { describe, it, expect } from '@jest/globals';
-import { asHtml } from './Slide';
+import { describe, expect, it } from '@jest/globals';
+
+import { asHtml } from './Html.ts';
 
 describe('asHtml', () => {
     it('returns empty paragraph for undefined', () => {
@@ -30,4 +31,3 @@ describe('asHtml', () => {
         expect(asHtml('not opened>')).toBe('<div>not opened></div>');
     });
 });
-

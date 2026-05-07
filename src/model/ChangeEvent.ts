@@ -1,9 +1,10 @@
 import { LocalDateTime } from '@js-joda/core';
 import { Slideshow } from './Slideshow.ts';
-import { asHtml, HtmlData, Slide, SlideId } from './Slide.ts';
+import { Slide, SlideId } from './Slide.ts';
 import { CHANGE_SET_SIZE } from '../settings.ts';
 import { I18N } from '../i18n/I18N.ts';
 import { Stack } from '../utils/Stack.ts';
+import { asHtml, HtmlData } from './Html.ts';
 
 export type ChangeEventId = `${string}-${string}-${string}-${string}-${string}`;
 

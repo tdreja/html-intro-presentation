@@ -5,6 +5,7 @@ import { SlideId } from '../../model/Slide.ts';
 export interface EditorProps {
     editedSlideshow: Slideshow,
     editedSlideId: SlideId | null,
+    editedSlideContent: string,
     changeSet: ChangeSet,
     onAddChange: (event: ChangeEvent) => void,
     onUndoLastChange: () => void,

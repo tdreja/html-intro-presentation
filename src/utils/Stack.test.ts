@@ -168,11 +168,11 @@ describe('Stack<string>', () => {
             expect([...stack]).toEqual([]);
         });
 
-        it('iterates top to bottom (LIFO order)', () => {
+        it('iterates top to bottom (FIFO order)', () => {
             stack.push('a');
             stack.push('b');
             stack.push('c');
-            expect([...stack]).toEqual(['c', 'b', 'a']);
+            expect([...stack]).toEqual(['a', 'b', 'c']);
         });
 
         it('for-of loop works', () => {
@@ -182,7 +182,7 @@ describe('Stack<string>', () => {
             for (const item of stack) {
                 result.push(item);
             }
-            expect(result).toEqual(['y', 'x']);
+            expect(result).toEqual(['x', 'y']);
         });
 
         it('iteration does not mutate stack', () => {
@@ -195,8 +195,8 @@ describe('Stack<string>', () => {
         it('multiple iterations are independent', () => {
             stack.push('1');
             stack.push('2');
-            expect([...stack]).toEqual(['2', '1']);
-            expect([...stack]).toEqual(['2', '1']);
+            expect([...stack]).toEqual(['1', '2']);
+            expect([...stack]).toEqual(['1', '2']);
         });
     });
 });

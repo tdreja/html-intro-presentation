@@ -1,9 +1,6 @@
-export type SlideId = `${string}-${string}-${string}-${string}-${string}`;
+import { HtmlData } from './Html.ts';
 
-/**
- * Container for HTML content
- */
-export type HtmlData = `<${string}>${string}</${string}>`;
+export type SlideId = `${string}-${string}-${string}-${string}-${string}`;
 
 /**
  * A single slide within the presentation, with a unique identifier and the displayed content
@@ -17,17 +14,4 @@ export interface Slide {
      * Content of the slide
      */
     content: HtmlData,
-}
-
-/**
- * Wraps the given content as HTML
- */
-export function asHtml(value?: string | null): HtmlData {
-    if (!value || value.length === 0) {
-        return '<span></span>';
-    }
-    if (value.startsWith('<') && value.endsWith('>')) {
-        return value as HtmlData;
-    }
-    return `<div>${value}</div>` as HtmlData;
 }

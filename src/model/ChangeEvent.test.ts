@@ -14,9 +14,9 @@ import {
     UpdateSlideContentEvent,
 } from './ChangeEvent';
 import { emptySlideshow, Slideshow } from './Slideshow';
-import { asHtml } from './Slide';
 import { CHANGE_SET_SIZE } from '../settings.ts';
 import { Stack } from '../utils/Stack.ts';
+import { asHtml } from './Html.ts';
 
 // ── helpers ────────────────────────────────────────────────────────────────
 

@@ -1,8 +1,9 @@
 import { describe, expect, it } from '@jest/globals';
 import { ChangeEvent, UpdateSlideContentEvent } from '../../model/ChangeEvent.ts';
 import { updateSlideContent } from './UpdateSlideContent.ts';
-import { asHtml, SlideId } from '../../model/Slide.ts';
+import { SlideId } from '../../model/Slide.ts';
 import { emptySlideshow, Slideshow } from '../../model/Slideshow.ts';
+import { asHtml } from '../../model/Html.ts';
 
 describe('UpdateSlideContent', () => {
     const slideIdA: SlideId = crypto.randomUUID();

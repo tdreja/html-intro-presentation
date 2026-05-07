@@ -1,5 +1,6 @@
 import React, { ReactElement } from 'react';
-import { HtmlData } from '../model/Slide.ts';
+
+import { HtmlData } from '../model/Html.ts';
 
 type Props = {
     html: HtmlData,

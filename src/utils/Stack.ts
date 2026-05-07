@@ -22,6 +22,9 @@ export class Stack<T> implements Iterable<T> {
     }
 
     public peek(): T | null {
+        if (this.items.length === 0) {
+            return null;
+        }
         return this.items[this.items.length - 1] || null;
     }
 
@@ -38,14 +41,14 @@ export class Stack<T> implements Iterable<T> {
     }
 
     public [Symbol.iterator](): Iterator<T> {
-        let index = this.items.length - 1;
+        let index = 0;
         const items = this.items;
         return {
             next(): IteratorResult<T> {
-                if (index >= 0) {
-                    return { value: items[index--], done: false };
+                if (index >= items.length) {
+                    return { value: undefined as unknown as T, done: true };
                 }
-                return { value: undefined as unknown as T, done: true };
+                return { value: items[index++], done: false };
             },
         };
     }
