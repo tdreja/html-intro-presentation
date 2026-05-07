@@ -4,20 +4,23 @@ import {
     addChange,
     AddSlideEvent,
     applyChanges,
+    ChangeEvent,
+    ChangeSet,
     emptyChangeSet,
     redoLastChange,
     RemoveSlideEvent,
     revertLastChange,
     TargetChangeEvent,
-    UpdateSelectedSlideEvent,
     UpdateSlideContentEvent,
 } from './ChangeEvent';
-import { emptySlideshow } from './Slideshow';
+import { emptySlideshow, Slideshow } from './Slideshow';
 import { asHtml } from './Slide';
 import { CHANGE_SET_SIZE } from '../settings.ts';
+import { Stack } from '../utils/Stack.ts';
 
 // ── helpers ────────────────────────────────────────────────────────────────
-function emptySlideShowWithSlides(count: number) {
+
+function emptySlideShowWithSlides(count: number): Slideshow {
     const show = emptySlideshow();
     const slides = Array.from({ length: count }, () => ({
         id: crypto.randomUUID(),
@@ -26,15 +29,24 @@ function emptySlideShowWithSlides(count: number) {
     return { ...show, slides };
 }
 
+/** Build a fresh ChangeSet from arrays (oldest → newest order). */
+function makeChangeSet(applied: ChangeEvent[], pending: ChangeEvent[] = []): ChangeSet {
+    const appliedStack = new Stack<ChangeEvent>(CHANGE_SET_SIZE);
+    applied.forEach((e) => appliedStack.push(e));
+    const pendingStack = new Stack<ChangeEvent>(CHANGE_SET_SIZE);
+    pending.forEach((e) => pendingStack.push(e));
+    return { appliedEvents: appliedStack, pendingEvents: pendingStack };
+}
+
 // ── emptyChangeSet ─────────────────────────────────────────────────────────
 
 describe('emptyChangeSet', () => {
-    it('has empty previousEvents', () => {
-        expect(emptyChangeSet.appliedEvents).toHaveLength(0);
+    it('has empty appliedEvents', () => {
+        expect(emptyChangeSet.appliedEvents.isEmpty()).toBe(true);
     });
 
-    it('has empty futureEvents', () => {
-        expect(emptyChangeSet.pendingEvents).toHaveLength(0);
+    it('has empty pendingEvents', () => {
+        expect(emptyChangeSet.pendingEvents.isEmpty()).toBe(true);
     });
 });
 
@@ -43,28 +55,25 @@ describe('emptyChangeSet', () => {
 describe('applyChanges', () => {
     it('returns unchanged slideShow when no events', () => {
         const show = emptySlideshow();
-        const [result] = applyChanges(show, null, emptyChangeSet);
+        const result = applyChanges(show, makeChangeSet([]));
         expect(result).toBe(show);
     });
 
-    it('applies multiple events in order', () => {
+    it('applies events — Stack iterates newest first, so last-pushed runs first', () => {
         const show = emptySlideshow();
         const e1 = new AddSlideEvent('<p>A</p>');
         const e2 = new AddSlideEvent('<p>B</p>');
-        const changeSet = { previousEvents: [e1, e2], futureEvents: [] };
-        const [result] = applyChanges(show, null, changeSet);
+        // e1 pushed first, e2 second → iterator: e2 then e1
+        const result = applyChanges(show, makeChangeSet([e1, e2]));
         expect(result.slides).toHaveLength(2);
-        expect(result.slides[0].content).toBe('<p>A</p>');
-        expect(result.slides[1].content).toBe('<p>B</p>');
+        expect(result.slides[0].content).toBe('<p>B</p>');
+        expect(result.slides[1].content).toBe('<p>A</p>');
     });
 
-    it('threads editedSlideId through events', () => {
-        const show = emptySlideshow();
-        const e1 = new AddSlideEvent();
-        const changeSet = { previousEvents: [e1], futureEvents: [] };
-        const [resultShow, resultId] = applyChanges(show, null, changeSet);
-        expect(resultId).not.toBeNull();
-        expect(resultShow.slides[0].id).toEqual(resultId);
+    it('returns Slideshow (not a tuple)', () => {
+        const e = new AddSlideEvent('<p>X</p>');
+        const result = applyChanges(emptySlideshow(), makeChangeSet([e]));
+        expect(result.slides).toHaveLength(1);
     });
 });
 
@@ -72,101 +81,103 @@ describe('applyChanges', () => {
 
 describe('addChange', () => {
     it('returns same changeSet when change is undefined', () => {
-        const result = addChange(emptyChangeSet, undefined);
-        expect(result).toBe(emptyChangeSet);
+        const cs = makeChangeSet([]);
+        expect(addChange(cs, undefined)).toBe(cs);
     });
 
     it('returns same changeSet when change is null', () => {
-        const result = addChange(emptyChangeSet, null);
-        expect(result).toBe(emptyChangeSet);
+        const cs = makeChangeSet([]);
+        expect(addChange(cs, null)).toBe(cs);
     });
 
-    it('appends event to previousEvents', () => {
+    it('pushes event onto appliedEvents', () => {
+        const cs = makeChangeSet([]);
         const event = new AddSlideEvent();
-        const result = addChange(emptyChangeSet, event);
-        expect(result.appliedEvents).toHaveLength(1);
-        expect(result.appliedEvents[0]).toBe(event);
+        addChange(cs, event);
+        expect(cs.appliedEvents.size()).toBe(1);
+        expect(cs.appliedEvents.peek()).toBe(event);
     });
 
-    it('clears futureEvents when new event added', () => {
-        const existing = new AddSlideEvent();
+    it('does NOT clear pendingEvents when new event added', () => {
         const future = new AddSlideEvent();
-        const changeSet = { previousEvents: [existing], futureEvents: [future] };
-        const result = addChange(changeSet, new AddSlideEvent());
-        expect(result.pendingEvents).toHaveLength(0);
+        const cs = makeChangeSet([], [future]);
+        addChange(cs, new AddSlideEvent());
+        expect(cs.pendingEvents.size()).toBe(1);
     });
 
-    it(`caps previousEvents at ${CHANGE_SET_SIZE}, dropping oldest`, () => {
-        let changeSet = emptyChangeSet;
+    it(`caps appliedEvents at ${CHANGE_SET_SIZE}, dropping oldest`, () => {
+        const cs = makeChangeSet([]);
         for (let i = 0; i < CHANGE_SET_SIZE; i++) {
-            changeSet = addChange(changeSet, new AddSlideEvent());
+            addChange(cs, new AddSlideEvent());
         }
-        expect(changeSet.appliedEvents).toHaveLength(CHANGE_SET_SIZE);
-        const oldest = changeSet.appliedEvents[0];
-        const newChange = new AddSlideEvent();
-        changeSet = addChange(changeSet, newChange);
-        expect(changeSet.appliedEvents).toHaveLength(CHANGE_SET_SIZE);
-        expect(changeSet.appliedEvents[0]).not.toBe(oldest);
-        expect(changeSet.appliedEvents[CHANGE_SET_SIZE - 1]).toBe(newChange);
+        expect(cs.appliedEvents.size()).toBe(CHANGE_SET_SIZE);
+
+        const newest = new AddSlideEvent();
+        addChange(cs, newest);
+        expect(cs.appliedEvents.size()).toBe(CHANGE_SET_SIZE);
+        expect(cs.appliedEvents.peek()).toBe(newest);
     });
 });
 
 // ── revertLastChange ───────────────────────────────────────────────────────
 
 describe('revertLastChange', () => {
-    it('returns same changeSet when previousEvents empty', () => {
-        const result = revertLastChange(emptyChangeSet);
-        expect(result).toBe(emptyChangeSet);
+    it('returns same changeSet when appliedEvents empty', () => {
+        const cs = makeChangeSet([]);
+        expect(revertLastChange(cs)).toBe(cs);
     });
 
-    it('moves last previousEvent to front of futureEvents', () => {
+    it('pops top of appliedEvents onto pendingEvents', () => {
         const e1 = new AddSlideEvent();
         const e2 = new AddSlideEvent();
-        const changeSet = { previousEvents: [e1, e2], futureEvents: [] };
-        const result = revertLastChange(changeSet);
-        expect(result.appliedEvents).toHaveLength(1);
-        expect(result.appliedEvents[0]).toBe(e1);
-        expect(result.pendingEvents).toHaveLength(1);
-        expect(result.pendingEvents[0]).toBe(e2);
+        const cs = makeChangeSet([e1, e2]); // e1 bottom, e2 top
+        revertLastChange(cs);
+        expect(cs.appliedEvents.size()).toBe(1);
+        expect(cs.appliedEvents.peek()).toBe(e1);
+        expect(cs.pendingEvents.size()).toBe(1);
+        expect(cs.pendingEvents.peek()).toBe(e2);
     });
 
-    it('prepends to existing futureEvents', () => {
+    it('pushes reverted event on top of existing pendingEvents', () => {
         const e1 = new AddSlideEvent();
         const e2 = new AddSlideEvent();
         const e3 = new AddSlideEvent();
-        const changeSet = { previousEvents: [e1, e2], futureEvents: [e3] };
-        const result = revertLastChange(changeSet);
-        expect(result.pendingEvents[0]).toBe(e2);
-        expect(result.pendingEvents[1]).toBe(e3);
+        // applied: e1 bottom, e2 top | pending: e3
+        const cs = makeChangeSet([e1, e2], [e3]);
+        revertLastChange(cs); // pop e2, push to pending → e3 bottom, e2 top
+        const pending = [...cs.pendingEvents]; // iterator: newest first → [e2, e3]
+        expect(pending[0]).toBe(e2);
+        expect(pending[1]).toBe(e3);
     });
 });
 
 // ── redoLastChange ─────────────────────────────────────────────────────────
 
 describe('redoLastChange', () => {
-    it('returns same changeSet when futureEvents empty', () => {
-        const result = redoLastChange(emptyChangeSet);
-        expect(result).toBe(emptyChangeSet);
+    it('returns same changeSet when pendingEvents empty', () => {
+        const cs = makeChangeSet([]);
+        expect(redoLastChange(cs)).toBe(cs);
     });
 
-    it('moves first futureEvent to end of previousEvents', () => {
+    it('pops top of pendingEvents onto appliedEvents', () => {
         const e1 = new AddSlideEvent();
         const e2 = new AddSlideEvent();
-        const changeSet = { previousEvents: [e1], futureEvents: [e2] };
-        const result = redoLastChange(changeSet);
-        expect(result.pendingEvents).toHaveLength(0);
-        expect(result.appliedEvents).toHaveLength(2);
-        expect(result.appliedEvents[1]).toBe(e2);
+        const cs = makeChangeSet([e1], [e2]); // pending: e2
+        redoLastChange(cs);
+        expect(cs.pendingEvents.isEmpty()).toBe(true);
+        expect(cs.appliedEvents.size()).toBe(2);
+        expect(cs.appliedEvents.peek()).toBe(e2);
     });
 
-    it('keeps remaining futureEvents in order', () => {
+    it('keeps remaining pendingEvents, last-in is re-applied first', () => {
         const e1 = new AddSlideEvent();
         const e2 = new AddSlideEvent();
-        const changeSet = { previousEvents: [], futureEvents: [e1, e2] };
-        const result = redoLastChange(changeSet);
-        expect(result.pendingEvents).toHaveLength(1);
-        expect(result.pendingEvents[0]).toBe(e2);
-        expect(result.appliedEvents[0]).toBe(e1);
+        // pending: e1 bottom, e2 top → pop returns e2
+        const cs = makeChangeSet([], [e1, e2]);
+        redoLastChange(cs);
+        expect(cs.pendingEvents.size()).toBe(1);
+        expect(cs.pendingEvents.peek()).toBe(e1);
+        expect(cs.appliedEvents.peek()).toBe(e2);
     });
 });
 
@@ -174,28 +185,23 @@ describe('redoLastChange', () => {
 
 describe('TargetChangeEvent', () => {
     it('has unique ChangeId', () => {
-        const e1 = new TargetChangeEvent(null);
-        const e2 = new TargetChangeEvent(null);
-        expect(e1.id).not.toBe(e2.id);
+        expect(new TargetChangeEvent(null).id).not.toBe(new TargetChangeEvent(null).id);
     });
 
     it('sets countdownTarget to given LocalDateTime', () => {
         const target = LocalDateTime.of(2026, 1, 1, 12, 0);
-        const show = emptySlideshow();
-        const [result] = new TargetChangeEvent(target).apply(show, null);
+        const result = new TargetChangeEvent(target).apply(emptySlideshow());
         expect(result.countdownTarget).toEqual(target);
     });
 
     it('sets countdownTarget to null', () => {
         const show = { ...emptySlideshow(), countdownTarget: LocalDateTime.of(2025, 6, 1, 9, 0) };
-        const [result] = new TargetChangeEvent(null).apply(show, null);
+        const result = new TargetChangeEvent(null).apply(show);
         expect(result.countdownTarget).toBeNull();
     });
 
-    it('preserves editedSlideId', () => {
-        const id = crypto.randomUUID();
-        const [, resultId] = new TargetChangeEvent(null).apply(emptySlideshow(), id);
-        expect(resultId).toBe(id);
+    it('moveToSlide is null', () => {
+        expect(new TargetChangeEvent(null).moveToSlide).toBeNull();
     });
 });
 
@@ -203,28 +209,24 @@ describe('TargetChangeEvent', () => {
 
 describe('AddSlideEvent', () => {
     it('has unique ChangeId', () => {
-        const e1 = new AddSlideEvent();
-        const e2 = new AddSlideEvent();
-        expect(e1.id).not.toBe(e2.id);
+        expect(new AddSlideEvent().id).not.toBe(new AddSlideEvent().id);
     });
 
     it('appends new slide to slideShow', () => {
-        const show = emptySlideshow();
-        const [result] = new AddSlideEvent('<p>hello</p>').apply(show);
+        const result = new AddSlideEvent('<p>hello</p>').apply(emptySlideshow());
         expect(result.slides).toHaveLength(1);
         expect(result.slides[0].content).toBe('<p>hello</p>');
     });
 
-    it('sets editedSlideId to new slide id', () => {
-        const show = emptySlideshow();
-        const [result, slideId] = new AddSlideEvent().apply(show);
-        expect(slideId).not.toBeNull();
-        expect(result.slides[0].id).toEqual(slideId);
+    it('moveToSlide equals the new slide id', () => {
+        const event = new AddSlideEvent();
+        const result = event.apply(emptySlideshow());
+        expect(result.slides[0].id).toEqual(event.moveToSlide);
     });
 
-    it('creates slide with empty content when called without args', () => {
-        const [result] = new AddSlideEvent().apply(emptySlideshow());
-        expect(result.slides[0].content).toBe('');
+    it('creates slide with default HTML content when called without args', () => {
+        const result = new AddSlideEvent().apply(emptySlideshow());
+        expect(result.slides[0].content).toBe(asHtml());
     });
 });
 
@@ -239,24 +241,19 @@ describe('RemoveSlideEvent', () => {
     it('removes slide with matching id', () => {
         const show = emptySlideShowWithSlides(2);
         const targetId = show.slides[0].id;
-        const [result] = new RemoveSlideEvent(targetId).apply(show, null);
+        const result = new RemoveSlideEvent(targetId).apply(show);
         expect(result.slides).toHaveLength(1);
         expect(result.slides[0].id).toEqual(show.slides[1].id);
     });
 
-    it('clears editedSlideId when removed slide was selected', () => {
+    it('does not remove slide with non-matching id', () => {
         const show = emptySlideShowWithSlides(2);
-        const targetId = show.slides[0].id;
-        const [, resultId] = new RemoveSlideEvent(targetId).apply(show, targetId);
-        expect(resultId).toBeNull();
+        const result = new RemoveSlideEvent(crypto.randomUUID()).apply(show);
+        expect(result.slides).toHaveLength(2);
     });
 
-    it('preserves editedSlideId when it refers to different slide', () => {
-        const show = emptySlideShowWithSlides(2);
-        const removeId = show.slides[0].id;
-        const keepId = show.slides[1].id;
-        const [, resultId] = new RemoveSlideEvent(removeId).apply(show, keepId);
-        expect(resultId).toEqual(keepId);
+    it('moveToSlide is null', () => {
+        expect(new RemoveSlideEvent(crypto.randomUUID()).moveToSlide).toBeNull();
     });
 });
 
@@ -265,15 +262,13 @@ describe('RemoveSlideEvent', () => {
 describe('UpdateSlideContentEvent', () => {
     it('has unique ChangeId', () => {
         const id = crypto.randomUUID();
-        expect(new UpdateSlideContentEvent(id).id).not.toBe(
-            new UpdateSlideContentEvent(id).id,
-        );
+        expect(new UpdateSlideContentEvent(id).id).not.toBe(new UpdateSlideContentEvent(id).id);
     });
 
     it('updates content of matching slide', () => {
         const show = emptySlideShowWithSlides(2);
         const targetId = show.slides[0].id;
-        const [result] = new UpdateSlideContentEvent(targetId, '<p>new</p>').apply(show, null);
+        const result = new UpdateSlideContentEvent(targetId, '<p>new</p>').apply(show);
         expect(result.slides[0].content).toBe('<p>new</p>');
         expect(result.slides[1].content).toBe(show.slides[1].content);
     });
@@ -281,45 +276,13 @@ describe('UpdateSlideContentEvent', () => {
     it('does not modify other slides', () => {
         const show = emptySlideShowWithSlides(3);
         const targetId = show.slides[1].id;
-        const [result] = new UpdateSlideContentEvent(targetId, '<b>x</b>').apply(show, null);
+        const result = new UpdateSlideContentEvent(targetId, '<b>x</b>').apply(show);
         expect(result.slides[0].content).toBe(show.slides[0].content);
         expect(result.slides[2].content).toBe(show.slides[2].content);
     });
 
-    it('preserves editedSlideId', () => {
-        const show = emptySlideShowWithSlides(1);
-        const targetId = show.slides[0].id;
-        const otherId = crypto.randomUUID();
-        const [, resultId] = new UpdateSlideContentEvent(targetId, '<p>x</p>').apply(show, otherId);
-        expect(resultId).toEqual(otherId);
-    });
-});
-
-// ── UpdateSelectedSlideEvent ───────────────────────────────────────────────
-
-describe('UpdateSelectedSlideEvent', () => {
-    it('has unique ChangeId', () => {
-        const e1 = new UpdateSelectedSlideEvent(null);
-        const e2 = new UpdateSelectedSlideEvent(null);
-        expect(e1.id).not.toBe(e2.id);
-    });
-
-    it('sets editedSlideId to given id', () => {
-        const show = emptySlideshow();
+    it('moveToSlide equals the target slide id', () => {
         const id = crypto.randomUUID();
-        const [, resultId] = new UpdateSelectedSlideEvent(id).apply(show);
-        expect(resultId).toEqual(id);
-    });
-
-    it('sets editedSlideId to null', () => {
-        const show = emptySlideshow();
-        const [, resultId] = new UpdateSelectedSlideEvent(null).apply(show);
-        expect(resultId).toBeNull();
-    });
-
-    it('does not mutate slideShow', () => {
-        const show = emptySlideshow();
-        const [result] = new UpdateSelectedSlideEvent(null).apply(show);
-        expect(result).toBe(show);
+        expect(new UpdateSlideContentEvent(id, '<p>x</p>').moveToSlide).toEqual(id);
     });
 });

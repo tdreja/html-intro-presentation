@@ -8,9 +8,21 @@ import { Stack } from '../utils/Stack.ts';
 export type ChangeEventId = `${string}-${string}-${string}-${string}-${string}`;
 
 export interface ChangeEvent {
+    /**
+     * Unique ID of the event itself
+     */
     readonly id: ChangeEventId,
-    readonly relevantSlideId: SlideId | null,
+    /**
+     * Is the event moving the UI to another slide?
+     */
+    readonly moveToSlide: SlideId | null,
+    /**
+     * Apply the event to the slideshow
+     */
     readonly apply: (slideShow: Slideshow) => Slideshow,
+    /**
+     * Describe the event
+     */
     readonly describe: (i18n: I18N) => string,
 }
 
@@ -75,19 +87,19 @@ export function redoLastChange(changes: ChangeSet): ChangeSet {
 
 abstract class AbstractChangeEvent implements ChangeEvent {
     protected readonly _id: ChangeEventId;
-    protected readonly _relevantSlideId: SlideId | null;
+    protected readonly _moveToSlide: SlideId | null;
 
-    protected constructor(relevantSlideId: SlideId | null) {
+    protected constructor(moveToSlide: SlideId | null) {
         this._id = crypto.randomUUID();
-        this._relevantSlideId = relevantSlideId;
+        this._moveToSlide = moveToSlide;
     }
 
     public get id(): ChangeEventId {
         return this._id;
     }
 
-    public get relevantSlideId(): SlideId | null {
-        return this._relevantSlideId;
+    public get moveToSlide(): SlideId | null {
+        return this._moveToSlide;
     }
 
     public abstract apply(slideShow: Slideshow): Slideshow;
@@ -121,9 +133,13 @@ export class AddSlideEvent extends AbstractChangeEvent {
     public constructor(content?: string | null) {
         super(crypto.randomUUID());
         this._slide = {
-            id: this._relevantSlideId!,
+            id: this._moveToSlide!,
             content: asHtml(content),
         };
+    }
+
+    public get moveToSlide(): SlideId {
+        return this._moveToSlide!;
     }
 
     public apply(slideShow: Slideshow): Slideshow {
@@ -139,16 +155,18 @@ export class AddSlideEvent extends AbstractChangeEvent {
 }
 
 export class RemoveSlideEvent extends AbstractChangeEvent {
+    private readonly _removedSlide: SlideId;
     public constructor(id: SlideId) {
-        super(id);
+        super(null);
+        this._removedSlide = id;
     }
 
-    public get relevantSlideId(): SlideId {
-        return this._relevantSlideId!;
+    public get moveToSlide(): null {
+        return null;
     }
 
     public apply(slideShow: Slideshow): Slideshow {
-        const slides: Array<Slide> = slideShow.slides.filter((slide) => slide.id !== this.relevantSlideId);
+        const slides: Array<Slide> = slideShow.slides.filter((slide) => slide.id !== this._removedSlide);
         return {
             ...slideShow,
             slides: slides,
@@ -168,14 +186,14 @@ export class UpdateSlideContentEvent extends AbstractChangeEvent {
         this._content = asHtml(content);
     }
 
-    public get relevantSlideId(): SlideId {
-        return this._relevantSlideId!;
+    public get moveToSlide(): SlideId {
+        return this._moveToSlide!;
     }
 
     public apply(slideShow: Slideshow): Slideshow {
         const slides: Array<Slide> = [];
         for (const slide of slideShow.slides) {
-            if (this.relevantSlideId === slide.id) {
+            if (this.moveToSlide === slide.id) {
                 slides.push({
                     ...slide,
                     content: this._content,
