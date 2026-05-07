@@ -1,56 +1,51 @@
-import React, { useEffect, useMemo } from 'react';
-import { ActivePresentation, ActivePresentationContext } from './model/ActivePresentationContext.ts';
-import { SlideShow } from './presentation/SlideShow.tsx';
-import { Countdown } from './presentation/Countdown.tsx';
-import { Editor } from './editor/Editor.tsx';
-import { EDITOR_REDIRECT_THRESHOLD } from './settings.ts';
-import { Route } from './model/Route.ts';
-import { useRoute } from './utils/UseRoute.tsx';
-import { useStoredPresentation } from './utils/UseStoredPresentation.tsx';
-import { ChronoUnit, LocalDateTime } from '@js-joda/core';
-import { CountdownContext, useCountdown } from './utils/UseCountdown.tsx';
+import React, { useEffect, useMemo, useState } from 'react';
+import { useStoredSlideshow } from './component/UseStoredSlideshow.tsx';
+import { Editor } from './pages/editor/Editor.tsx';
+import { i18n, I18NContext } from './i18n/I18NContext.tsx';
+import { parseCurrentRoute, Route } from './model/Route.ts';
+import { SlideshowContext } from './component/SlideshowContext.ts';
+import { SlideshowController } from './pages/slideshow/SlideshowController.tsx';
+import { RouteContext } from './component/RouteContext.ts';
 
 function App() {
-    const route = useRoute();
-    const [presentation, setPresentation] = useStoredPresentation();
-    const activePresentation: ActivePresentation = useMemo(() => ({
-        presentation,
-        updatePresentation: setPresentation,
-    }), [presentation, setPresentation]);
-    const timeRemaining = useCountdown(activePresentation);
+    // I18N for translations
+    const currentI18N = useMemo(() => {
+        return i18n();
+    }, []);
 
-    // Auto-redirect to editor after threshold has passed since presentation ended
+    // Route Status
+    const routeState = useState(() => parseCurrentRoute());
+    const [route, setRoute] = routeState;
     useEffect(() => {
-        if (route === Route.EDITOR) {
-            return;
+        const handler = () => setRoute(parseCurrentRoute());
+        window.addEventListener('hashchange', handler);
+        return () => window.removeEventListener('hashchange', handler);
+    }, []);
+
+    // Update the route in the URL as well!
+    useEffect(() => {
+        const current = parseCurrentRoute();
+        if (current !== route) {
+            window.location.hash = route;
         }
-        const endOfPresentation = presentation.target.plus(EDITOR_REDIRECT_THRESHOLD);
-        const now = LocalDateTime.now();
-        if (now.isAfter(endOfPresentation)) {
-            window.location.hash = 'editor';
-            return;
-        }
-        const remainingMillis = now.until(endOfPresentation, ChronoUnit.MILLIS);
-        const id = setTimeout(() => {
-            window.location.hash = 'editor';
-        }, remainingMillis);
-        return () => clearTimeout(id);
-    }, [presentation.target, route]);
+    }, [route]);
+
+    // Presentation currently shown to the user or being edited
+    const slideshowState = useStoredSlideshow();
 
     return (
-        <ActivePresentationContext.Provider value={activePresentation}>
-            <CountdownContext.Provider value={timeRemaining}>
-                {route === Route.EDITOR && (
-                    <Editor />
-                )}
-                {route === Route.PRESENTATION && (
-                    <>
-                        <SlideShow />
-                        <Countdown />
-                    </>
-                )}
-            </CountdownContext.Provider>
-        </ActivePresentationContext.Provider>
+        <I18NContext.Provider value={currentI18N}>
+            <RouteContext value={routeState}>
+                <SlideshowContext value={slideshowState}>
+                    {route === Route.EDITOR && (
+                        <Editor />
+                    )}
+                    {route === Route.PRESENTATION && (
+                        <SlideshowController />
+                    )}
+                </SlideshowContext>
+            </RouteContext>
+        </I18NContext.Provider>
     );
 }
 

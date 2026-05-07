@@ -1,0 +1,47 @@
+/** Overrides for bootstrap text & headings **/
+h1, h2, h3 {
+    margin-bottom: 0.5em !important;
+    font-family: var(--bs-body-font-family), sans-serif !important;
+}
+h1 {
+    font-size: 2.5em !important;
+}
+h2 {
+    font-size: 2em !important;
+}
+h3 {
+    font-size: 1.75em !important;
+}
+p {
+    font-size: 1em !important;
+    margin-bottom: 0.2em !important;
+    font-family: var(--bs-body-font-family), sans-serif !important;
+}
+p:empty {
+    height: 1em;
+}
+h6 {
+    font-size: 0.8em;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.25em;
+}
+
+/** Transmit Quill Styles to other slides **/
+.ql-align-center {
+    text-align: center;
+}
+.ql-align-right {
+    text-align: right;
+}
+.ql-align-justify {
+    text-align: justify;
+}
+
+/** Adjust boostrap layouting **/
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 0.5em;
+}

@@ -6,11 +6,12 @@ const config: JestConfigWithTsJest = {
     testRegex: '(/__tests__/.*|(\\.|/)(test|spec))\\.[t]sx?$',
     transform: {
         '^.+.tsx?$': ['ts-jest', {
-            diagnostics: { ignoreCodes: ['TS151001'] },
+            diagnostics: { ignoreCodes: ['TS151001', 'TS5097'] },
             tsconfig: {
                 moduleResolution: 'node',
                 rootDir: './src',
                 ignoreDeprecations: '6.0',
+                jsx: 'react',
             },
         }],
     },

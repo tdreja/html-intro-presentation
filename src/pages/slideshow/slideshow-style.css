@@ -1,0 +1,13 @@
+.carousel {
+    height: 100vh;
+}
+
+.carousel-item {
+    font-size: 2rem;
+}
+
+#slideshow-bottom {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+}
