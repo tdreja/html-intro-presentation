@@ -1,10 +1,10 @@
 import { describe, expect, it } from '@jest/globals';
 import { checkForSlideContentChanges, mergeAdditionalChanges } from './EditorOperation.ts';
 import { ChangeEvent, ChangeSet, UpdateSlideContentEvent } from '../../model/ChangeEvent.ts';
-import { SlideId } from '../../model/Slide.ts';
 import { emptySlideshow, Slideshow } from '../../model/Slideshow.ts';
-import { asHtml } from '../../model/Html.ts';
+import { toHtmlData } from '../../model/Html.ts';
 import { Stack } from '../../utils/Stack.ts';
+import { UuidV4 } from '../../model/UuidV4.ts';
 
 function freshChangeSet(): ChangeSet {
     return {
@@ -14,11 +14,11 @@ function freshChangeSet(): ChangeSet {
 }
 
 describe('checkForSlideContentChanges', () => {
-    const slideIdA: SlideId = crypto.randomUUID();
-    const slideIdB: SlideId = crypto.randomUUID();
+    const slideIdA: UuidV4 = crypto.randomUUID();
+    const slideIdB: UuidV4 = crypto.randomUUID();
 
-    const contentA = asHtml('<p>Hello A</p>');
-    const contentB = asHtml('<p>Hello B</p>');
+    const contentA = toHtmlData('<p>Hello A</p>');
+    const contentB = toHtmlData('<p>Hello B</p>');
 
     const slideshow: Slideshow = {
         ...emptySlideshow(),
@@ -75,7 +75,7 @@ describe('checkForSlideContentChanges', () => {
     // --- editedSlideId not found in slideshow ---
 
     it('editedSlideId unknown in slideshow, content differs → prependChange (content not null in store)', () => {
-        const unknownId: SlideId = crypto.randomUUID();
+        const unknownId: UuidV4 = crypto.randomUUID();
         // findSlideContent returns null → null !== '<p>X</p>' → prepend change
         const result = checkForSlideContentChanges(slideshow, unknownId, '<p>X</p>', slideIdB);
         expect(result.appendChange).toBeNull();
@@ -85,9 +85,9 @@ describe('checkForSlideContentChanges', () => {
 });
 
 describe('mergeAdditionalChanges', () => {
-    const slideIdA: SlideId = crypto.randomUUID();
-    const slideIdB: SlideId = crypto.randomUUID();
-    const slideIdC: SlideId = crypto.randomUUID();
+    const slideIdA: UuidV4 = crypto.randomUUID();
+    const slideIdB: UuidV4 = crypto.randomUUID();
+    const slideIdC: UuidV4 = crypto.randomUUID();
 
     const prepend = new UpdateSlideContentEvent(slideIdA, '<p>prepend</p>');
     const main = new UpdateSlideContentEvent(slideIdB, '<p>main</p>');

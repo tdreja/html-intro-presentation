@@ -13,7 +13,6 @@ import {
 import { SlideCarousel } from './SlideCarousel.tsx';
 import { SlideEditor } from './SlideEditor.tsx';
 import { BottomBar } from './BottomBar.tsx';
-import { SlideId } from '../../model/Slide.ts';
 import { Slideshow } from '../../model/Slideshow.ts';
 import '../global-style.css';
 import { SlideshowContext } from '../../component/SlideshowContext.ts';
@@ -21,6 +20,7 @@ import { RouteContext } from '../../component/RouteContext.ts';
 import { checkForSlideContentChanges, mergeAdditionalChanges } from './EditorOperation.ts';
 import { emptyHtmlParagraph } from '../../model/Html.ts';
 import { Route } from '../../model/Route.ts';
+import { UuidV4 } from '../../model/UuidV4.ts';
 
 export const Editor = (): ReactElement => {
     // Attach to the overall UI
@@ -30,25 +30,25 @@ export const Editor = (): ReactElement => {
     // Hold the edited changes as internal state!
     const [changeSet, setChangeSet] = useState<ChangeSet>(emptyChangeSet());
     const [editedSlideshow, setEditedSlideshow] = useState<Slideshow>(slideshow);
-    const [editedSlideId, setEditedSlideId] = useState<SlideId | null>(null);
+    const [editedSlideId, setEditedSlideId] = useState<UuidV4 | null>(null);
     const [editedSlideContent, setEditedSlideContent] = useState<string>(emptyHtmlParagraph);
 
     // Checks if we need to save the current slide content, before we move to another slide!
-    const onCheckSlideContent = useCallback((moveToSlide?: SlideId | null) => {
+    const onCheckSlideContent = useCallback((moveToSlide?: UuidV4 | null) => {
         return checkForSlideContentChanges(editedSlideshow, editedSlideId, editedSlideContent, moveToSlide);
     }, [editedSlideshow, editedSlideId, editedSlideContent]);
 
     // Applies the finalized changeset to the slideshow and shows these to the user!
     const onApplyChanges = useCallback((
         newChangeSet: ChangeSet,
-        moveToSlide: SlideId | null,
+        moveToSlide: UuidV4 | null,
     ) => {
         const newSlideshow = applyChanges(slideshow, newChangeSet);
         setEditedSlideshow(newSlideshow);
         setChangeSet(newChangeSet);
 
         // Ensure that we either move to a valid slide or reset the editor!
-        const idToMoveTo: SlideId | null = moveToSlide || editedSlideId;
+        const idToMoveTo: UuidV4 | null = moveToSlide || editedSlideId;
         const slideToMoveTo = newSlideshow.slides.find((slide) => slide.id === idToMoveTo);
         if (slideToMoveTo) {
             setEditedSlideId(idToMoveTo);
@@ -81,7 +81,7 @@ export const Editor = (): ReactElement => {
     }, [changeSet, onApplyChanges]);
 
     // Moves to another slide for editing
-    const onChangeEditedSlideId = useCallback((slideId: SlideId | null) => {
+    const onChangeEditedSlideId = useCallback((slideId: UuidV4 | null) => {
         const check = onCheckSlideContent(slideId);
         const newChangeSet = mergeAdditionalChanges(changeSet, check, null);
         onApplyChanges(newChangeSet, slideId);

@@ -4,6 +4,8 @@ import { ChangeEvent, TargetChangeEvent } from '../../model/ChangeEvent.ts';
 import { Button, ButtonGroup, Form } from 'react-bootstrap';
 import { useI18N } from '../../i18n/I18NContext.tsx';
 import { I18N } from '../../i18n/I18N.ts';
+import { fromLocalDateTimeOr, toLocalDateTime } from '../../utils/DateTimeUtils.ts';
+import { LocalDateTime } from '@js-joda/core';
 
 function describeChangeEvent(i18n: I18N, action: string, event?: ChangeEvent | null): string {
     if (!event) {
@@ -25,12 +27,15 @@ export const BottomBar = ({
     onStartSlideshow,
 }: BottomBarProps): ReactElement => {
     const i18n = useI18N();
-    const [countdownTime, setCountdownTime] = useState<string>('2026-05-05T18:00');
+    const [countdownTime, setCountdownTime] = useState<string>(
+        fromLocalDateTimeOr(LocalDateTime.now(), editedSlideshow.countdownTarget),
+    );
     const [useCountdown, setUseCountdown] = useState<boolean>(!!editedSlideshow.countdownTarget);
 
     useEffect(() => {
         if (useCountdown) {
-            // TODO Alter countdown
+            const target = toLocalDateTime(countdownTime);
+            onAddChange(new TargetChangeEvent(target));
         } else if (editedSlideshow.countdownTarget) {
             onAddChange(new TargetChangeEvent(null));
         }

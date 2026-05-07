@@ -16,7 +16,7 @@ import {
 import { emptySlideshow, Slideshow } from './Slideshow';
 import { CHANGE_SET_SIZE } from '../settings.ts';
 import { Stack } from '../utils/Stack.ts';
-import { asHtml } from './Html.ts';
+import { toHtmlData } from './Html.ts';
 
 // ── helpers ────────────────────────────────────────────────────────────────
 
@@ -24,7 +24,7 @@ function emptySlideShowWithSlides(count: number): Slideshow {
     const show = emptySlideshow();
     const slides = Array.from({ length: count }, () => ({
         id: crypto.randomUUID(),
-        content: asHtml('<p>slide</p>'),
+        content: toHtmlData('<p>slide</p>'),
     }));
     return { ...show, slides };
 }
@@ -227,7 +227,7 @@ describe('AddSlideEvent', () => {
 
     it('creates slide with default HTML content when called without args', () => {
         const result = new AddSlideEvent().apply(emptySlideshow());
-        expect(result.slides[0].content).toBe(asHtml());
+        expect(result.slides[0].content).toBe(toHtmlData());
     });
 });
 

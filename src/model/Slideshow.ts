@@ -1,8 +1,7 @@
-import { Slide, SlideId } from './Slide.ts';
+import { Slide } from './Slide.ts';
 import { LocalDateTime } from '@js-joda/core';
-import { Html } from './Presentation.ts';
-
-export type SlideShowId = `${string}-${string}-${string}-${string}-${string}`;
+import { HtmlData } from './Html.ts';
+import { generateUuidV4, UuidV4 } from './UuidV4.ts';
 
 /**
  * Container for the entire slideshow
@@ -11,7 +10,7 @@ export interface Slideshow {
     /**
      * Unique ID of the current slideshow
      */
-    readonly id: SlideShowId,
+    readonly id: UuidV4,
     /**
      * All slides that will be displayed
      */
@@ -24,7 +23,7 @@ export interface Slideshow {
 
 export function emptySlideshow(): Slideshow {
     return {
-        id: crypto.randomUUID(),
+        id: generateUuidV4(),
         slides: [],
         countdownTarget: null,
     };
@@ -33,7 +32,7 @@ export function emptySlideshow(): Slideshow {
 /**
  * Tries to fetch the content of a slide with the given ID within the slideshow
  */
-export function findSlideContent(slideshow?: Slideshow | null, slideId?: SlideId | null): Html | null {
+export function findSlideContent(slideshow?: Slideshow | null, slideId?: UuidV4 | null): HtmlData | null {
     if (!slideshow || !slideId) {
         return null;
     }
