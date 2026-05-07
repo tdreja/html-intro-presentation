@@ -10,6 +10,11 @@
     height: 100vh;
 }
 
+.carousel-inner {
+    padding-left: 2em;
+    padding-right: 2em;
+}
+
 .carousel-item {
     font-size: 2rem;
 }

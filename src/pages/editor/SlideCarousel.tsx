@@ -6,6 +6,7 @@ import { AddSlideEvent, ChangeEvent, RemoveSlideEvent } from '../../model/Change
 import { Button, ButtonGroup, Dropdown } from 'react-bootstrap';
 import { useI18N } from '../../i18n/I18NContext.tsx';
 import { UuidV4 } from '../../model/UuidV4.ts';
+import { templates } from '../../templates.ts';
 
 type SlideProps = {
     slide: Slide,
@@ -90,7 +91,14 @@ export const SlideCarousel = ({
                     </Button>
                     <Dropdown.Toggle variant="outline-primary"></Dropdown.Toggle>
                     <Dropdown.Menu>
-                        <Dropdown.Item>Test</Dropdown.Item>
+                        {templates.map((template) => (
+                            <Dropdown.Item
+                                key={template.label}
+                                onClick={() => onAddChange(new AddSlideEvent(template.template(i18n)))}
+                            >
+                                {template.label}
+                            </Dropdown.Item>
+                        ))}
                     </Dropdown.Menu>
                 </Dropdown>
             </div>
