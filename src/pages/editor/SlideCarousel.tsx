@@ -50,16 +50,12 @@ const SlidePreview = ({
     );
 };
 
-type SlideCarouselProps = EditorProps & {
-    onChangeEditedSlideId: (slideId: UuidV4 | null) => void,
-};
-
 export const SlideCarousel = ({
     editedSlideshow,
     editedSlideId,
     onAddChange,
     onChangeEditedSlideId,
-}: SlideCarouselProps): ReactElement => {
+}: EditorProps): ReactElement => {
     const i18n = useI18N();
     return (
         <div id="slide-carousel">

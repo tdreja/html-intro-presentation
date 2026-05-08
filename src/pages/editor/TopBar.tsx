@@ -1,8 +1,18 @@
 import React, { ReactElement } from 'react';
 import { EditorProps } from './EditorProps.ts';
 import { useI18N } from '../../i18n/I18NContext.tsx';
+import { stringify } from 'yaml';
+import { toYaml } from '../../model/YamlModel.ts';
 
-export const TopBar = ({ }: EditorProps): ReactElement => {
+function downloadYaml(yaml: string, fileName: string) {
+    const href = document.createElement('a');
+    href.download = fileName;
+    const url = URL.createObjectURL(new Blob([yaml], { type: 'application/yaml' }));
+    href.href = url;
+    href.click();
+}
+
+export const TopBar = ({ onChangeEditedSlideId }: EditorProps): ReactElement => {
     const i18n = useI18N();
     return (
         <div id="top-bar">
@@ -11,7 +21,13 @@ export const TopBar = ({ }: EditorProps): ReactElement => {
                 {i18n.editor.titleSlideshowEditor}
             </span>
 
-            <button className="btn btn-primary">
+            <button
+                className="btn btn-primary"
+                onClick={() => {
+                    const slideshow = onChangeEditedSlideId(null);
+                    downloadYaml(stringify(toYaml(slideshow)), 'slideshow.yaml');
+                }}
+            >
                 <span className="material-symbols-outlined">download</span>
                 {i18n.editor.btnDownloadSlideshow}
             </button>

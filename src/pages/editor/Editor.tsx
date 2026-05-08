@@ -21,6 +21,7 @@ import { checkForSlideContentChanges, mergeAdditionalChanges } from './EditorOpe
 import { emptyHtmlParagraph } from '../../model/Html.ts';
 import { Route } from '../../model/Route.ts';
 import { UuidV4 } from '../../model/UuidV4.ts';
+import { stringify } from 'yaml';
 
 export const Editor = (): ReactElement => {
     // Attach to the overall UI
@@ -84,19 +85,18 @@ export const Editor = (): ReactElement => {
     const onChangeEditedSlideId = useCallback((slideId: UuidV4 | null) => {
         const check = onCheckSlideContent(slideId);
         const newChangeSet = mergeAdditionalChanges(changeSet, check, null);
-        onApplyChanges(newChangeSet, slideId);
+        return onApplyChanges(newChangeSet, slideId);
     }, [changeSet, editedSlideId, setEditedSlideId, onCheckSlideContent, onApplyChanges]);
 
     const onStartSlideshow = useCallback(() => {
-        // Check for any missing changes!
-        const check = onCheckSlideContent(null);
-        const newChangeSet = mergeAdditionalChanges(changeSet, check, null);
-        const newSlideshow = onApplyChanges(newChangeSet, null);
-
+        const newSlideshow = onChangeEditedSlideId(null);
         // Apply the new data and start the presentation!
         setSlideshow(newSlideshow);
         setRoute(Route.PRESENTATION);
-    }, [onCheckSlideContent, onApplyChanges, setRoute, setSlideshow]);
+
+        // Also store the slideshow in the localstorage
+        localStorage.setItem('slideshow', stringify(newSlideshow));
+    }, [onChangeEditedSlideId, setRoute, setSlideshow]);
 
     // Reset the editor, if the slideshow was changed!
     useEffect(() => {
@@ -117,6 +117,7 @@ export const Editor = (): ReactElement => {
                 onAddChange={onAddChange}
                 onRedoLastChange={onRedoLastChange}
                 onUndoLastChange={onUndoLastChange}
+                onChangeEditedSlideId={onChangeEditedSlideId}
             />
 
             {/* ══ EDITOR AREA ══ */}
@@ -144,6 +145,7 @@ export const Editor = (): ReactElement => {
                     onAddChange={onAddChange}
                     onRedoLastChange={onRedoLastChange}
                     onUndoLastChange={onUndoLastChange}
+                    onChangeEditedSlideId={onChangeEditedSlideId}
                 />
 
             </div>
@@ -158,6 +160,7 @@ export const Editor = (): ReactElement => {
                 onRedoLastChange={onRedoLastChange}
                 onUndoLastChange={onUndoLastChange}
                 onStartSlideshow={onStartSlideshow}
+                onChangeEditedSlideId={onChangeEditedSlideId}
             />
         </div>
     );
