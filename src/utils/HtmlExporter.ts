@@ -1,6 +1,22 @@
 const startComment = '/*** Slideshow Start ***/';
 const endComment = '/*** Slideshow End ***/';
 
+export function openCurrentDocument(): string {
+    const xml = new XMLSerializer();
+    return `
+        <!doctype html>
+        <html lang="en" data-bs-theme="dark">
+            ${xml.serializeToString(document.head)
+                .replaceAll('&gt;', '>')
+                .replaceAll('&lt;', '<')
+                .replaceAll('&amp;', '&')}
+            <body>
+                <div id="root"></div>
+            </body>
+        </html>
+    `;
+}
+
 export function alterHtml(html: string, newContent: string): string {
     const startIndex = html.indexOf(startComment);
     const endIndex = html.indexOf(endComment);
