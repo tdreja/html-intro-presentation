@@ -1,13 +1,13 @@
 import { describe, expect, it } from '@jest/globals';
 import { ChangeEvent, UpdateSlideContentEvent } from '../../model/ChangeEvent.ts';
 import { updateSlideContent } from './UpdateSlideContent.ts';
-import { SlideId } from '../../model/Slide.ts';
 import { emptySlideshow, Slideshow } from '../../model/Slideshow.ts';
-import { asHtml } from '../../model/Html.ts';
+import { toHtmlData } from '../../model/Html.ts';
+import { UuidV4 } from '../../model/UuidV4.ts';
 
 describe('UpdateSlideContent', () => {
-    const slideIdA: SlideId = crypto.randomUUID();
-    const slideIdB: SlideId = crypto.randomUUID();
+    const slideIdA: UuidV4 = crypto.randomUUID();
+    const slideIdB: UuidV4 = crypto.randomUUID();
 
     let events: Array<ChangeEvent> = [];
     const onAddChange = (event: ChangeEvent) => events.push(event);
@@ -49,8 +49,8 @@ describe('UpdateSlideContent', () => {
 
     // --- Slides present in slideShow ---
 
-    const contentA = asHtml('<p>Hello A</p>');
-    const contentB = asHtml('<p>Hello B</p>');
+    const contentA = toHtmlData('<p>Hello A</p>');
+    const contentB = toHtmlData('<p>Hello B</p>');
     const slideShowWithSlides: Slideshow = {
         ...emptySlideshow(),
         slides: [
@@ -108,7 +108,7 @@ describe('UpdateSlideContent', () => {
 
     it('lastEditedSlideId=null, editedSlideId unknown, content non-empty → fires event, resets (slide not found)', () => {
         events = [];
-        const unknownId: SlideId = crypto.randomUUID();
+        const unknownId: UuidV4 = crypto.randomUUID();
         const newContent = '<p>Unknown</p>';
         const result = updateSlideContent(slideShowWithSlides, unknownId, onAddChange, null, newContent);
         // overrideSlideContent set but slide not in show → reset

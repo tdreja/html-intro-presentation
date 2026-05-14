@@ -1,22 +1,21 @@
 import { LocalDateTime } from '@js-joda/core';
 import { Slideshow } from './Slideshow.ts';
-import { Slide, SlideId } from './Slide.ts';
+import { Slide } from './Slide.ts';
 import { CHANGE_SET_SIZE } from '../settings.ts';
 import { I18N } from '../i18n/I18N.ts';
 import { Stack } from '../utils/Stack.ts';
-import { asHtml, HtmlData } from './Html.ts';
-
-export type ChangeEventId = `${string}-${string}-${string}-${string}-${string}`;
+import { HtmlData, toHtmlData } from './Html.ts';
+import { UuidV4 } from './UuidV4.ts';
 
 export interface ChangeEvent {
     /**
      * Unique ID of the event itself
      */
-    readonly id: ChangeEventId,
+    readonly id: UuidV4,
     /**
      * Is the event moving the UI to another slide?
      */
-    readonly moveToSlide: SlideId | null,
+    readonly moveToSlide: UuidV4 | null,
     /**
      * Apply the event to the slideshow
      */
@@ -89,19 +88,19 @@ export function redoLastChange(changes: ChangeSet): ChangeSet {
 }
 
 abstract class AbstractChangeEvent implements ChangeEvent {
-    protected readonly _id: ChangeEventId;
-    protected readonly _moveToSlide: SlideId | null;
+    protected readonly _id: UuidV4;
+    protected readonly _moveToSlide: UuidV4 | null;
 
-    protected constructor(moveToSlide: SlideId | null) {
+    protected constructor(moveToSlide: UuidV4 | null) {
         this._id = crypto.randomUUID();
         this._moveToSlide = moveToSlide;
     }
 
-    public get id(): ChangeEventId {
+    public get id(): UuidV4 {
         return this._id;
     }
 
-    public get moveToSlide(): SlideId | null {
+    public get moveToSlide(): UuidV4 | null {
         return this._moveToSlide;
     }
 
@@ -137,11 +136,11 @@ export class AddSlideEvent extends AbstractChangeEvent {
         super(crypto.randomUUID());
         this._slide = {
             id: this._moveToSlide!,
-            content: asHtml(content),
+            content: toHtmlData(content),
         };
     }
 
-    public get moveToSlide(): SlideId {
+    public get moveToSlide(): UuidV4 {
         return this._moveToSlide!;
     }
 
@@ -158,8 +157,8 @@ export class AddSlideEvent extends AbstractChangeEvent {
 }
 
 export class RemoveSlideEvent extends AbstractChangeEvent {
-    private readonly _removedSlide: SlideId;
-    public constructor(id: SlideId) {
+    private readonly _removedSlide: UuidV4;
+    public constructor(id: UuidV4) {
         super(null);
         this._removedSlide = id;
     }
@@ -184,12 +183,12 @@ export class RemoveSlideEvent extends AbstractChangeEvent {
 export class UpdateSlideContentEvent extends AbstractChangeEvent {
     private readonly _content: HtmlData;
 
-    public constructor(id: SlideId, content?: string | null) {
+    public constructor(id: UuidV4, content?: string | null) {
         super(id);
-        this._content = asHtml(content);
+        this._content = toHtmlData(content);
     }
 
-    public get moveToSlide(): SlideId {
+    public get moveToSlide(): UuidV4 {
         return this._moveToSlide!;
     }
 

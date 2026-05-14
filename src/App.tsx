@@ -14,7 +14,7 @@ function App() {
     }, []);
 
     // Route Status
-    const routeState = useState(() => parseCurrentRoute());
+    const routeState = useState<Route>(parseCurrentRoute());
     const [route, setRoute] = routeState;
     useEffect(() => {
         const handler = () => setRoute(parseCurrentRoute());

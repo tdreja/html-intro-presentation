@@ -30,7 +30,8 @@ export const SlideEditor = ({
                     toolbar: [
                         [{ header: 1 }, { header: 2 }, { header: 3 }],
                         ['bold', 'italic', 'underline'],
-                        [{ align: [] }],
+                        [{ align: null }, { align: 'center' }, { align: 'right' }],
+                        [{ indent: '-1' }, { indent: '+1' }],
                         ['image'],
                         ['clean'],
                     ],

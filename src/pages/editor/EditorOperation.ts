@@ -1,7 +1,7 @@
 import { addChange, ChangeEvent, ChangeSet, emptyChangeSet, UpdateSlideContentEvent } from '../../model/ChangeEvent.ts';
 import { findSlideContent, Slideshow } from '../../model/Slideshow.ts';
-import { SlideId } from '../../model/Slide.ts';
 import { isEmptyHtml } from '../../model/Html.ts';
+import { UuidV4 } from '../../model/UuidV4.ts';
 
 /**
  * Additional changes from the html content of the slide before completing the change operation
@@ -27,9 +27,9 @@ const noChanges: AdditionalChange = {
  */
 export function checkForSlideContentChanges(
     slideshow: Slideshow,
-    editedSlideId: SlideId | null,
+    editedSlideId: UuidV4 | null,
     editorContent: string,
-    moveToSlideId?: SlideId | null,
+    moveToSlideId?: UuidV4 | null,
 ): AdditionalChange {
     // Skip any checks if we don't have any relevant content!
     if (isEmptyHtml(editorContent)) {

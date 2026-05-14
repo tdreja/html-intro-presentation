@@ -1,17 +1,19 @@
 import React, { ReactElement } from 'react';
 import { EditorProps } from './EditorProps.ts';
-import { Slide, SlideId } from '../../model/Slide.ts';
+import { Slide } from '../../model/Slide.ts';
 import { DisplayHtml } from '../../component/DisplayHtml.tsx';
 import { AddSlideEvent, ChangeEvent, RemoveSlideEvent } from '../../model/ChangeEvent.ts';
 import { Button, ButtonGroup, Dropdown } from 'react-bootstrap';
 import { useI18N } from '../../i18n/I18NContext.tsx';
+import { UuidV4 } from '../../model/UuidV4.ts';
+import { templates } from '../../templates.ts';
 
 type SlideProps = {
     slide: Slide,
     current: boolean,
     index: number,
     onAddChange: (ev: ChangeEvent) => void,
-    onChangeEditedSlideId: (slideId: SlideId | null) => void,
+    onChangeEditedSlideId: (slideId: UuidV4 | null) => void,
 };
 
 const SlidePreview = ({
@@ -48,16 +50,12 @@ const SlidePreview = ({
     );
 };
 
-type SlideCarouselProps = EditorProps & {
-    onChangeEditedSlideId: (slideId: SlideId | null) => void,
-};
-
 export const SlideCarousel = ({
     editedSlideshow,
     editedSlideId,
     onAddChange,
     onChangeEditedSlideId,
-}: SlideCarouselProps): ReactElement => {
+}: EditorProps): ReactElement => {
     const i18n = useI18N();
     return (
         <div id="slide-carousel">
@@ -89,7 +87,14 @@ export const SlideCarousel = ({
                     </Button>
                     <Dropdown.Toggle variant="outline-primary"></Dropdown.Toggle>
                     <Dropdown.Menu>
-                        <Dropdown.Item>Test</Dropdown.Item>
+                        {templates.map((template) => (
+                            <Dropdown.Item
+                                key={template.label}
+                                onClick={() => onAddChange(new AddSlideEvent(template.template(i18n)))}
+                            >
+                                {template.label}
+                            </Dropdown.Item>
+                        ))}
                     </Dropdown.Menu>
                 </Dropdown>
             </div>

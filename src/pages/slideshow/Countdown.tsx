@@ -1,8 +1,7 @@
-import React, { ReactElement, useContext, useEffect, useState } from 'react';
+import React, { ReactElement, useCallback, useContext, useEffect, useState } from 'react';
 import { SlideshowContext } from '../../component/SlideshowContext.ts';
 import { ChronoUnit, Duration, LocalDateTime } from '@js-joda/core';
-
-const COUNTDOWN_REFRESH_INTERVAL = Duration.ofMillis(250);
+import { COUNTDOWN_REFRESH_INTERVAL, HIGHLIGHT_COUNTDOWN_INTERVAL } from '../../settings.ts';
 
 function formatTimeRemaining(duration: Duration): string {
     if (duration.isZero() || duration.isNegative()) {
@@ -17,25 +16,49 @@ function formatTimeRemaining(duration: Duration): string {
     return `${minutes}:${seconds}`;
 }
 
-export const Countdown = (): ReactElement | undefined => {
+export const Countdown = (): ReactElement => {
     const [slideshow] = useContext(SlideshowContext);
     const [timeRemaining, setTimeRemaining] = useState<Duration>(Duration.ZERO);
+    const [highlightCountdown, setHighlightCountdown] = useState<boolean>(false);
+
+    const onRecalculateTimeRemaining = useCallback(() => {
+        if (!slideshow.countdownTarget) {
+            return;
+        }
+        const remaining
+            = Duration.ofMillis(LocalDateTime.now().until(slideshow.countdownTarget, ChronoUnit.MILLIS));
+
+        // We never store negative durations as state!
+        if (remaining.isZero() || remaining.isNegative()) {
+            setTimeRemaining(Duration.ZERO);
+            return;
+        }
+
+        // Calculate if we need to highlight the countdown!
+        if (!HIGHLIGHT_COUNTDOWN_INTERVAL.isZero() && remaining.compareTo(HIGHLIGHT_COUNTDOWN_INTERVAL) <= 0) {
+            setHighlightCountdown(true);
+        }
+        setTimeRemaining(remaining);
+    }, [slideshow, setTimeRemaining, setHighlightCountdown]);
 
     useEffect(() => {
-        const target = slideshow.countdownTarget;
-        if (target) {
-            const updateCountdown = setInterval(() => {
-                setTimeRemaining(Duration.ofMillis(target.until(LocalDateTime.now(), ChronoUnit.MILLIS)));
-            }, COUNTDOWN_REFRESH_INTERVAL.toMillis());
+        if (slideshow.countdownTarget) {
+            const updateCountdown
+                = setInterval(onRecalculateTimeRemaining, COUNTDOWN_REFRESH_INTERVAL.toMillis());
+            setHighlightCountdown(false);
+            onRecalculateTimeRemaining();
             return () => clearInterval(updateCountdown);
         }
     }, [slideshow]);
 
     // Skip any missing countdowns
     if (!slideshow.countdownTarget) {
-        return undefined;
+        return (<span className="countdown" />);
+    }
+    if (highlightCountdown) {
+        return (<h1 className="countdown">{formatTimeRemaining(timeRemaining)}</h1>);
     }
     return (
-        <span>{formatTimeRemaining(timeRemaining)}</span>
+        <h2 className="countdown">{formatTimeRemaining(timeRemaining)}</h2>
     );
 };

@@ -1,5 +1,3 @@
-import { Html } from './Presentation.ts';
-
 /**
  * Container for HTML content
  */
@@ -10,7 +8,7 @@ export const emptyHtmlParagraph: HtmlData = '<p></p>';
 /**
  * Wraps the given content as HTML
  */
-export function asHtml(value?: string | null): HtmlData {
+export function toHtmlData(value?: string | null): HtmlData {
     if (!value || value.length === 0) {
         return emptyHtmlParagraph;
     }
@@ -20,7 +18,7 @@ export function asHtml(value?: string | null): HtmlData {
     return `<div>${value}</div>` as HtmlData;
 }
 
-export function isEmptyHtml(value?: string | Html | null): boolean {
+export function isEmptyHtml(value?: string | HtmlData | null): boolean {
     // Actual empty or undefined strings?
     if (!value || value.length === 0) {
         return true;
