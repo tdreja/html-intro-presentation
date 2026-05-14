@@ -5,6 +5,7 @@ import { importFileList } from '../../utils/FileListLoader.ts';
 import { alterHtml, openCurrentDocument } from '../../utils/HtmlExporter.ts';
 import { stringify } from 'yaml';
 import { toYaml } from '../../model/YamlModel.ts';
+import { Button } from 'react-bootstrap';
 
 function downloadHtmlFile(yaml: string, fileName: string) {
     const href = document.createElement('a');
@@ -39,12 +40,6 @@ export const TopBar = ({ onChangeEditedSlideId }: EditorProps): ReactElement => 
                 {i18n.editor.titleSlideshowEditor}
             </span>
 
-            <span
-                onClick={onExportSlideshow}
-            >
-                Test
-            </span>
-
             <div
                 className="row"
             >
@@ -52,7 +47,7 @@ export const TopBar = ({ onChangeEditedSlideId }: EditorProps): ReactElement => 
                     htmlFor="uploadHtmlFile"
                     className="form-label"
                 >
-                    {i18n.editor.titleExportSlideshow}
+                    Temp
                 </label>
                 <input
                     type="file"
@@ -64,6 +59,11 @@ export const TopBar = ({ onChangeEditedSlideId }: EditorProps): ReactElement => 
                     placeholder="Quiz Datei ablegen"
                 />
             </div>
+
+            <Button onClick={onExportSlideshow} variant="outline-primary">
+                <span className="material-symbols-outlined">download</span>
+                {i18n.editor.btnExportSlideshow}
+            </Button>
         </div>
     );
 };

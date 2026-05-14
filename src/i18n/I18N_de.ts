@@ -7,7 +7,7 @@ export const I18N_de: I18N = {
         titleSlideshowEditor: 'Präsentations-Editor',
         titleSlides: 'Folien',
         titleSlide: 'Folie',
-        titleExportSlideshow: 'Präsentation in Datei exportieren',
+        btnExportSlideshow: 'Präsentation exportieren',
         formCheckboxWithCountdown: 'Mit Countdown?',
         formDatePickerCountdown: 'Countdown Ende',
         btnUndo: 'Rückgängig',

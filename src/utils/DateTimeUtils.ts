@@ -1,7 +1,7 @@
 import { DateTimeFormatter, LocalDateTime, nativeJs } from '@js-joda/core';
 import { YamlLocalDateTime } from '../model/YamlModel.ts';
 
-const FORM_FORMAT: DateTimeFormatter = DateTimeFormatter.ofPattern('yyyy-MM-dd\'T\'HH:mm');
+const FORM_FORMAT: DateTimeFormatter = DateTimeFormatter.ofPattern('yyyy-MM-dd\'T\'HH:mm:ss');
 
 export function toLocalDateTime(input?: YamlLocalDateTime | null): LocalDateTime | null {
     if (!input) {

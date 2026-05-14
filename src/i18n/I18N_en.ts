@@ -7,7 +7,7 @@ export const I18N_en: I18N = {
         titleSlideshowEditor: 'Slideshow editor',
         titleSlides: 'Slides',
         titleSlide: 'Slide',
-        titleExportSlideshow: 'Export slideshow into file',
+        btnExportSlideshow: 'Export slideshow',
         formCheckboxWithCountdown: 'Form checkbox with countdown',
         formDatePickerCountdown: 'From date picker countdown',
         btnUndo: 'Undo',
