@@ -8,6 +8,8 @@ import { parse } from 'yaml';
  * Automatically stores the current presentation in the browsers storage
  */
 export function useStoredSlideshow(): SlideshowState {
+    const data = window.SLIDESHOW;
+    console.log('Init data', data);
     const state = useState(emptySlideshow());
     const [_, setSlideshow] = state;
     useEffect(() => {

@@ -4,16 +4,12 @@
 export interface EditorI18N {
     btnStartSlideshow: string,
     btnAddSlide: string,
-    btnDownloadSlideshow: string,
-    btnUploadSlideshow: string,
-    btnUploadImagesAsSlides: string,
     btnUndo: string,
     btnRedo: string,
     titleSlideshowEditor: string,
-    titleUploadSlideshow: string,
-    titleUploadImagesAsSlides: string,
     titleSlides: string,
     titleSlide: string,
+    titleExportSlideshow: string,
     formCheckboxWithCountdown: string,
     formDatePickerCountdown: string,
 }
