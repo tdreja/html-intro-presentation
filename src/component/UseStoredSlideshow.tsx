@@ -12,8 +12,19 @@ export function useStoredSlideshow(): SlideshowState {
     const [_, setSlideshow] = state;
     useEffect(() => {
         const json = localStorage.getItem('slideshow');
-        if (json) {
-            setSlideshow(fromYaml(parse(json)));
+        const jsonSlideshow = json ? fromYaml(parse(json)) : null;
+        const data = window.SLIDESHOW;
+        const dataSlideshow = data ? fromYaml(parse(data)) : null;
+
+        // Pick the most current possible slideshow!
+        if (jsonSlideshow) {
+            if (dataSlideshow && jsonSlideshow.lastUpdate.isBefore(dataSlideshow.lastUpdate)) {
+                setSlideshow(dataSlideshow);
+            } else {
+                setSlideshow(jsonSlideshow);
+            }
+        } else if (dataSlideshow) {
+            setSlideshow(dataSlideshow);
         }
     }, []);
     return state;

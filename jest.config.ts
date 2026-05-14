@@ -12,6 +12,7 @@ const config: JestConfigWithTsJest = {
                 rootDir: './src',
                 ignoreDeprecations: '6.0',
                 jsx: 'react',
+                types: ['jest'],
             },
         }],
     },

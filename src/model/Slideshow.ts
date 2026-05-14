@@ -3,6 +3,8 @@ import { LocalDateTime } from '@js-joda/core';
 import { HtmlData } from './Html.ts';
 import { generateUuidV4, UuidV4 } from './UuidV4.ts';
 
+export const earliestSlideshow = LocalDateTime.of(2025, 1, 1, 0, 0);
+
 /**
  * Container for the entire slideshow
  */
@@ -11,6 +13,10 @@ export interface Slideshow {
      * Unique ID of the current slideshow
      */
     readonly id: UuidV4,
+    /**
+     * Last update of the slideshow
+     */
+    readonly lastUpdate: LocalDateTime,
     /**
      * All slides that will be displayed
      */
@@ -24,6 +30,7 @@ export interface Slideshow {
 export function emptySlideshow(): Slideshow {
     return {
         id: generateUuidV4(),
+        lastUpdate: earliestSlideshow,
         slides: [],
         countdownTarget: null,
     };

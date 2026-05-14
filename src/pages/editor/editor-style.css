@@ -47,6 +47,7 @@ body {
     display: flex;
     align-items: center;
     gap: 1.25rem;
+    justify-content: space-between;
 }
 .upload-group {
     display: flex;

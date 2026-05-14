@@ -1,4 +1,4 @@
-import { emptySlideshow, Slideshow } from './Slideshow.ts';
+import { earliestSlideshow, emptySlideshow, Slideshow } from './Slideshow.ts';
 import { Slide } from './Slide.ts';
 import { toUuidV4OrRandom } from './UuidV4.ts';
 import { toHtmlData } from './Html.ts';
@@ -25,6 +25,7 @@ export interface YamlSlideshow {
     readonly id?: string | null,
     readonly slides?: Array<YamlSlide | null | undefined> | null,
     readonly countdownTarget?: YamlLocalDateTime | null,
+    readonly lastUpdate?: YamlLocalDateTime | null,
 }
 
 function toYamlSlide(slide: Slide): YamlSlide {
@@ -38,6 +39,7 @@ export function toYaml(slideshow: Slideshow): YamlSlideshow {
         id: slideshow.id,
         slides: slideshow.slides.map(toYamlSlide),
         countdownTarget: slideshow.countdownTarget ? fromLocalDateTime(slideshow.countdownTarget) : null,
+        lastUpdate: slideshow.lastUpdate ? fromLocalDateTime(slideshow.lastUpdate) : earliestSlideshow,
     };
 }
 
@@ -55,9 +57,11 @@ export function fromYaml(yaml?: YamlSlideshow | null): Slideshow {
         }
     }
     const countdownTarget = toLocalDateTime(yaml.countdownTarget);
+    const lastUpdate = toLocalDateTime(yaml.lastUpdate)!;
     return {
         id,
         slides,
         countdownTarget,
+        lastUpdate,
     };
 }

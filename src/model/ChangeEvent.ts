@@ -121,6 +121,7 @@ export class TargetChangeEvent extends AbstractChangeEvent {
         return {
             ...slideShow,
             countdownTarget: this._target,
+            lastUpdate: LocalDateTime.now(),
         };
     }
 
@@ -148,6 +149,7 @@ export class AddSlideEvent extends AbstractChangeEvent {
         return {
             ...slideShow,
             slides: [...slideShow.slides, this._slide],
+            lastUpdate: LocalDateTime.now(),
         };
     }
 
@@ -172,6 +174,7 @@ export class RemoveSlideEvent extends AbstractChangeEvent {
         return {
             ...slideShow,
             slides: slides,
+            lastUpdate: LocalDateTime.now(),
         };
     }
 
@@ -207,6 +210,7 @@ export class UpdateSlideContentEvent extends AbstractChangeEvent {
         return {
             ...slideShow,
             slides: slides,
+            lastUpdate: LocalDateTime.now(),
         };
     }
 
