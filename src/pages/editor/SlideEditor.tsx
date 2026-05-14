@@ -1,8 +1,7 @@
-import React, { Dispatch, ReactElement, SetStateAction } from 'react';
+import React, { Dispatch, ReactElement, SetStateAction, useEffect, useRef } from 'react';
 import { EditorProps } from './EditorProps.ts';
-import ReactQuill from 'react-quill-new';
-import 'react-quill-new/dist/quill.snow.css';
 import { useI18N } from '../../i18n/I18NContext.tsx';
+import { createEditor, NotectlEditor } from '@notectl/core';
 
 type SlideEditorProps = EditorProps & {
     setEditedSlideContent: Dispatch<SetStateAction<string>>,
@@ -17,26 +16,41 @@ export const SlideEditor = ({
     const i18n = useI18N();
     const slideIndex
         = (editedSlideId && editedSlideshow.slides.findIndex((s) => s.id === editedSlideId) + 1) || 0;
-    return (
-        <div id="slide-editor-wrapper">
-            {slideIndex > 0 && (
-                <h6>{`${i18n.editor.titleSlide} ${slideIndex}`}</h6>
-            )}
-            <ReactQuill
-                theme="snow"
-                value={editedSlideContent}
-                onChange={setEditedSlideContent}
-                modules={{
-                    toolbar: [
-                        [{ header: 1 }, { header: 2 }, { header: 3 }],
-                        ['bold', 'italic', 'underline'],
-                        [{ align: null }, { align: 'center' }, { align: 'right' }],
-                        [{ indent: '-1' }, { indent: '+1' }],
-                        ['image'],
-                        ['clean'],
-                    ],
-                }}
-            />
-        </div>
-    );
+
+    const containerRef = useRef<HTMLDivElement>(null);
+    const editorRef = useRef<NotectlEditor | null>(null);
+
+    useEffect(() => {
+        let mounted = true;
+
+        createEditor({
+            placeholder: 'Start typing...',
+            autofocus: true,
+        }).then((editor) => {
+            if (!mounted || !containerRef.current) {
+                return;
+            }
+            containerRef.current.appendChild(editor);
+            editorRef.current = editor;
+            editor.on('stateChange', () => {
+                editor.getContentHTML().then((html) => {
+                    setEditedSlideContent(html);
+                });
+            });
+        });
+
+        return () => {
+            mounted = false;
+            void editorRef.current?.destroy();
+        };
+    }, []);
+
+    useEffect(() => {
+        if (editorRef.current) {
+            editorRef.current.setContentHTML(editedSlideContent)
+                .then(() => {});
+        }
+    }, [editorRef, editedSlideId]);
+
+    return (<div ref={containerRef} />);
 };
