@@ -2,6 +2,7 @@ import React, { Dispatch, ReactElement, SetStateAction, useEffect, useRef } from
 import { EditorProps } from './EditorProps.ts';
 import { useI18N } from '../../i18n/I18NContext.tsx';
 import { createEditor, NotectlEditor } from '@notectl/core';
+import { editorConfiguration } from './EditorConfiguration.ts';
 
 type SlideEditorProps = EditorProps & {
     setEditedSlideContent: Dispatch<SetStateAction<string>>,
@@ -23,10 +24,7 @@ export const SlideEditor = ({
     useEffect(() => {
         let mounted = true;
 
-        createEditor({
-            placeholder: 'Start typing...',
-            autofocus: true,
-        }).then((editor) => {
+        createEditor(editorConfiguration).then((editor) => {
             if (!mounted || !containerRef.current) {
                 return;
             }
@@ -38,7 +36,6 @@ export const SlideEditor = ({
                 });
             });
         });
-
         return () => {
             mounted = false;
             void editorRef.current?.destroy();
@@ -52,5 +49,5 @@ export const SlideEditor = ({
         }
     }, [editorRef, editedSlideId]);
 
-    return (<div ref={containerRef} />);
+    return (<div ref={containerRef} style={{ width: '100%' }} />);
 };

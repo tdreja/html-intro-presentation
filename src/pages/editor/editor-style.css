@@ -27,6 +27,24 @@ body {
     flex-direction: column;
 }
 
+notectl-editor {
+    --notectl-bg: var(--bs-body-bg);
+    --notectl-fg: var(--bs-body-color);
+    --notectl-fg-muted: var(--bs-secondary-color);
+    --notectl-border: var(--bs-border-color);
+    --notectl-border-focus: var(--bs-border-color-translucent);
+    --notectl-primary: var(--bs-primary);
+    --notectl-primary-fg: var(--bs-body-color);
+    --notectl-primary-muted: var(--bs-primary);
+    --notectl-toolbar-bg: var(--bs-body-bg);
+    --notectl-toolbar-border: var(--bs-border-color);
+    --notectl-active-bg: var(--bs-primary);
+    --notectl-surface-overlay: var(--bs-body-bg);
+    --notectl-surface-raised: var(--bs-body-bg);
+    --notectl-hover-bg: var(--bs-primary);
+    --notectl-focus-ring: var(--bs-body-bg);
+}
+
 /* ── Material Symbols ── */
 .material-symbols-outlined {
     font-size: 1.2em;
@@ -133,6 +151,9 @@ body {
 .thumb-preview img {
     max-width: 2.2vw;
     max-height: 2.2vh;
+    height: unset;
+    width: unset;
+    aspect-ratio: unset;
 }
 
 .slide-thumb.active .thumb-preview {

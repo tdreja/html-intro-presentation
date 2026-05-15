@@ -69,3 +69,8 @@ h6 {
     justify-content: flex-start;
     gap: 0.5em;
 }
+
+figure > img {
+    height: unset;
+    width: unset;
+}
