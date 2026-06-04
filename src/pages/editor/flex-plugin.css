@@ -1,0 +1,14 @@
+/** Flex layout blocks **/
+.flex-layout {
+    display: flex;
+    flex-wrap: wrap;
+    border: 1px solid white;
+}
+.flex-item {
+    box-sizing: border-box;
+    min-height: 1em;
+    border: 1px solid white;
+}
+.flex-item-30 { width: 30%; }
+.flex-item-50 { width: 50%; }
+.flex-item-70 { width: 70%; }
