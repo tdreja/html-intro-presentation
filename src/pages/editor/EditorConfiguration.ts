@@ -4,6 +4,7 @@ import {
     CodeBlockPlugin,
     HardBreakPlugin,
     HeadingPlugin,
+    ListPlugin,
     SmartPastePlugin,
     TablePlugin,
     TextFormattingPlugin,
@@ -21,6 +22,7 @@ export const editorConfiguration: NotectlEditorConfig = {
         })],
         [new Base64ImagePlugin({ resizable: false }), new TablePlugin()],
         [new FlexPlugin()],
+        [new ListPlugin()],
     ],
     plugins: [
         new CodeBlockPlugin(),

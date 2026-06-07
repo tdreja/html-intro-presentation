@@ -8,7 +8,7 @@ export enum FlexWidth {
 }
 
 export class FlexPlugin implements Plugin {
-    readonly id: string = 'flex';
+    readonly id: string = 'flex_item';
     readonly name: string = 'Flex Plugin';
     readonly priority: number = 50;
 
@@ -26,15 +26,16 @@ export class FlexPlugin implements Plugin {
     private registerFlexItemNodeSpec(context: PluginContext): void {
         context.registerNodeSpec({
             type: 'flex_item',
-            group: 'block',
+            group: 'flex_content',
+            isVoid: false,
+            selectable: true,
             content: {
-                allow: ['paragraph', 'list_item', 'heading', 'blockquote', 'image', 'horizontal_rule'],
+                allow: ['paragraph', 'heading', 'blockquote', 'image', 'horizontal_rule', 'list_item'],
                 min: 1,
             },
             attrs: {
                 width: { default: FlexWidth.WIDTH_1_2 },
             },
-            isolating: true,
             toDOM: (node) => {
                 const div = createBlockElement('div', node.id);
                 const width = node.attrs?.width;
@@ -67,7 +68,12 @@ export class FlexPlugin implements Plugin {
             parseHTML: [
                 {
                     tag: 'div',
-                    getAttrs: (el) => ({ width: this.classToWidth(el) }),
+                    getAttrs: (el) => {
+                        if (!el.classList.contains('flex-item')) {
+                            return false;
+                        }
+                        return { width: this.classToWidth(el) };
+                    },
                 },
             ],
             sanitize: {
